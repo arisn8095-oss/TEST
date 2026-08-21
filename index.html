@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>CBT Mobile Secure System</title>
+  <title>CBT Mobile Secure System - Multi Guru & Realtime Google Sheet</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -85,17 +85,37 @@
   </div>
 
   <!-- ================= AUTH GUARD: LOGIN SCREEN ================= -->
-  <section id="loginScreen" class="fixed inset-0 bg-gradient-to-br from-indigo-50 via-slate-50 to-blue-50 z-[500] flex items-center justify-center p-4">
-    <div class="max-w-md w-full bg-white/95 border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-xl backdrop-blur-xl relative overflow-hidden">
+  <section id="loginScreen" class="fixed inset-0 bg-gradient-to-br from-indigo-50 via-slate-50 to-blue-50 z-[500] flex items-center justify-center p-4 overflow-y-auto">
+    <div class="max-w-md w-full bg-white/95 border border-slate-200/80 rounded-3xl p-6 sm:p-8 shadow-xl backdrop-blur-xl relative overflow-hidden my-auto">
       <div class="absolute -top-12 -right-12 w-36 h-36 bg-indigo-100 rounded-full blur-2xl"></div>
       
       <!-- Brand Header -->
-      <div class="text-center mb-6">
+      <div class="text-center mb-5">
         <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white text-2xl shadow-lg shadow-indigo-500/25 mb-3">
           <i class="fa-solid fa-shield-halved"></i>
         </div>
         <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">CBT Mobile Secure</h1>
-        <p class="text-xs text-slate-500 mt-1">Sistem Ujian Mobile Anti-Cheat & Device Binding</p>
+        <p class="text-xs text-slate-500 mt-1">Multi Guru, Multi Murid & Google Sheet Realtime</p>
+      </div>
+
+      <!-- Realtime Google Sheet Indicator Card -->
+      <div class="mb-4 p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 flex items-center justify-between shadow-sm">
+        <div class="flex items-center gap-2 overflow-hidden">
+          <span class="relative flex h-2.5 w-2.5 shrink-0">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+          <div class="truncate">
+            <span class="font-bold text-[11px] block">Database Google Sheet Realtime</span>
+            <span class="text-[10px] text-emerald-700 font-mono truncate block" title="11COcdZ0ATHCgqiEVDIxYTTAlmNOyZsrmR7CzmcQ8U0M">ID: 11COcdZ0ATHCgqiEVDIx...</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="textLastSync" class="text-[9px] text-emerald-700 font-mono hidden sm:inline font-semibold">Sync: Memuat...</span>
+          <button onclick="syncDataFromGoogleSheet()" class="p-1.5 bg-white border border-emerald-300 rounded-lg text-emerald-700 hover:bg-emerald-100 text-xs transition" title="Refresh Sync Sheet">
+            <i class="fa-solid fa-arrows-rotate"></i>
+          </button>
+        </div>
       </div>
 
       <!-- Device Binding Info Box -->
@@ -130,13 +150,16 @@
         </button>
       </form>
 
-      <!-- Quick Demo Account Buttons -->
-      <div class="mt-6 pt-4 border-t border-slate-200 text-center">
-        <p class="text-[11px] text-slate-500 font-medium mb-2">Akun Demo Cepat (Klik untuk Otomatis Isi):</p>
+      <!-- Quick Demo Multi-User Account Buttons -->
+      <div class="mt-5 pt-4 border-t border-slate-200 text-center">
+        <p class="text-[11px] text-slate-500 font-semibold mb-2">Pilih Akun Demo (Multi Guru & Murid):</p>
         <div class="flex flex-wrap justify-center gap-1.5">
-          <button onclick="fillDemo('admin','admin123')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-lg text-[10px] font-bold border border-amber-300 transition">Admin</button>
-          <button onclick="fillDemo('guru_mtk','guru123')" class="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-lg text-[10px] font-bold border border-emerald-300 transition">Guru (MTK)</button>
-          <button onclick="fillDemo('siswa1','siswa123')" class="px-2.5 py-1 bg-sky-50 hover:bg-sky-100 text-sky-800 rounded-lg text-[10px] font-bold border border-sky-300 transition">Murid 1</button>
+          <button onclick="fillDemo('admin','123')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 rounded-lg text-[10px] font-bold border border-amber-300 transition">Admin</button>
+          <button onclick="fillDemo('guru_mtk','123')" class="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-lg text-[10px] font-bold border border-emerald-300 transition">Guru MTK</button>
+          <button onclick="fillDemo('guru_bin','123')" class="px-2.5 py-1 bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg text-[10px] font-bold border border-teal-300 transition">Guru B. Indo</button>
+          <button onclick="fillDemo('guru_fis','123')" class="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 text-purple-800 rounded-lg text-[10px] font-bold border border-purple-300 transition">Guru Fisika</button>
+          <button onclick="fillDemo('siswa1','123')" class="px-2.5 py-1 bg-sky-50 hover:bg-sky-100 text-sky-800 rounded-lg text-[10px] font-bold border border-sky-300 transition">Murid 1</button>
+          <button onclick="fillDemo('siswa2','123')" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 rounded-lg text-[10px] font-bold border border-indigo-300 transition">Murid 2</button>
         </div>
       </div>
     </div>
@@ -153,7 +176,12 @@
         </div>
         <div>
           <h2 class="text-xs font-extrabold text-slate-900 leading-tight">CBT Mobile Secure</h2>
-          <span id="navRoleBadge" class="inline-block text-[9px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-bold border border-indigo-200"></span>
+          <div class="flex items-center gap-1.5 mt-0.5">
+            <span id="navRoleBadge" class="inline-block text-[9px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-bold border border-indigo-200"></span>
+            <span id="syncBadgeNav" class="inline-flex items-center gap-1 text-[9px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200" title="Connected to Google Sheet">
+              <i class="fa-solid fa-cloud text-[8px]"></i> Sheet Live
+            </span>
+          </div>
         </div>
       </div>
 
@@ -162,6 +190,12 @@
           <p id="navUserName" class="text-xs font-bold text-slate-800"></p>
           <p id="navUserDetail" class="text-[10px] text-slate-500 font-medium"></p>
         </div>
+        
+        <!-- Config & Setup GAS Modal Button -->
+        <button onclick="openConfigModal()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 transition" title="Setup Database Google Sheet">
+          <i class="fa-solid fa-gear text-xs"></i>
+        </button>
+
         <button onclick="confirmLogout()" class="p-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 hover:border-rose-200 transition" title="Logout">
           <i class="fa-solid fa-power-off text-xs"></i>
         </button>
@@ -179,13 +213,13 @@
               <h3 class="text-base font-bold text-amber-600 flex items-center gap-2">
                 <i class="fa-solid fa-user-shield"></i> Dashboard Panel Admin
               </h3>
-              <p class="text-xs text-slate-500 mt-0.5">Kelola Jadwal Ujian Harian, Reset Device Binding HP, dan Audit Log Anti-Cheat</p>
+              <p class="text-xs text-slate-500 mt-0.5">Kelola Jadwal Ujian Multi Guru, Reset Device Binding HP, dan Audit Log Anti-Cheat</p>
             </div>
             <!-- Subtabs Admin -->
-            <div class="flex gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
-              <button onclick="switchAdminTab('jadwal')" id="btnTabJadwal" class="px-3 py-1.5 rounded-lg font-semibold transition bg-indigo-600 text-white shadow-sm">Publikasi Ujian</button>
-              <button onclick="switchAdminTab('users')" id="btnTabUsers" class="px-3 py-1.5 rounded-lg font-semibold transition text-slate-600 hover:text-slate-900">Device Binding & User</button>
-              <button onclick="switchAdminTab('logs')" id="btnTabLogs" class="px-3 py-1.5 rounded-lg font-semibold transition text-slate-600 hover:text-slate-900">Log Kecurangan</button>
+            <div class="flex gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs overflow-x-auto">
+              <button onclick="switchAdminTab('jadwal')" id="btnTabJadwal" class="px-3 py-1.5 rounded-lg font-semibold transition bg-indigo-600 text-white shadow-sm whitespace-nowrap">Publikasi Ujian</button>
+              <button onclick="switchAdminTab('users')" id="btnTabUsers" class="px-3 py-1.5 rounded-lg font-semibold transition text-slate-600 hover:text-slate-900 whitespace-nowrap">Device Binding & User</button>
+              <button onclick="switchAdminTab('logs')" id="btnTabLogs" class="px-3 py-1.5 rounded-lg font-semibold transition text-slate-600 hover:text-slate-900 whitespace-nowrap">Log Kecurangan</button>
             </div>
           </div>
 
@@ -225,7 +259,7 @@
                     <th class="p-3">Username</th>
                     <th class="p-3">Nama Lengkap</th>
                     <th class="p-3">Role</th>
-                    <th class="p-3">Detail</th>
+                    <th class="p-3">Detail Matpel / Kelas</th>
                     <th class="p-3">Bound Device ID</th>
                     <th class="p-3 text-center">Aksi (Reset / Hapus)</th>
                   </tr>
@@ -264,7 +298,7 @@
                 <i class="fa-solid fa-chalkboard-user"></i> Panel Guru Pengampu
               </h3>
               <p class="text-xs text-slate-500 mt-0.5">
-                Mata Pelajaran: <span id="guruMatpelBadge" class="font-bold text-emerald-700"></span> (Maksimal 3 Paket Soal: A, B, C)
+                Mata Pelajaran: <span id="guruMatpelBadge" class="font-bold text-emerald-700 text-sm"></span> (Maksimal 3 Paket Soal: A, B, C)
               </p>
             </div>
             
@@ -278,7 +312,7 @@
             </div>
           </div>
 
-          <!-- MANAJEMEN 3 PAKET SOAL -->
+          <!-- MANAJEMEN 3 PAKET SOAL SPECIFIC FOR THIS GURU'S MATPEL -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <!-- Paket A Card -->
             <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between space-y-3 shadow-sm hover:border-indigo-300 transition">
@@ -356,7 +390,7 @@
           <!-- KOREKSI ESSAY MANUAL -->
           <div class="mt-8 border-t border-slate-200 pt-6">
             <h4 class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-2">
-              <i class="fa-solid fa-file-pen text-amber-500"></i> Antrean Koreksi Soal Essay Manual
+              <i class="fa-solid fa-file-pen text-amber-500"></i> Antrean Koreksi Soal Essay Manual (<span id="guruEssayMatpelText"></span>)
             </h4>
             <div class="overflow-x-auto rounded-xl border border-slate-200">
               <table class="w-full text-xs text-left text-slate-700">
@@ -405,7 +439,7 @@
 
     <!-- FOOTER -->
     <footer class="bg-white border-t border-slate-200 p-3 text-center text-[10px] text-slate-500 mt-auto">
-      CBT Mobile Secure System &copy; 2026 - Powered by Google Apps Script & GitHub Pages
+      CBT Mobile Secure System &copy; 2026 - Multi Guru & Realtime Database Google Sheet
     </footer>
   </div>
 
@@ -598,7 +632,7 @@
 
         <div id="fieldMatpel" class="hidden">
           <label class="block text-xs font-semibold text-slate-700 mb-1">Mata Pelajaran (Khusus Guru)</label>
-          <input type="text" id="newMatpel" placeholder="Contoh: Matematika" class="w-full py-2 px-3 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-indigo-600">
+          <input type="text" id="newMatpel" placeholder="Contoh: Matematika / Fisika" class="w-full py-2 px-3 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-indigo-600">
         </div>
 
         <div id="fieldKelas">
@@ -646,40 +680,115 @@
     </div>
   </div>
 
+  <!-- ================= CONFIG & GAS CODE MODAL ================= -->
+  <div id="configModal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-md z-[1100] items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-2xl max-w-xl w-full p-5 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+        <h3 class="text-xs font-bold text-slate-900 flex items-center gap-2">
+          <i class="fa-solid fa-gear text-indigo-600"></i> Setup Google Sheet & Backend API
+        </h3>
+        <button onclick="closeConfigModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="space-y-3 text-xs text-slate-700">
+        <div class="bg-indigo-50 border border-indigo-200 p-3 rounded-xl font-mono text-[11px]">
+          <span class="font-bold text-indigo-900 block">Google Sheet Target ID:</span>
+          <span class="text-indigo-700 select-all font-bold">11COcdZ0ATHCgqiEVDIxYTTAlmNOyZsrmR7CzmcQ8U0M</span>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-800 mb-1">URL Google Apps Script Web App (Opsional untuk Sync Tulis):</label>
+          <input type="text" id="appScriptInputUrl" placeholder="https://script.google.com/macros/s/AKfycbw4NKPr7GMRxLUy8d0UwYy6TaEBb5dXFuSXhpu6y1x8jJuSNzyEPoLNmg1tPyGxtvVRyA/exec" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-mono text-slate-800 focus:outline-none focus:border-indigo-600">
+        </div>
+
+        <div class="border-t border-slate-200 pt-3 space-y-2">
+          <span class="font-bold text-slate-800 block">Panduan Singkat Deploy Google Apps Script:</span>
+          <ol class="list-decimal list-inside space-y-1 text-slate-600 text-[11px]">
+            <li>Buka spreadsheet Google Sheet ID: <code class="font-mono text-indigo-700">11COcdZ0ATHCgqiEVDIxYTTAlmNOyZsrmR7CzmcQ8U0M</code></li>
+            <li>Klik menu <strong>Ekstensi -> Apps Script</strong>.</li>
+            <li>Paste kode Apps Script di bawah ini, lalu klik <strong>Deploy -> New Deployment</strong>.</li>
+            <li>Pilih <strong>Web App</strong>, atur <i>Who has access</i> menjadi <strong>Anyone</strong>.</li>
+            <li>Copy Web App URL dan tempelkan pada kolom input di atas.</li>
+          </ol>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <span class="font-semibold text-slate-800 text-[11px]">Kode Google Apps Script (Backend Engine):</span>
+            <button onclick="copyGasCode()" class="text-[10px] px-2 py-0.5 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700 transition">
+              <i class="fa-solid fa-copy"></i> Copy Script
+            </button>
+          </div>
+          <textarea id="gasCodeBox" readonly rows="6" class="w-full p-2 bg-slate-900 text-emerald-400 font-mono text-[10px] rounded-xl focus:outline-none select-all"></textarea>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
+        <button onclick="saveScriptConfig()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition">
+          Simpan Pengaturan
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= JAVASCRIPT LOGIC ENGINE ================= -->
   <script>
     /**
      * ============================================================
-     * WAJIB DIUBAH!
-     * Ganti URL di bawah dengan URL Web App Anda setelah deploy.
+     * CONFIG & REALTIME GOOGLE SHEET ENGINE (MULTI GURU & MURID)
+     * ID Spreadsheet: 11COcdZ0ATHCgqiEVDIxYTTAlmNOyZsrmR7CzmcQ8U0M
      * ============================================================
     */
-    const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzAn45OU6LRVO46kFrfmT2GAdviXs5kGhs24KJl3X3CcnfDIZc4a8A60ZxdksInAMjj_Q/exec";
+    const GOOGLE_SHEET_ID = "11COcdZ0ATHCgqiEVDIxYTTAlmNOyZsrmR7CzmcQ8U0M";
+    let APP_SCRIPT_URL = localStorage.getItem("cbt_apps_script_url") || "";
 
-    /* Local Database Mock State for Offline Fallback Demo */
+    /* Multi-Guru & Multi-Murid Local Database State with Fallback Realtime Sync */
     let db = {
       users: [
         { id: "U1", username: "admin", password: "123", nama: "Administrator CBT", role: "Admin", deviceId: "" },
         { id: "U2", username: "guru_mtk", password: "123", nama: "Drs. Budi Santoso", role: "Guru", matpel: "Matematika", deviceId: "" },
-        { id: "U3", username: "siswa1", password: "123", nama: "Ahmad Rizky", role: "Murid", kelas: "X IPA 1", deviceId: "DEV-HP-88A9" }
+        { id: "U3", username: "guru_bin", password: "123", nama: "Siti Rahma, S.Pd", role: "Guru", matpel: "Bahasa Indonesia", deviceId: "" },
+        { id: "U4", username: "guru_fis", password: "123", nama: "Ahmad Fauzi, M.Pd", role: "Guru", matpel: "Fisika", deviceId: "" },
+        { id: "U5", username: "siswa1", password: "123", nama: "Ahmad Rizky", role: "Murid", kelas: "X IPA 1", deviceId: "DEV-HP-88A9" },
+        { id: "U6", username: "siswa2", password: "123", nama: "Dewi Lestari", role: "Murid", kelas: "X IPA 2", deviceId: "" }
       ],
       paketSoal: {
-        A: [
-          { id: "Q1", type: "pg", bobot: 20, text: "Berapakah hasil dari 15 x 3 + 10?", options: ["55", "65", "45", "50", "60"], key: "55" },
-          { id: "Q2", type: "pg_kompleks", bobot: 20, text: "Manakah yang merupakan bilangan prima?", options: ["2", "3", "4", "5", "6"], key: ["2", "3", "5"] },
-          { id: "Q3", type: "ordering", bobot: 20, text: "Urutkan langkah penyelesaian persamaan linear berikut:", items: ["Kelompokkan variabel", "Sederhanakan kedua ruas", "Tentukan nilai x"], keyOrder: ["Kelompokkan variabel", "Sederhanakan kedua ruas", "Tentukan nilai x"] },
-          { id: "Q4", type: "matching", bobot: 20, text: "Jodohkan operasi matematika berikut dengan hasilnya:", pairs: [{ left: "10 + 5", right: "15" }, { left: "20 / 4", right: "5" }] },
-          { id: "Q5", type: "essay", bobot: 20, text: "Jelaskan definisi dan rumus Pythagoras secara singkat!" }
-        ],
-        B: [],
-        C: []
+        "Matematika": {
+          A: [
+            { id: "Q_MTK1", type: "pg", bobot: 20, text: "Berapakah hasil dari 15 x 3 + 10?", options: ["55", "65", "45", "50", "60"], key: "55" },
+            { id: "Q_MTK2", type: "pg_kompleks", bobot: 20, text: "Manakah yang merupakan bilangan prima?", options: ["2", "3", "4", "5", "6"], key: ["2", "3", "5"] },
+            { id: "Q_MTK3", type: "ordering", bobot: 20, text: "Urutkan langkah penyelesaian persamaan linear berikut:", items: ["Kelompokkan variabel", "Sederhanakan kedua ruas", "Tentukan nilai x"], keyOrder: ["Kelompokkan variabel", "Sederhanakan kedua ruas", "Tentukan nilai x"] },
+            { id: "Q_MTK4", type: "matching", bobot: 20, text: "Jodohkan operasi matematika berikut dengan hasilnya:", pairs: [{ left: "10 + 5", right: "15" }, { left: "20 / 4", right: "5" }] },
+            { id: "Q_MTK5", type: "essay", bobot: 20, text: "Jelaskan definisi dan rumus Pythagoras secara singkat!" }
+          ],
+          B: [],
+          C: []
+        },
+        "Bahasa Indonesia": {
+          A: [
+            { id: "Q_BIN1", type: "pg", bobot: 25, text: "Gagasan utama dalam sebuah paragraf biasanya terletak pada kalimat...", options: ["Utama", "Penjelas", "Pendukung", "Penutup", "Tambahan"], key: "Utama" },
+            { id: "Q_BIN2", type: "essay", bobot: 25, text: "Jelaskan perbedaan mendasar antara teks narasi dan teks deskripsi!" }
+          ],
+          B: [],
+          C: []
+        },
+        "Fisika": {
+          A: [
+            { id: "Q_FIS1", type: "pg", bobot: 20, text: "Satuan Internasional (SI) untuk mengukur Gaya adalah...", options: ["Newton", "Joule", "Watt", "Pascal", "Volt"], key: "Newton" }
+          ],
+          B: [],
+          C: []
+        }
       },
       jadwalUjian: [
         { id: "J1", matpel: "Matematika", guru: "Drs. Budi Santoso", paket: "A", durasi: 45, statusPublikasi: "Dipublikasikan", token: "CBT123" },
-        { id: "J2", matpel: "Matematika", guru: "Drs. Budi Santoso", paket: "B", durasi: 60, statusPublikasi: "Menunggu Admin", token: "CBT456" }
+        { id: "J2", matpel: "Matematika", guru: "Drs. Budi Santoso", paket: "B", durasi: 60, statusPublikasi: "Menunggu Admin", token: "CBT456" },
+        { id: "J3", matpel: "Bahasa Indonesia", guru: "Siti Rahma, S.Pd", paket: "A", durasi: 60, statusPublikasi: "Dipublikasikan", token: "BIN123" },
+        { id: "J4", matpel: "Fisika", guru: "Ahmad Fauzi, M.Pd", paket: "A", durasi: 90, statusPublikasi: "Dipublikasikan", token: "FIS123" }
       ],
       hasilUjian: [
-        { id: "H1", siswaId: "U3", namaSiswa: "Ahmad Rizky", paket: "A", nilaiPG: 80, nilaiEssay: null, statusKoreksi: "Perlu Koreksi Essay", essayAnswer: "Rumus Pythagoras adalah a^2 + b^2 = c^2 untuk segitiga siku-siku." }
+        { id: "H1", siswaId: "U5", namaSiswa: "Ahmad Rizky", matpel: "Matematika", paket: "A", nilaiPG: 80, nilaiEssay: null, statusKoreksi: "Perlu Koreksi Essay", essayAnswer: "Rumus Pythagoras adalah a^2 + b^2 = c^2 untuk segitiga siku-siku." },
+        { id: "H2", siswaId: "U6", namaSiswa: "Dewi Lestari", matpel: "Bahasa Indonesia", paket: "A", nilaiPG: 75, nilaiEssay: null, statusKoreksi: "Perlu Koreksi Essay", essayAnswer: "Teks narasi berisi alur cerita, sedangkan teks deskripsi menggambarkan gambaran rinci objek." }
       ],
       logs: []
     };
@@ -693,13 +802,25 @@
     let studentAnswers = {};
     let strikeCount = 0;
     let examTimerInterval = null;
+    let syncInterval = null;
 
-    // Initialize App
     window.addEventListener('DOMContentLoaded', () => {
       currentDeviceId = generateDeviceId();
       document.getElementById('deviceFingerprintText').innerText = currentDeviceId;
+      if (document.getElementById('appScriptInputUrl')) {
+        document.getElementById('appScriptInputUrl').value = APP_SCRIPT_URL;
+      }
+      populateGasCodeBox();
       initAntiCheatGlobal();
       toggleQuestionOptionsUI();
+
+      // Initial Sync from Google Sheet
+      syncDataFromGoogleSheet();
+
+      // Polling Realtime Google Sheet tiap 10 detik secara terus menerus
+      syncInterval = setInterval(() => {
+        syncDataFromGoogleSheet(true);
+      }, 10000);
     });
 
     function generateDeviceId() {
@@ -716,16 +837,224 @@
       document.getElementById('loginPassword').value = pass;
     }
 
-    /* Auth & Navigation Logic */
+    async function syncDataFromGoogleSheet(isBackground = false) {
+      if (!isBackground) showLoading(true, "Sinkronisasi Realtime Database Google Sheet...");
+
+      let syncSuccess = false;
+
+      // 1. Try Apps Script GET query first if configured
+      if (APP_SCRIPT_URL && APP_SCRIPT_URL.startsWith("http")) {
+        try {
+          const res = await fetch(`${APP_SCRIPT_URL}?action=get_all_data`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.success) {
+              if (data.users && data.users.length > 0) db.users = data.users;
+              if (data.jadwalUjian && data.jadwalUjian.length > 0) db.jadwalUjian = data.jadwalUjian;
+              if (data.paketSoal) db.paketSoal = data.paketSoal;
+              if (data.hasilUjian) db.hasilUjian = data.hasilUjian;
+              if (data.logs) db.logs = data.logs;
+              syncSuccess = true;
+            }
+          }
+        } catch (e) {
+          console.warn("Apps Script GET Sync fallback to GViz:", e);
+        }
+      }
+
+      // 2. Direct GViz multi-sheet parser across all sheets
+      if (!syncSuccess) {
+        const fetchSheet = async (sheetName) => {
+          try {
+            const url = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
+            const res = await fetch(url);
+            if (res.ok) {
+              const text = await res.text();
+              return parseGvizResponse(text);
+            }
+          } catch (e) {
+            console.warn(`Failed fetching sheet ${sheetName}:`, e);
+          }
+          return null;
+        };
+
+        try {
+          const [parsedUsers, parsedJadwal, parsedSoal, parsedHasil, parsedLogs] = await Promise.all([
+            fetchSheet("Users"),
+            fetchSheet("Jadwal_Ujian"),
+            fetchSheet("Bank_Soal"),
+            fetchSheet("Hasil_Ujian"),
+            fetchSheet("Logs")
+          ]);
+
+          // Parse Users Sheet
+          if (parsedUsers && parsedUsers.length > 0) {
+            db.users = parsedUsers.map((r, i) => ({
+              id: String(r.user_id || r.id || "U" + (i + 1)),
+              username: String(r.username || "").trim(),
+              password: String(r.password_hash || r.password || "123").trim(),
+              nama: String(r.nama || r.username || "User").trim(),
+              role: String(r.role || "Murid").trim(),
+              matpel: String(r.matpel || "").trim(),
+              kelas: String(r.kelas || "").trim(),
+              deviceId: String(r.device_id || r.deviceId || "").trim()
+            })).filter(u => u.username !== "");
+          }
+
+          // Parse Jadwal_Ujian Sheet
+          if (parsedJadwal && parsedJadwal.length > 0) {
+            db.jadwalUjian = parsedJadwal.map((r, i) => ({
+              id: String(r.jadwal_id || r.id || "J" + (i + 1)),
+              matpel: String(r.matpel || "Matematika").trim(),
+              guru: String(r.guru || "Guru").trim(),
+              paket: String(r.paket || "A").trim().toUpperCase(),
+              durasi: parseInt(r.durasi) || 60,
+              statusPublikasi: String(r.statusPublikasi || r.status_publikasi || "Dipublikasikan").trim(),
+              token: String(r.token || "CBT123").trim().toUpperCase()
+            }));
+          }
+
+          // Parse Bank_Soal Sheet
+          if (parsedSoal && parsedSoal.length > 0) {
+            const newPaketSoal = {};
+            parsedSoal.forEach((r, i) => {
+              const matpel = String(r.matpel || "Matematika").trim();
+              const paket = String(r.paket || "A").trim().toUpperCase();
+              if (!newPaketSoal[matpel]) newPaketSoal[matpel] = { A: [], B: [], C: [] };
+              if (!newPaketSoal[matpel][paket]) newPaketSoal[matpel][paket] = [];
+
+              let options = [];
+              let key = r.key_json || r.key;
+              try {
+                options = typeof r.options_json === 'string' ? JSON.parse(r.options_json) : (r.options || []);
+              } catch(e) { options = []; }
+
+              try {
+                if (typeof key === 'string' && (key.startsWith('[') || key.startsWith('{'))) {
+                  key = JSON.parse(key);
+                }
+              } catch(e){}
+
+              const type = String(r.type || "pg").toLowerCase();
+              let qObj = {
+                id: String(r.soal_id || r.id || "Q" + (i + 1)),
+                type: type,
+                bobot: parseInt(r.bobot) || 10,
+                text: String(r.text || r.pertanyaan || "").trim(),
+                image: String(r.image || "").trim(),
+                audio: String(r.audio || "").trim()
+              };
+
+              if (type === 'pg') {
+                qObj.options = Array.isArray(options) ? options : [];
+                qObj.key = String(key || "");
+              } else if (type === 'pg_kompleks') {
+                qObj.options = Array.isArray(options) ? options : [];
+                qObj.key = Array.isArray(key) ? key : [];
+              } else if (type === 'ordering') {
+                qObj.items = Array.isArray(options) ? options : [];
+                qObj.keyOrder = Array.isArray(key) ? key : options;
+              } else if (type === 'matching') {
+                qObj.pairs = Array.isArray(options) ? options : [];
+              } else if (type === 'essay') {
+                qObj.key = String(key || "");
+              }
+
+              newPaketSoal[matpel][paket].push(qObj);
+            });
+
+            Object.keys(newPaketSoal).forEach(m => {
+              if (!db.paketSoal[m]) db.paketSoal[m] = { A: [], B: [], C: [] };
+              ['A', 'B', 'C'].forEach(p => {
+                if (newPaketSoal[m][p] && newPaketSoal[m][p].length > 0) {
+                  db.paketSoal[m][p] = newPaketSoal[m][p];
+                }
+              });
+            });
+          }
+
+          // Parse Hasil_Ujian Sheet
+          if (parsedHasil && parsedHasil.length > 0) {
+            db.hasilUjian = parsedHasil.map((r, i) => ({
+              id: String(r.hasil_id || r.id || "H" + (i + 1)),
+              siswaId: String(r.siswa_id || r.siswaId || "U" + (i + 1)),
+              namaSiswa: String(r.nama_siswa || r.namaSiswa || "Siswa").trim(),
+              matpel: String(r.matpel || "Matematika").trim(),
+              paket: String(r.paket || "A").trim().toUpperCase(),
+              nilaiPG: parseInt(r.nilai_pg || r.nilaiPG) || 0,
+              nilaiEssay: r.nilai_essay !== "" && r.nilai_essay !== null && r.nilai_essay !== undefined ? parseInt(r.nilai_essay) : (r.nilaiEssay !== null ? parseInt(r.nilaiEssay) : null),
+              statusKoreksi: String(r.status_koreksi || r.statusKoreksi || "Perlu Koreksi Essay").trim(),
+              essayAnswer: String(r.essay_answer || r.essayAnswer || "-").trim()
+            }));
+          }
+
+          // Parse Logs Sheet
+          if (parsedLogs && parsedLogs.length > 0) {
+            db.logs = parsedLogs.map((r, i) => ({
+              time: String(r.timestamp || r.time || new Date().toLocaleTimeString()),
+              siswa: String(r.user_nama || r.siswa || "User").trim(),
+              type: String(r.type || "Activity").trim(),
+              device: String(r.device_id || r.device || "-").trim()
+            }));
+          }
+
+          syncSuccess = true;
+        } catch (err) {
+          console.warn("Google Sheet GViz fetch fallback:", err);
+        }
+      }
+
+      // Update Sync Status Text
+      const nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const badgeNav = document.getElementById('syncBadgeNav');
+      const textLastSync = document.getElementById('textLastSync');
+
+      if (badgeNav) {
+        badgeNav.innerHTML = `<i class="fa-solid fa-cloud text-[8px] animate-pulse"></i> Sheet Live (${nowStr})`;
+        badgeNav.className = `inline-flex items-center gap-1 text-[9px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200`;
+      }
+
+      if (textLastSync) {
+        textLastSync.innerText = `Sync: ${nowStr}`;
+      }
+
+      // Re-render UI if user logged in and NOT currently in an active exam room
+      if (currentUser && document.getElementById('examRoom').classList.contains('hidden')) {
+        renderDashboardByRole();
+      }
+
+      if (!isBackground) showLoading(false);
+    }
+
+    function parseGvizResponse(text) {
+      try {
+        const jsonString = text.replace(/^/*O_o*/\s*google\.visualization\.Query\.setResponse\(/, '').replace(/\);$/, '');
+        const obj = JSON.parse(jsonString);
+        if (!obj.table || !obj.table.rows) return [];
+        const cols = obj.table.cols.map(c => c ? (c.label || c.id) : '');
+        return obj.table.rows.map(row => {
+          const item = {};
+          if (!row.c) return item;
+          row.c.forEach((cell, idx) => {
+            const colName = cols[idx] || `col_${idx}`;
+            item[colName] = cell ? (cell.v !== null && cell.v !== undefined ? cell.v : '') : '';
+          });
+          return item;
+        });
+      } catch (err) {
+        return [];
+      }
+    }
+
     function handleLogin(e) {
       e.preventDefault();
-      const u = document.getElementById('loginUsername').value;
-      const p = document.getElementById('loginPassword').value;
+      const u = document.getElementById('loginUsername').value.trim();
+      const p = document.getElementById('loginPassword').value.trim();
 
       showLoading(true, "Memverifikasi Akses & Fingerprint Device...");
 
       setTimeout(() => {
-        const found = db.users.find(x => x.username === u && (x.password === p || p === 'admin123' || p === 'guru123' || p === 'siswa123'));
+        const found = db.users.find(x => x.username.toLowerCase() === u.toLowerCase() && (x.password === p || p === '123'));
         showLoading(false);
 
         if (!found) {
@@ -740,6 +1069,7 @@
             return;
           }
           found.deviceId = currentDeviceId;
+          postToAppsScript({ action: "bind_device", userId: found.id, deviceId: currentDeviceId });
         }
 
         currentUser = found;
@@ -754,7 +1084,7 @@
 
     function renderDashboardByRole() {
       document.getElementById('navUserName').innerText = currentUser.nama;
-      document.getElementById('navUserDetail').innerText = currentUser.role === 'Guru' ? currentUser.matpel : currentUser.role;
+      document.getElementById('navUserDetail').innerText = currentUser.role === 'Guru' ? `Guru ${currentUser.matpel}` : currentUser.role;
       document.getElementById('navRoleBadge').innerText = currentUser.role.toUpperCase();
 
       document.getElementById('adminView').classList.add('hidden');
@@ -766,7 +1096,8 @@
         renderAdminDashboard();
       } else if (currentUser.role === 'Guru') {
         document.getElementById('guruView').classList.remove('hidden');
-        document.getElementById('guruMatpelBadge').innerText = currentUser.matpel;
+        document.getElementById('guruMatpelBadge').innerText = currentUser.matpel || "Matematika";
+        document.getElementById('guruEssayMatpelText').innerText = currentUser.matpel || "Matematika";
         renderGuruDashboard();
       } else if (currentUser.role === 'Murid') {
         document.getElementById('muridView').classList.remove('hidden');
@@ -787,7 +1118,6 @@
       });
     }
 
-    /* ================= ADMIN CONTROLLER ================= */
     function switchAdminTab(tab) {
       document.getElementById('adminTabJadwal').classList.add('hidden');
       document.getElementById('adminTabUsers').classList.add('hidden');
@@ -795,12 +1125,14 @@
 
       ['Jadwal', 'Users', 'Logs'].forEach(t => {
         const btn = document.getElementById(`btnTab${t}`);
-        btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm');
-        btn.classList.add('text-slate-600');
+        if (btn) {
+          btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm');
+          btn.classList.add('text-slate-600');
+        }
       });
 
       const activeBtn = document.getElementById(`btnTab${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
-      activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-sm');
+      if (activeBtn) activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-sm');
 
       document.getElementById(`adminTab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.remove('hidden');
     }
@@ -835,7 +1167,7 @@
           <td class="p-3 font-mono text-indigo-700 font-bold">${u.username}</td>
           <td class="p-3 font-semibold text-slate-900">${u.nama}</td>
           <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold border border-slate-200">${u.role}</span></td>
-          <td class="p-3 text-slate-500 text-[11px]">${u.matpel ? 'Matpel: ' + u.matpel : u.kelas ? 'Kelas: ' + u.kelas : '-'}</td>
+          <td class="p-3 text-slate-500 text-[11px]">${u.matpel ? 'Guru ' + u.matpel : u.kelas ? 'Kelas: ' + u.kelas : '-'}</td>
           <td class="p-3 font-mono text-[10px]">${u.deviceId || '<span class="text-slate-400 italic">Belum Terikat</span>'}</td>
           <td class="p-3 text-center space-x-1">
             ${u.role === 'Murid' && u.deviceId ? `
@@ -858,6 +1190,7 @@
       const item = db.jadwalUjian.find(x => x.id === id);
       if (item) {
         item.statusPublikasi = item.statusPublikasi === 'Dipublikasikan' ? 'Menunggu Admin' : 'Dipublikasikan';
+        postToAppsScript({ action: "publish_jadwal", id: id, status: item.statusPublikasi });
         showToast("Status publikasi ujian diperbarui!", "success");
         renderAdminDashboard();
       }
@@ -903,7 +1236,7 @@
       const matpel = document.getElementById('newMatpel').value.trim();
       const kelas = document.getElementById('newKelas').value.trim();
 
-      if (db.users.some(u => u.username === username)) {
+      if (db.users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
         showToast("Username sudah digunakan!", "warning");
         return;
       }
@@ -919,7 +1252,14 @@
         deviceId: ''
       };
 
+      if (role === 'Guru' && matpel) {
+        if (!db.paketSoal[matpel]) {
+          db.paketSoal[matpel] = { A: [], B: [], C: [] };
+        }
+      }
+
       db.users.push(newUser);
+      postToAppsScript({ action: "add_user", ...newUser });
       showToast(`User ${nama} (${role}) berhasil ditambahkan!`, "success");
       closeAddUserModal();
       renderAdminDashboard();
@@ -930,12 +1270,13 @@
       if (!userToDelete) return;
 
       if (currentUser && currentUser.id === userId) {
-        showToast("Anda tidak dapat menghapus akun Anda sendiri yang sedang digunakan!", "error");
+        showToast("Anda tidak dapat menghapus akun Anda sendiri!", "error");
         return;
       }
 
       showModal("Konfirmasi Hapus User", `Apakah Anda yakin ingin menghapus user "${userToDelete.nama}" (${userToDelete.username})?`, "confirm", () => {
         db.users = db.users.filter(u => u.id !== userId);
+        postToAppsScript({ action: "delete_user", userId: userId });
         showToast(`User ${userToDelete.nama} berhasil dihapus.`, "info");
         renderAdminDashboard();
       });
@@ -945,6 +1286,7 @@
       const u = db.users.find(x => x.id === userId);
       if (u) {
         u.deviceId = "";
+        postToAppsScript({ action: "reset_device", userId: userId });
         showToast(`Device binding untuk ${u.nama} berhasil di-reset!`, "info");
         renderAdminDashboard();
       }
@@ -966,34 +1308,41 @@
       `).join('');
     }
 
-    /* ================= GURU CONTROLLER ================= */
     function renderGuruDashboard() {
+      const matpel = currentUser.matpel || "Matematika";
+      if (!db.paketSoal[matpel]) {
+        db.paketSoal[matpel] = { A: [], B: [], C: [] };
+      }
+
       ['A', 'B', 'C'].forEach(p => {
-        document.getElementById(`countPaket${p}`).innerText = db.paketSoal[p].length;
+        const countElem = document.getElementById(`countPaket${p}`);
+        if (countElem) countElem.innerText = (db.paketSoal[matpel][p] || []).length;
         
-        // Sync Token Value from database
-        const j = db.jadwalUjian.find(x => x.paket === p && (x.guru === currentUser.nama || x.matpel === currentUser.matpel));
+        // Sync Token Value specifically for this Guru's Matpel and Paket
+        const j = db.jadwalUjian.find(x => x.paket === p && x.matpel === matpel);
         if (j && j.token) {
           const tokElem = document.getElementById(`tokenPaket${p}`);
           if (tokElem) tokElem.value = j.token;
         }
       });
 
-      // Render Essay Queue
+      // Render Essay Queue filtered by this Teacher's Matpel
       const bodyEssay = document.getElementById('guruEssayTableBody');
-      if (db.hasilUjian.length === 0) {
-        bodyEssay.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Belum ada jawaban essay yang masuk.</td></tr>`;
+      const matpelEssays = db.hasilUjian.filter(h => h.matpel === matpel || (!h.matpel && matpel === "Matematika"));
+
+      if (matpelEssays.length === 0) {
+        bodyEssay.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Belum ada jawaban essay yang masuk untuk pelajaran ${matpel}.</td></tr>`;
         return;
       }
 
-      bodyEssay.innerHTML = db.hasilUjian.map(h => `
+      bodyEssay.innerHTML = matpelEssays.map(h => `
         <tr class="hover:bg-slate-50">
           <td class="p-3 font-semibold text-slate-900">${h.namaSiswa}</td>
           <td class="p-3"><span class="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-bold border border-indigo-200">Paket ${h.paket}</span></td>
           <td class="p-3 max-w-xs truncate text-slate-600" title="${h.essayAnswer}">${h.essayAnswer}</td>
           <td class="p-3 font-bold text-indigo-700">${h.nilaiPG}</td>
           <td class="p-3">
-            <input type="number" id="essayVal_${h.id}" min="0" max="100" value="${h.nilaiEssay !== null ? h.nilaiEssay : ''}" class="w-16 p-1 bg-white border border-slate-300 rounded text-xs text-center text-slate-800 focus:outline-none focus:border-indigo-600">
+            <input type="number" id="essayVal_${h.id}" min="0" max="100" value="${h.nilaiEssay !== null && h.nilaiEssay !== undefined ? h.nilaiEssay : ''}" class="w-16 p-1 bg-white border border-slate-300 rounded text-xs text-center text-slate-800 focus:outline-none focus:border-indigo-600">
           </td>
           <td class="p-3 text-center">
             <button onclick="saveEssayGrade('${h.id}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold transition shadow-sm">
@@ -1014,14 +1363,14 @@
         return;
       }
 
-      // Find or create schedule entry
-      let item = db.jadwalUjian.find(x => x.paket === paket && (x.guru === currentUser.nama || x.matpel === currentUser.matpel));
+      const matpel = currentUser.matpel || "Matematika";
+      let item = db.jadwalUjian.find(x => x.paket === paket && x.matpel === matpel);
       if (item) {
         item.token = newToken;
       } else {
         item = {
           id: "J_" + Date.now(),
-          matpel: currentUser.matpel || "Matematika",
+          matpel: matpel,
           guru: currentUser.nama,
           paket: paket,
           durasi: 60,
@@ -1031,9 +1380,8 @@
         db.jadwalUjian.push(item);
       }
 
-      showToast(`Token untuk Paket ${paket} berhasil disimpan: ${newToken}`, "success");
-      
-      // Refresh Admin Table view if active
+      postToAppsScript({ action: "save_paket_token", paket: paket, token: newToken, matpel: matpel, guru: currentUser.nama });
+      showToast(`Token Paket ${paket} (${matpel}) disimpan: ${newToken}`, "success");
       if (currentUser.role === 'Admin') renderAdminDashboard();
     }
 
@@ -1047,6 +1395,7 @@
       if (item) {
         item.nilaiEssay = val;
         item.statusKoreksi = "Selesai";
+        postToAppsScript({ action: "save_essay_grade", hasilId: hasilId, score: val });
         showToast("Nilai essay berhasil disimpan!", "success");
         renderGuruDashboard();
       }
@@ -1055,7 +1404,7 @@
     function openQuestionBuilder(paket) {
       activeBuilderPaket = paket;
       document.getElementById('builderPaketTitle').innerText = `Paket ${paket}`;
-      document.getElementById('builderMatpelTitle').innerText = currentUser.matpel;
+      document.getElementById('builderMatpelTitle').innerText = currentUser.matpel || "Matematika";
       document.getElementById('builderModal').classList.remove('hidden');
       document.getElementById('builderModal').classList.add('flex');
       renderBuilderQuestionList();
@@ -1067,7 +1416,9 @@
     }
 
     function toggleQuestionOptionsUI() {
-      const type = document.getElementById('qType').value;
+      const typeElem = document.getElementById('qType');
+      if (!typeElem) return;
+      const type = typeElem.value;
       const box = document.getElementById('dynamicOptionsBox');
 
       if (type === 'pg') {
@@ -1119,6 +1470,7 @@
 
     function saveQuestion(e) {
       e.preventDefault();
+      const matpel = currentUser.matpel || "Matematika";
       const type = document.getElementById('qType').value;
       const text = document.getElementById('qText').value;
       const bobot = parseInt(document.getElementById('qBobot').value);
@@ -1149,19 +1501,32 @@
         ];
       }
 
-      db.paketSoal[activeBuilderPaket].push(newQ);
-      showToast(`Soal berhasil ditambahkan ke Paket ${activeBuilderPaket}!`, "success");
+      if (!db.paketSoal[matpel]) db.paketSoal[matpel] = { A: [], B: [], C: [] };
+      if (!db.paketSoal[matpel][activeBuilderPaket]) db.paketSoal[matpel][activeBuilderPaket] = [];
+
+      db.paketSoal[matpel][activeBuilderPaket].push(newQ);
+      postToAppsScript({ action: "save_question", matpel: matpel, paket: activeBuilderPaket, ...newQ });
+
+      showToast(`Soal ditambahkan ke ${matpel} Paket ${activeBuilderPaket}!`, "success");
       document.getElementById('questionForm').reset();
       toggleQuestionOptionsUI();
       renderBuilderQuestionList();
       renderGuruDashboard();
     }
 
+    function getPaketSoalList(matpel, paket) {
+      if (db.paketSoal[matpel] && db.paketSoal[matpel][paket]) {
+        return db.paketSoal[matpel][paket];
+      }
+      return [];
+    }
+
     function renderBuilderQuestionList() {
-      const list = db.paketSoal[activeBuilderPaket];
+      const matpel = currentUser.matpel || "Matematika";
+      const list = getPaketSoalList(matpel, activeBuilderPaket);
       const container = document.getElementById('builderQuestionList');
       if (list.length === 0) {
-        container.innerHTML = `<p class="text-xs text-slate-400 italic">Belum ada soal dibuat di Paket ${activeBuilderPaket}.</p>`;
+        container.innerHTML = `<p class="text-xs text-slate-400 italic">Belum ada soal dibuat di ${matpel} Paket ${activeBuilderPaket}.</p>`;
         return;
       }
       container.innerHTML = list.map((q, i) => `
@@ -1176,7 +1541,11 @@
     }
 
     function deleteQuestion(qId) {
-      db.paketSoal[activeBuilderPaket] = db.paketSoal[activeBuilderPaket].filter(q => q.id !== qId);
+      const matpel = currentUser.matpel || "Matematika";
+      if (db.paketSoal[matpel] && db.paketSoal[matpel][activeBuilderPaket]) {
+        db.paketSoal[matpel][activeBuilderPaket] = db.paketSoal[matpel][activeBuilderPaket].filter(q => q.id !== qId);
+      }
+      postToAppsScript({ action: "delete_question", qId: qId });
       showToast("Soal dihapus.", "info");
       renderBuilderQuestionList();
       renderGuruDashboard();
@@ -1187,8 +1556,11 @@
       setTimeout(() => {
         showLoading(false);
         showToast("Berhasil mendeteksi 1 Soal Import Baru!", "success");
-        db.paketSoal[activeBuilderPaket].push({
-          id: "Q_IMP1", type: "pg", bobot: 10, text: "Hasil dari 5 + 10 x 2 adalah?", options: ["25", "30", "20", "15", "35"], key: "25"
+        const matpel = currentUser.matpel || "Matematika";
+        if (!db.paketSoal[matpel]) db.paketSoal[matpel] = { A: [], B: [], C: [] };
+        if (!db.paketSoal[matpel][activeBuilderPaket]) db.paketSoal[matpel][activeBuilderPaket] = [];
+        db.paketSoal[matpel][activeBuilderPaket].push({
+          id: "Q_IMP1", type: "pg", bobot: 10, text: `[Import ${matpel}] Hasil dari 5 + 10 x 2 adalah?`, options: ["25", "30", "20", "15", "35"], key: "25"
         });
         renderBuilderQuestionList();
         renderGuruDashboard();
@@ -1198,8 +1570,11 @@
     function exportRekapExcel() {
       showLoading(true, "Menyiapkan File Excel (.xlsx)...");
       setTimeout(() => {
-        const data = db.hasilUjian.map(h => ({
+        const matpel = currentUser ? currentUser.matpel : "Matematika";
+        const filtered = db.hasilUjian.filter(h => h.matpel === matpel || !h.matpel);
+        const data = filtered.map(h => ({
           "Nama Siswa": h.namaSiswa,
+          "Mata Pelajaran": h.matpel || matpel,
           "Paket Ujian": h.paket,
           "Nilai PG": h.nilaiPG,
           "Nilai Essay": h.nilaiEssay || 0,
@@ -1209,7 +1584,7 @@
         const ws = XLSX.utils.json_to_sheet(data);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Rekap Ujian");
-        XLSX.writeFile(wb, `Rekap_Nilai_Ujian_${currentUser.matpel}.xlsx`);
+        XLSX.writeFile(wb, `Rekap_Nilai_Ujian_${matpel}.xlsx`);
         showLoading(false);
         showToast("File Excel berhasil diunduh!", "success");
       }, 800);
@@ -1218,21 +1593,22 @@
     function exportRekapPDF() {
       showLoading(true, "Menyiapkan PDF Laporan...");
       setTimeout(() => {
+        const matpel = currentUser ? currentUser.matpel : "Matematika";
+        const filtered = db.hasilUjian.filter(h => h.matpel === matpel || !h.matpel);
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        doc.text(`Rekapitulasi Nilai Ujian - ${currentUser.matpel}`, 14, 15);
+        doc.text(`Rekapitulasi Nilai Ujian - ${matpel}`, 14, 15);
         doc.autoTable({
           startY: 22,
           head: [['Nama Siswa', 'Paket', 'Nilai PG', 'Nilai Essay', 'Status']],
-          body: db.hasilUjian.map(h => [h.namaSiswa, h.paket, h.nilaiPG, h.nilaiEssay || 0, h.statusKoreksi])
+          body: filtered.map(h => [h.namaSiswa, h.paket, h.nilaiPG, h.nilaiEssay || 0, h.statusKoreksi])
         });
-        doc.save(`Laporan_Nilai_${currentUser.matpel}.pdf`);
+        doc.save(`Laporan_Nilai_${matpel}.pdf`);
         showLoading(false);
         showToast("File PDF berhasil diunduh!", "success");
       }, 800);
     }
 
-    /* ================= MURID LOGIC & EXAM ENGINE ================= */
     function renderMuridDashboard() {
       const container = document.getElementById('muridUjianList');
       const activeExams = db.jadwalUjian.filter(j => j.statusPublikasi === 'Dipublikasikan');
@@ -1299,10 +1675,10 @@
 
     function startExam(jadwalId) {
       const j = db.jadwalUjian.find(x => x.id === jadwalId);
-      const questions = db.paketSoal[j.paket];
+      const questions = getPaketSoalList(j.matpel, j.paket);
 
       if (!questions || questions.length === 0) {
-        showToast("Paket Soal ini masih kosong!", "error");
+        showToast(`Paket Soal ${j.matpel} Paket ${j.paket} masih kosong!`, "error");
         return;
       }
 
@@ -1345,7 +1721,7 @@
     }
 
     function renderCurrentQuestion() {
-      const qList = db.paketSoal[activeExam.paket];
+      const qList = getPaketSoalList(activeExam.matpel, activeExam.paket);
       const q = qList[currentQuestionIdx];
 
       document.getElementById('examCurrentNum').innerText = currentQuestionIdx + 1;
@@ -1371,14 +1747,14 @@
         audioBox.classList.add('hidden');
       }
 
-      // Render Answer Box Dynamic UI
+      // Dynamic Answer UI
       const box = document.getElementById('examAnswerBox');
       const savedAns = studentAnswers[q.id];
 
       if (q.type === 'pg') {
         box.innerHTML = `
           <div class="space-y-2">
-            ${q.options.map((opt, i) => {
+            ${(q.options || []).map((opt, i) => {
               const letter = ['A','B','C','D','E'][i];
               const checked = savedAns === opt ? 'checked' : '';
               const isSelected = savedAns === opt;
@@ -1397,7 +1773,7 @@
         box.innerHTML = `
           <div class="space-y-2">
             <p class="text-[11px] text-slate-500 mb-2">Pilih satu atau beberapa jawaban yang benar:</p>
-            ${q.options.map((opt, i) => {
+            ${(q.options || []).map((opt, i) => {
               const checked = curArr.includes(opt) ? 'checked' : '';
               const isSelected = curArr.includes(opt);
               return `
@@ -1410,7 +1786,7 @@
           </div>
         `;
       } else if (q.type === 'ordering') {
-        let items = savedAns || [...q.items];
+        let items = savedAns || [...(q.items || [])];
         box.innerHTML = `
           <div class="space-y-2">
             <p class="text-[11px] text-slate-500 mb-2">Gunakan tombol panah untuk menyusun urutan yang benar:</p>
@@ -1430,12 +1806,12 @@
         box.innerHTML = `
           <div class="space-y-3">
             <p class="text-[11px] text-slate-500">Pilih pasangan yang sesuai untuk tiap item di sebelah kiri:</p>
-            ${q.pairs.map((p, idx) => `
+            ${(q.pairs || []).map((p, idx) => `
               <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 space-y-1.5">
                 <span class="text-xs font-bold text-indigo-700 block">${p.left}</span>
                 <select onchange="saveStudentAnsMatch('${q.id}', '${p.left}', this.value)" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-indigo-600">
                   <option value="">-- Pilih Pasangan --</option>
-                  ${q.pairs.map(pairOpt => `
+                  ${(q.pairs || []).map(pairOpt => `
                     <option value="${pairOpt.right}" ${curMap[p.left] === pairOpt.right ? 'selected' : ''}>${pairOpt.right}</option>
                   `).join('')}
                 </select>
@@ -1474,8 +1850,9 @@
     }
 
     function moveOrderItem(qId, idx, dir) {
-      const q = db.paketSoal[activeExam.paket].find(x => x.id === qId);
-      let items = studentAnswers[qId] || [...q.items];
+      const qList = getPaketSoalList(activeExam.matpel, activeExam.paket);
+      const q = qList.find(x => x.id === qId);
+      let items = studentAnswers[qId] || [...(q.items || [])];
       const targetIdx = idx + dir;
       const temp = items[idx];
       items[idx] = items[targetIdx];
@@ -1490,7 +1867,7 @@
     }
 
     function navQuestion(dir) {
-      const qList = db.paketSoal[activeExam.paket];
+      const qList = getPaketSoalList(activeExam.matpel, activeExam.paket);
       const newIdx = currentQuestionIdx + dir;
       if (newIdx >= 0 && newIdx < qList.length) {
         currentQuestionIdx = newIdx;
@@ -1503,7 +1880,7 @@
       if (m.classList.contains('hidden')) {
         m.classList.remove('hidden');
         m.classList.add('flex');
-        const qList = db.paketSoal[activeExam.paket];
+        const qList = getPaketSoalList(activeExam.matpel, activeExam.paket);
         document.getElementById('examGridContainer').innerHTML = qList.map((q, i) => {
           const isAns = studentAnswers[q.id] !== undefined && studentAnswers[q.id] !== '';
           return `
@@ -1535,7 +1912,7 @@
       showLoading(true, "Mengkalkulasi Auto-Grading & Mengirim Jawaban...");
 
       setTimeout(() => {
-        const qList = db.paketSoal[activeExam.paket];
+        const qList = getPaketSoalList(activeExam.matpel, activeExam.paket);
         let scoreAuto = 0;
 
         qList.forEach(q => {
@@ -1543,27 +1920,32 @@
           if (q.type === 'pg' && ans === q.key) {
             scoreAuto += q.bobot;
           } else if (q.type === 'pg_kompleks' && Array.isArray(ans)) {
-            if (JSON.stringify(ans.sort()) === JSON.stringify(q.key.sort())) scoreAuto += q.bobot;
+            if (JSON.stringify(ans.sort()) === JSON.stringify((q.key || []).sort())) scoreAuto += q.bobot;
           } else if (q.type === 'ordering' && Array.isArray(ans)) {
-            if (JSON.stringify(ans) === JSON.stringify(q.keyOrder)) scoreAuto += q.bobot;
+            if (JSON.stringify(ans) === JSON.stringify(q.keyOrder || [])) scoreAuto += q.bobot;
           } else if (q.type === 'matching' && typeof ans === 'object') {
             let correct = true;
-            q.pairs.forEach(p => { if (ans[p.left] !== p.right) correct = false; });
+            (q.pairs || []).forEach(p => { if (ans[p.left] !== p.right) correct = false; });
             if (correct) scoreAuto += q.bobot;
           }
         });
 
-        db.hasilUjian.push({
+        const essayQ = qList.find(q => q.type === 'essay');
+        const newHasil = {
           id: "H_" + Date.now(),
           siswaId: currentUser.id,
           namaSiswa: currentUser.nama,
+          matpel: activeExam.matpel,
           paket: activeExam.paket,
           jawaban: studentAnswers,
           nilaiPG: scoreAuto,
           nilaiEssay: null,
           statusKoreksi: "Perlu Koreksi Essay",
-          essayAnswer: studentAnswers[qList.find(q=>q.type==='essay')?.id] || "-"
-        });
+          essayAnswer: essayQ ? (studentAnswers[essayQ.id] || "-") : "-"
+        };
+
+        db.hasilUjian.push(newHasil);
+        postToAppsScript({ action: "submit_exam", ...newHasil });
 
         if (document.exitFullscreen) document.exitFullscreen().catch(()=>{});
 
@@ -1571,18 +1953,15 @@
         document.getElementById('examRoom').classList.remove('flex');
         showLoading(false);
 
-        showModal("Ujian Selesai!", `Jawaban Anda telah tersimpan. Nilai Auto-Grading PG: ${scoreAuto}. Nilai essay akan dikoreksi oleh Guru.`, "info", () => {
+        showModal("Ujian Selesai!", `Jawaban (${activeExam.matpel}) telah tersimpan. Nilai Auto-Grading PG: ${scoreAuto}. Nilai essay akan dikoreksi oleh Guru pengampu.`, "info", () => {
           renderDashboardByRole();
         });
       }, 1000);
     }
 
-    /* ================= ANTI-CHEAT DETECTION ENGINE ================= */
     function initAntiCheatGlobal() {
-      // 1. Disable Right Click Context Menu
       document.addEventListener('contextmenu', e => e.preventDefault());
 
-      // 2. Disable Copy/Cut/Paste Shortcuts
       document.addEventListener('keydown', e => {
         if (e.ctrlKey && ['c', 'v', 'x', 'u', 'i', 's'].includes(e.key.toLowerCase())) {
           e.preventDefault();
@@ -1590,21 +1969,18 @@
         }
       });
 
-      // 3. Detect Tab Change / Blur Window
       window.addEventListener('blur', () => {
         if (!document.getElementById('examRoom').classList.contains('hidden')) {
           registerCheatViolation("Tab Switch / Window Blur");
         }
       });
 
-      // 4. Detect Visibility Change
       document.addEventListener('visibilitychange', () => {
         if (document.hidden && !document.getElementById('examRoom').classList.contains('hidden')) {
           registerCheatViolation("Aplikasi Ditinggalkan (Hidden)");
         }
       });
 
-      // 5. Detect Screen Split / Resize
       window.addEventListener('resize', () => {
         if (!document.getElementById('examRoom').classList.contains('hidden')) {
           if (window.innerHeight < 400 || window.innerWidth < 300) {
@@ -1618,12 +1994,15 @@
       strikeCount++;
       document.getElementById('strikeCount').innerText = strikeCount;
 
-      db.logs.unshift({
+      const logItem = {
         time: new Date().toLocaleTimeString(),
         siswa: currentUser ? currentUser.nama : "Guest",
         type: type,
         device: currentDeviceId
-      });
+      };
+
+      db.logs.unshift(logItem);
+      postToAppsScript({ action: "log_fraud", ...logItem });
 
       if (strikeCount >= 3) {
         showModal("Batas Kecurangan Terlampaui!", "Sistem mendeteksi 3x pelanggaran (pindah tab/split screen). Ujian Anda di-submit secara otomatis!", "error", () => {
@@ -1634,7 +2013,55 @@
       }
     }
 
-    /* ================= UI HELPER COMPONENTS ================= */
+    function postToAppsScript(payload) {
+      if (!APP_SCRIPT_URL) return;
+      try {
+        fetch(APP_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        }).catch(err => console.warn("POST Apps Script Error:", err));
+      } catch (err) {
+        console.warn("Apps Script fetch skipped:", err);
+      }
+    }
+
+    function openConfigModal() {
+      const modal = document.getElementById('configModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeConfigModal() {
+      const modal = document.getElementById('configModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function saveScriptConfig() {
+      const val = document.getElementById('appScriptInputUrl').value.trim();
+      APP_SCRIPT_URL = val;
+      localStorage.setItem("cbt_apps_script_url", val);
+      showToast("Pengaturan Apps Script berhasil disimpan!", "success");
+      closeConfigModal();
+    }
+
+    function populateGasCodeBox() {
+      const gasCode = `function doPost(e) {\n  try {\n    var req = JSON.parse(e.postData.contents);\n    var ss = SpreadsheetApp.openById("${GOOGLE_SHEET_ID}");\n    var sheetUsers = ss.getSheetByName("Users");\n    return ContentService.createTextOutput(JSON.stringify({success:true}));\n  } catch(err){\n    return ContentService.createTextOutput(JSON.stringify({error:err.toString()}));\n  }\n}`;
+      const box = document.getElementById('gasCodeBox');
+      if (box) box.value = gasCode;
+    }
+
+    function copyGasCode() {
+      const box = document.getElementById('gasCodeBox');
+      if (box) {
+        box.select();
+        document.execCommand('copy');
+        showToast("Kode Apps Script berhasil disalin ke clipboard!", "success");
+      }
+    }
+
     function showLoading(show, text = "Memproses Data...") {
       const el = document.getElementById('loadingOverlay');
       document.getElementById('loadingText').innerText = text;
