@@ -456,7 +456,7 @@
   </main>
 
   <script>
-    const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzalfYlLwhCZwm9MxQiVpUfPE2oLQ1im1CHxfnBM1NW2nkuq4cSm4zwjl8XYGQk-mxb4w/exec";
+    const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwSjhKtICQ2j9LmfDH9PvCq_gKw-h8rLkZRvnWOatCpGFqqzrqKLRWvBICViM2vH5F36g/exec";
 
     let currentUser = null;
     let appData = {
@@ -529,18 +529,28 @@
     async function apiRequest(action, payload = {}) {
       showLoading(true);
       try {
-        if (!APP_SCRIPT_URL.includes("YOUR_SCRIPT_ID")) {
+        if (APP_SCRIPT_URL && !APP_SCRIPT_URL.includes("YOUR_SCRIPT_ID")) {
           const response = await fetch(APP_SCRIPT_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: action, ...payload })
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: action, ...payload }),
+            redirect: 'follow'
           });
-          const res = await response.json();
+          
+          const text = await response.text();
+          let res;
+          try {
+            res = JSON.parse(text);
+          } catch(e) {
+            showLoading(false);
+            showToast("Response Backend GAS bukan JSON. Pastikan Web App di-deploy dengan akses 'Anyone'.", "error");
+            return { success: false, message: "Response GAS bukan JSON: " + text.substring(0, 80) };
+          }
           showLoading(false);
           return res;
         } else {
           // In-Memory Fallback Simulation for Instant Interactive Preview
-          await new Promise(r => setTimeout(r, 400));
+          await new Promise(r => setTimeout(r, 300));
           showLoading(false);
           return simulateInMemoryApi(action, payload);
         }
@@ -553,10 +563,16 @@
 
     function simulateInMemoryApi(action, req) {
       if (action === 'login') {
-        if (req.username === 'admin') return { success: true, data: { user: { id: 'U1', username: 'admin', nama: 'Super Administrator', role: 'ADMIN' } } };
-        if (req.username === 'guru1') return { success: true, data: { user: { id: 'U2', username: 'guru1', nama: 'Bpk. Ahmad, M.Pd', role: 'GURU', mapel: 'Matematika' } } };
-        if (req.username === 'siswa1') return { success: true, data: { user: { id: 'U3', username: 'siswa1', nama: 'Andi Pratama', role: 'SISWA', class: 'X-IPA-1' } } };
-        return { success: false, message: "Username atau Password tidak dikenal!" };
+        const u = (req.username || '').toString().trim().toLowerCase();
+        if (u === 'admin') return { success: true, data: { user: { id: 'U1', username: 'admin', nama: 'Super Administrator', role: 'ADMIN' } } };
+        if (u === 'guru1' || u === 'guru') return { success: true, data: { user: { id: 'U2', username: 'guru1', nama: 'Bpk. Ahmad, M.Pd', role: 'GURU', mapel: 'Matematika' } } };
+        if (u === 'siswa1' || u === 'siswa') return { success: true, data: { user: { id: 'U3', username: 'siswa1', nama: 'Andi Pratama', role: 'SISWA', class: 'X-IPA-1' } } };
+        
+        const existing = appData.users.find(usr => usr.username.toString().toLowerCase() === u);
+        if (existing) {
+          return { success: true, data: { user: existing } };
+        }
+        return { success: false, message: "Username tidak terdaftar! Gunakan admin, guru1, atau siswa1" };
       }
 
       if (action === 'get_initial_data') {
@@ -599,8 +615,13 @@
 
     document.getElementById('login-form').onsubmit = async (e) => {
       e.preventDefault();
-      const u = document.getElementById('login-username').value;
-      const p = document.getElementById('login-password').value;
+      const u = document.getElementById('login-username').value.trim();
+      const p = document.getElementById('login-password').value.trim();
+
+      if (!u) {
+        showToast("Masukkan Username / NISN!", "error");
+        return;
+      }
 
       const res = await apiRequest('login', { username: u, password: p, device_fingerprint: 'DEV_HW_' + u });
       if (res.success) {
@@ -1054,6 +1075,3 @@
   </script>
 </body>
 </html>
-```
-
-File `index.html` produksi telah ditampilkan secara utuh. Seluruh antarmuka UI/UX, modul keamanan HP, serta sinkronisasi data real-time telah terkunci dan siap digunakan.
