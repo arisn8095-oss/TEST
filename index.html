@@ -14,6 +14,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <!-- Document Parsing Libraries: Mammoth for DOCX & PDF.js for PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 
     <style>
         body {
@@ -484,8 +487,7 @@
     </div>
 
     <script>
-        // Production Backend Web App URL Placeholder (Required)
-        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbywHRPN04UPbqdvHOE37fcse6nZf-Cz9EchC5_U78I8GOJpg4Rmti6VIh1tVkgbcCRV/exec";
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx07exXrsjeh_-5nsineB7DswMdT0T73df6_BsC0M3JdB45aZDMIkJYk-xlBJqZDQCd/exec";
 
         const STATE = {
             currentUser: null,
@@ -1126,21 +1128,256 @@
             }
         }
 
+        function openModalAddQuestion() {
+            const mapelObj = STATE.guruMapelList.find(s => s.id === STATE.guruActiveMapel);
+            const mapelName = mapelObj ? mapelObj.name : 'Mata Pelajaran';
+
+            showModal(
+                `Tambah Soal Manual (${mapelName})`,
+                `<form id="form-add-question" onsubmit="event.preventDefault(); saveManualQuestion();" class="space-y-4 text-xs">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Paket Soal</label>
+                            <select id="manual-pkg" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-blue-600">
+                                <option value="A">Paket A</option>
+                                <option value="B">Paket B</option>
+                                <option value="C">Paket C</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Tipe Soal</label>
+                            <select id="manual-type" onchange="updateManualQuestionFields()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold">
+                                <option value="PG">Pilihan Ganda (PG)</option>
+                                <option value="PG_KOMPLEKS">Pilihan Ganda Kompleks (PGK)</option>
+                                <option value="ORDERING">Mengurutkan (Ordering)</option>
+                                <option value="MATCHING">Menjodohkan (Matching)</option>
+                                <option value="ESSAY">Essay / Uraian</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Pertanyaan / Teks Soal</label>
+                        <textarea id="manual-text" rows="3" required placeholder="Tuliskan pertanyaan di sini..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1"><i class="fa-solid fa-image text-slate-400"></i> URL Gambar (Opsional)</label>
+                            <input type="url" id="manual-image" placeholder="https://..." class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1"><i class="fa-solid fa-volume-high text-slate-400"></i> URL Audio (Opsional)</label>
+                            <input type="url" id="manual-audio" placeholder="https://..." class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl">
+                        </div>
+                    </div>
+
+                    <div id="manual-type-dynamic-container" class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                        <!-- Dynamic Inputs per Question Type -->
+                    </div>
+                </form>`,
+                `<button onclick="closeModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-xs font-bold">Batal</button>
+                 <button onclick="document.getElementById('form-add-question').requestSubmit()" class="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/20">Simpan Soal</button>`
+            );
+
+            updateManualQuestionFields();
+        }
+
+        function updateManualQuestionFields() {
+            const type = document.getElementById('manual-type').value;
+            const container = document.getElementById('manual-type-dynamic-container');
+            container.innerHTML = '';
+
+            if (type === 'PG' || type === 'PG_KOMPLEKS') {
+                const letters = ['A', 'B', 'C', 'D', 'E'];
+                let html = `<label class="block font-bold text-slate-800 mb-2">Opsi Jawaban (A - E)</label>`;
+                letters.forEach(l => {
+                    html += `
+                        <div class="flex items-center gap-2">
+                            <span class="w-6 font-bold text-slate-600 text-center">${l}.</span>
+                            <input type="text" id="manual-opt-${l}" required placeholder="Pilihan ${l}" class="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs">
+                        </div>
+                    `;
+                });
+
+                if (type === 'PG') {
+                    html += `
+                        <div class="pt-2">
+                            <label class="block font-bold text-slate-800 mb-1">Kunci Jawaban Benar</label>
+                            <select id="manual-pg-key" class="w-full p-2 bg-white border border-slate-200 rounded-lg font-bold text-emerald-600">
+                                ${letters.map(l => `<option value="${l}">Opsi ${l}</option>`).join('')}
+                            </select>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="pt-2">
+                            <label class="block font-bold text-slate-800 mb-1">Pilih Beberapa Kunci Jawaban Benar (PGK)</label>
+                            <div class="flex gap-3">
+                                ${letters.map(l => `
+                                    <label class="flex items-center gap-1 cursor-pointer font-bold text-slate-700">
+                                        <input type="checkbox" name="manual-pgk-key" value="${l}" class="rounded text-blue-600"> Opsi ${l}
+                                    </label>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+                container.innerHTML = html;
+            } else if (type === 'ORDERING') {
+                container.innerHTML = `
+                    <label class="block font-bold text-slate-800 mb-1">Item-item Urutan Sesuai Urutan BENAR (1 - 5)</label>
+                    <p class="text-[11px] text-slate-500 mb-2">Masukkan item berurutan dari posisi pertama hingga akhir. Sistem mengacaknya saat ujian.</p>
+                    <div class="space-y-2">
+                        ${[1, 2, 3, 4, 5].map(i => `
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 font-bold text-slate-600 text-center">${i}.</span>
+                                <input type="text" id="manual-order-${i}" ${i <= 3 ? 'required' : ''} placeholder="Item Urutan ${i}" class="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs">
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else if (type === 'MATCHING') {
+                container.innerHTML = `
+                    <label class="block font-bold text-slate-800 mb-1">Pasangan Menjodohkan (Premis = Pasangan Benar)</label>
+                    <p class="text-[11px] text-slate-500 mb-2">Isikan item Kiri (Soal) dan Sebelah Kanan (Pasangan Jawaban).</p>
+                    <div class="space-y-2">
+                        ${[1, 2, 3, 4, 5].map(i => `
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="text" id="manual-match-left-${i}" ${i <= 2 ? 'required' : ''} placeholder="Kiri ${i} (Contoh: Ctrl+C)" class="p-2 bg-white border border-slate-200 rounded-lg text-xs">
+                                <input type="text" id="manual-match-right-${i}" ${i <= 2 ? 'required' : ''} placeholder="Kanan ${i} (Contoh: Menyalin)" class="p-2 bg-white border border-slate-200 rounded-lg text-xs">
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else if (type === 'ESSAY') {
+                container.innerHTML = `
+                    <label class="block font-bold text-slate-800 mb-1">Pedoman Kunci Jawaban / Uraian Essay</label>
+                    <textarea id="manual-essay-key" rows="3" placeholder="Masukkan poin acuan penilaian essay..." class="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs"></textarea>
+                `;
+            }
+        }
+
+        async function saveManualQuestion() {
+            const pkg = document.getElementById('manual-pkg').value;
+            const type = document.getElementById('manual-type').value;
+            const text = document.getElementById('manual-text').value.trim();
+            const imageUrl = document.getElementById('manual-image').value.trim() || null;
+            const audioUrl = document.getElementById('manual-audio').value.trim() || null;
+
+            if (!text) {
+                showToast('Teks pertanyaan wajib diisi!', 'warning');
+                return;
+            }
+
+            let options = [];
+            let correctAnswer = null;
+            let items = [];
+            let pairs = [];
+
+            if (type === 'PG') {
+                const letters = ['A', 'B', 'C', 'D', 'E'];
+                options = letters.map(l => document.getElementById(`manual-opt-${l}`).value.trim()).filter(Boolean);
+                const selectedKeyLetter = document.getElementById('manual-pg-key').value;
+                const letterIdx = letters.indexOf(selectedKeyLetter);
+                correctAnswer = options[letterIdx] || options[0];
+            } else if (type === 'PG_KOMPLEKS') {
+                const letters = ['A', 'B', 'C', 'D', 'E'];
+                options = letters.map(l => document.getElementById(`manual-opt-${l}`).value.trim()).filter(Boolean);
+                const checkedLetters = Array.from(document.querySelectorAll('input[name="manual-pgk-key"]:checked')).map(cb => cb.value);
+                correctAnswer = checkedLetters.map(l => {
+                    const idx = letters.indexOf(l);
+                    return options[idx] || l;
+                });
+            } else if (type === 'ORDERING') {
+                for (let i = 1; i <= 5; i++) {
+                    const val = document.getElementById(`manual-order-${i}`).value.trim();
+                    if (val) items.push(val);
+                }
+                options = items;
+                correctAnswer = items;
+            } else if (type === 'MATCHING') {
+                for (let i = 1; i <= 5; i++) {
+                    const l = document.getElementById(`manual-match-left-${i}`).value.trim();
+                    const r = document.getElementById(`manual-match-right-${i}`).value.trim();
+                    if (l && r) {
+                        pairs.push({ left: l, right: r });
+                    }
+                }
+                options = pairs.map(p => p.left);
+                correctAnswer = pairs;
+            } else if (type === 'ESSAY') {
+                correctAnswer = document.getElementById('manual-essay-key').value.trim();
+            }
+
+            const newQ = {
+                id: 'Q_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                mapelId: STATE.guruActiveMapel,
+                packageCode: pkg,
+                type: type,
+                questionText: text,
+                imageUrl: imageUrl,
+                audioUrl: audioUrl,
+                options: options,
+                items: items.length > 0 ? items : undefined,
+                pairs: pairs.length > 0 ? pairs : undefined,
+                correctAnswer: correctAnswer
+            };
+
+            const res = await apiCall('saveQuestion', { question: newQ });
+            if (res.success) {
+                closeModal();
+                showToast('Soal manual berhasil disimpan!', 'success');
+                fetchGuruData();
+            } else {
+                showToast(res.message || 'Gagal menyimpan soal!', 'error');
+            }
+        }
+
         function triggerImportDialog() {
             document.getElementById('import-file-input').click();
         }
 
-        function handleFileImport(e) {
+        async function handleFileImport(e) {
             const file = e.target.files[0];
             if (!file) return;
 
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                let fileText = evt.target.result || '';
+            showLoading(true, "Membaca & mengurai berkas...");
+            let fileText = "";
+
+            try {
+                const ext = file.name.split('.').pop().toLowerCase();
+                if (ext === 'docx') {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+                    fileText = result.value;
+                } else if (ext === 'pdf') {
+                    const arrayBuffer = await file.arrayBuffer();
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+                    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    let textBuilder = "";
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const pageText = textContent.items.map(item => item.str).join(' ');
+                        textBuilder += pageText + "\n";
+                    }
+                    fileText = textBuilder;
+                } else {
+                    fileText = await file.text();
+                }
+
                 STATE.importedStagingQuestions = parseCustomFormatText(fileText);
-                renderStagingModal(file.name);
-            };
-            reader.readAsText(file);
+                showLoading(false);
+                if (STATE.importedStagingQuestions.length === 0) {
+                    showToast("Tidak ada soal yang berhasil diurai. Periksa format dokumen!", "warning");
+                } else {
+                    renderStagingModal(file.name);
+                }
+            } catch (err) {
+                showLoading(false);
+                showToast("Gagal membaca file " + file.name + ": " + err.message, "error");
+            }
         }
 
         function parseCustomFormatText(rawText) {
