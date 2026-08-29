@@ -93,7 +93,7 @@
                     <div>
                         <h1 class="font-extrabold text-slate-800 text-xs sm:text-sm md:text-base leading-tight">CBT SMA NEGERI 1 KUTOWINANGUN</h1>
                         <span class="text-[11px] text-brand-600 font-bold flex items-center gap-1">
-                            <i class="fa-solid fa-shield-halved text-[10px]"></i> High Security Mobile CBT v7.5 (Multi-Paket & 1 Guru = 1 Mapel)
+                            <i class="fa-solid fa-shield-halved text-[10px]"></i> High Security Mobile CBT v7.8 (Multi-Paket & 1 Guru = 1 Mapel)
                         </span>
                     </div>
                 </div>
@@ -122,7 +122,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCLH2hfCE6rzh5FXXZEd9GqaE-NwIsHTCiDN-CYIV1FRRl11gIndauYt4EW9VWIixV/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXdJg8-PLdA7NjUZktkKeJO-nPd8p58xNugR7W8nAm6276RBiHFRg4OsaWX8iA64h4/exec";
 
         // LOCAL MEMORY STATE (Objektif Murni, 100 Poin Total, 1 Guru = 1 Mapel Mandiri)
         const DB = {
@@ -265,7 +265,19 @@
             results: [
                 { rowIdx: 2, nis: "1003", name: "Candra Wijaya", class: "XII IPS 1", subject: "Informatika", package: "A", scorePG: 100, totalScore: 100, status: "Selesai", submittedAt: "08:15:00" }
             ],
-            studentAnswersMap: {}
+            studentAnswersMap: {
+                "1003_Informatika_A": {
+                    0: 1,
+                    1: [0, 2, 4],
+                    2: { 0: "BENAR", 1: "SALAH", 2: "BENAR" },
+                    3: ["Input (Masukan)", "Process (Pemrosesan)", "Storage (Penyimpanan)", "Output (Keluaran)"],
+                    4: [
+                        { left: "LAN (Local Area Network)", userRight: "Jangkauan lokal dalam satu ruangan, gedung, atau sekolah" },
+                        { left: "MAN (Metropolitan Area Network)", userRight: "Jangkauan antar gedung dalam satu kawasan kota" },
+                        { left: "WAN (Wide Area Network)", userRight: "Jangkauan luas mencakup antar kota, pulau, dan negara" }
+                    ]
+                }
+            }
         };
 
         async function apiCall(action, payload = {}) {
@@ -573,7 +585,7 @@
                                 </button>
                             </div>
 
-                           <!-- <div class="mt-8 border-t border-slate-200 pt-5 space-y-2">
+                         <!--   <div class="mt-8 border-t border-slate-200 pt-5 space-y-2">
                                 <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block text-center">Akses Cepat Pengujian:</span>
                                 <div class="grid grid-cols-3 gap-2">
                                     <button onclick="EduGuard.quickLogin('student', '1001')" class="bg-blue-50 text-blue-700 px-2 py-2 rounded-xl font-bold border border-blue-200 hover:bg-blue-100 transition text-[11px] text-center truncate">
@@ -1831,9 +1843,9 @@
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-purple-50 border border-purple-200 p-4 rounded-2xl">
                                 <div>
                                     <h4 class="font-bold text-purple-900 text-xs sm:text-sm flex items-center gap-2">
-                                        <i class="fa-solid fa-square-poll-vertical text-purple-600"></i> Rekapitulasi Nilai Siswa (Objektif Murni)
+                                        <i class="fa-solid fa-square-poll-vertical text-purple-600"></i> Rekapitulasi Nilai & Hasil Pengerjaan Siswa
                                     </h4>
-                                    <p class="text-xs text-purple-700">Mapel: <strong>${subjectName}</strong> | Semua soal dinilai secara instan otomatis oleh sistem.</p>
+                                    <p class="text-xs text-purple-700">Mapel: <strong>${subjectName}</strong> | Klik <strong>"Cek Lembar Jawaban"</strong> untuk melihat rincian pekerjaan siswa.</p>
                                 </div>
                                 <button onclick="EduGuard.exportTeacherResultsExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2 active:scale-95 whitespace-nowrap">
                                     <i class="fa-solid fa-file-excel text-sm"></i> Unduh Rekap Nilai (Excel)
@@ -1857,6 +1869,7 @@
                                                 <th class="p-3 font-extrabold text-purple-800">Skor Akhir (Max 100)</th>
                                                 <th class="p-3">Status</th>
                                                 <th class="p-3">Waktu Selesai</th>
+                                                <th class="p-3 text-center">Hasil Pekerjaan Siswa</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y text-slate-600">
@@ -1871,6 +1884,11 @@
                                                         <span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.status && r.status.includes('Dibatalkan') ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${r.status || 'Selesai'}</span>
                                                     </td>
                                                     <td class="p-3 text-slate-500 font-mono">${r.submittedAt || '-'}</td>
+                                                    <td class="p-3 text-center">
+                                                        <button onclick="EduGuard.viewTeacherStudentWorkModal('${r.nis}', '${r.name}', '${r.class || '-'}', '${r.subject}', '${r.package || 'A'}', ${r.totalScore})" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm transition active:scale-95 inline-flex items-center gap-1.5">
+                                                            <i class="fa-solid fa-file-signature"></i> Cek Lembar Jawaban
+                                                        </button>
+                                                    </td>
                                                 </tr>
                                             `).join('')}
                                         </tbody>
@@ -1912,6 +1930,187 @@
                         </div>
                     `;
                 }
+            },
+
+            async viewTeacherStudentWorkModal(nis, name, className, subjectName, pkg, totalScore) {
+                this.showToast('Memuat lembar pengerjaan siswa...', 'info');
+
+                let answersMap = {};
+                const remoteAnswers = await apiCall('getStudentAnswers', { nis: nis, subject: subjectName });
+                if (remoteAnswers && remoteAnswers.status === 'success' && Array.isArray(remoteAnswers.data)) {
+                    const found = remoteAnswers.data.find(a => String(a.nis) === String(nis) && String(a.package || 'A') === String(pkg));
+                    if (found && found.userAnswers) answersMap = found.userAnswers;
+                }
+
+                if (Object.keys(answersMap).length === 0 && DB.studentAnswersMap) {
+                    const localKey = `${nis}_${subjectName}_${pkg}`;
+                    if (DB.studentAnswersMap[localKey]) {
+                        answersMap = DB.studentAnswersMap[localKey];
+                    }
+                }
+
+                const subObj = DB.subjects.find(s => s.name === subjectName || s.id === this.teacherSelectedSubject);
+                const subId = subObj ? subObj.id : this.teacherSelectedSubject;
+
+                let questions = (DB.examPackages[subId] && DB.examPackages[subId][pkg]) || [];
+                if (questions.length === 0) {
+                    const remoteQ = await apiCall('getQuestions', { subjectId: subId, package: pkg });
+                    if (remoteQ && remoteQ.status === 'success' && remoteQ.data.length > 0) questions = remoteQ.data;
+                }
+
+                const body = `
+                    <div class="space-y-4">
+                        <div class="bg-purple-50 p-4 rounded-2xl border border-purple-200 text-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <span class="text-[10px] bg-purple-200 text-purple-900 px-2 py-0.5 rounded-full font-bold uppercase">Lembar Hasil Pengerjaan Siswa</span>
+                                <h4 class="font-black text-sm text-purple-950 mt-1 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-user-graduate text-purple-600"></i> ${name} (NIS: ${nis})
+                                </h4>
+                                <p class="text-xs text-slate-600">Kelas: <strong>${className}</strong> | Mapel: <strong>${subjectName}</strong> | Paket: <strong>${pkg}</strong></p>
+                            </div>
+                            <div class="text-right sm:border-l sm:border-purple-200 sm:pl-4">
+                                <span class="text-[10px] text-slate-500 font-bold block">Skor Akhir (Otomatis):</span>
+                                <span class="text-2xl font-black text-purple-700">${totalScore} <span class="text-xs font-normal text-slate-500">/ 100</span></span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+                            ${questions.length === 0 ? `
+                                <div class="text-center py-6 text-slate-400 text-xs bg-slate-50 border rounded-2xl">
+                                    <i class="fa-solid fa-folder-open text-2xl mb-1 text-slate-300 block"></i>
+                                    Belum ada data butir soal yang terbaca untuk paket ini.
+                                </div>
+                            ` : questions.map((q, qIdx) => {
+                                const userAns = answersMap[qIdx];
+                                const formattedQImg = this.formatImageUrl(q.image);
+                                const weight = Number(q.weight || 20);
+
+                                // Check correctness for each objective type
+                                let isCorrect = false;
+                                if (q.type === 'PG' && userAns === q.correctKey) isCorrect = true;
+                                else if (q.type === 'PGK' && Array.isArray(userAns) && Array.isArray(q.correctKeys)) {
+                                    isCorrect = [...userAns].sort().join(',') === [...q.correctKeys].sort().join(',');
+                                } else if (q.type === 'BS') {
+                                    if (typeof userAns === 'object' && userAns !== null && q.statements) {
+                                        let correctCount = 0;
+                                        const keysObj = typeof q.correctKey === 'object' ? q.correctKey : {};
+                                        q.statements.forEach((st, sIdx) => {
+                                            if (String(userAns[sIdx] || '').toUpperCase() === String(keysObj[sIdx] || 'BENAR').toUpperCase()) correctCount++;
+                                        });
+                                        isCorrect = correctCount === q.statements.length;
+                                    } else {
+                                        isCorrect = String(userAns || '').toUpperCase() === String(q.correctKey || 'BENAR').toUpperCase();
+                                    }
+                                } else if (q.type === 'URUTAN' && Array.isArray(userAns)) {
+                                    isCorrect = JSON.stringify(userAns) === JSON.stringify(q.correctOrder);
+                                } else if (q.type === 'JODOH' && Array.isArray(userAns)) {
+                                    let matchCount = 0;
+                                    (q.pairs || []).forEach((pair, pIdx) => {
+                                        if (userAns[pIdx] && userAns[pIdx].userRight === pair.right) matchCount++;
+                                    });
+                                    isCorrect = matchCount === (q.pairs || []).length;
+                                }
+
+                                return `
+                                    <div class="border rounded-2xl p-4 bg-slate-50 space-y-3">
+                                        <div class="flex justify-between items-center">
+                                            <div class="flex items-center gap-2">
+                                                <span class="bg-purple-100 text-purple-900 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase">Soal ${qIdx + 1} (${q.type === 'BS' ? 'B/S' : q.type})</span>
+                                                <span class="text-[10px] bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded">Bobot: ${weight} Poin</span>
+                                            </div>
+                                            <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full ${isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}">
+                                                ${isCorrect ? `✓ Benar (+${weight} Poin)` : '✗ Salah (0 Poin)'}
+                                            </span>
+                                        </div>
+
+                                        <p class="text-xs font-bold text-slate-800 leading-relaxed whitespace-pre-line">${q.text}</p>
+                                        ${formattedQImg ? `<img src="${formattedQImg}" class="max-h-36 rounded-xl my-1 border bg-white p-1">` : ''}
+
+                                        <!-- Jawaban yang Dipilih Siswa -->
+                                        <div class="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
+                                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Jawaban yang Dipilih Siswa:</span>
+                                            ${this.renderStudentWorkDetailValue(q, userAns)}
+                                        </div>
+
+                                        <!-- Kunci Jawaban Resmi Guru / Sistem -->
+                                        <div class="p-2.5 bg-emerald-50/70 border border-emerald-200 rounded-xl text-[11px] text-emerald-950">
+                                            <span class="font-extrabold text-emerald-800 block text-[10px] uppercase">Kunci Jawaban Tepat Sistem:</span>
+                                            ${this.renderQuestionKeySummary(q)}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+
+                this.showModal(`Lembar Jawaban Siswa - ${name}`, body, `<button onclick="EduGuard.closeModal()" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold">Tutup Lembar Jawaban</button>`);
+            },
+
+            renderStudentWorkDetailValue(q, userAns) {
+                if (userAns === undefined || userAns === null || userAns === '') {
+                    return `<span class="text-xs text-red-600 font-bold italic"><i class="fa-solid fa-circle-exclamation mr-1"></i>Siswa tidak menjawab butir soal ini.</span>`;
+                }
+
+                if (q.type === 'PG') {
+                    const optIdx = Number(userAns);
+                    const optText = q.options && q.options[optIdx] ? q.options[optIdx] : `Opsi ${String.fromCharCode(65 + optIdx)}`;
+                    return `<p class="text-xs font-bold text-slate-800"><span class="w-5 h-5 rounded-full bg-slate-100 text-slate-700 border inline-flex items-center justify-center text-[10px] mr-1.5 font-black">${String.fromCharCode(65 + optIdx)}</span> ${optText}</p>`;
+                } else if (q.type === 'PGK') {
+                    if (!Array.isArray(userAns) || userAns.length === 0) return `<span class="text-xs text-red-600 italic">Tidak ada opsi yang dipilih.</span>`;
+                    return `
+                        <div class="flex flex-wrap gap-1.5 pt-1">
+                            ${userAns.map(k => `
+                                <span class="text-xs bg-purple-100 text-purple-900 font-bold px-2 py-0.5 rounded-lg border border-purple-200">
+                                    ${String.fromCharCode(65 + k)}. ${q.options ? q.options[k] : ''}
+                                </span>
+                            `).join('')}
+                        </div>
+                    `;
+                } else if (q.type === 'BS') {
+                    if (typeof userAns === 'object' && userAns !== null && q.statements) {
+                        return `
+                            <ul class="text-xs font-semibold text-slate-700 space-y-1">
+                                ${q.statements.map((st, idx) => `
+                                    <li class="flex items-center justify-between border-b pb-1">
+                                        <span>${idx + 1}. ${st}</span>
+                                        <span class="font-bold ${userAns[idx] === 'BENAR' ? 'text-emerald-700' : 'text-red-700'}">${userAns[idx] || 'Kosong'}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        `;
+                    }
+                    const isVal = String(userAns).toUpperCase();
+                    return `<span class="text-xs font-black ${isVal === 'BENAR' ? 'text-emerald-700' : 'text-red-700'}">${isVal}</span>`;
+                } else if (q.type === 'URUTAN') {
+                    if (!Array.isArray(userAns)) return `<p class="text-xs text-slate-700">${userAns}</p>`;
+                    return `<ol class="list-decimal list-inside text-xs font-semibold text-slate-800 space-y-0.5">${userAns.map(it => `<li>${it}</li>`).join('')}</ol>`;
+                } else if (q.type === 'JODOH') {
+                    if (!Array.isArray(userAns)) return `<p class="text-xs text-slate-700">${userAns}</p>`;
+                    return `
+                        <ul class="text-xs font-semibold text-slate-800 space-y-1">
+                            ${userAns.map((p, idx) => `
+                                <li><strong>${idx + 1}. ${p.left}:</strong> ➔ <span class="text-purple-700 font-bold">${p.userRight || 'Tidak Diisi'}</span></li>
+                            `).join('')}
+                        </ul>
+                    `;
+                }
+                return `<p class="text-xs text-slate-700">${JSON.stringify(userAns)}</p>`;
+            },
+
+            renderQuestionKeySummary(q) {
+                if (q.type === 'PG' && q.options) {
+                    return `Kunci: <strong>${String.fromCharCode(65 + q.correctKey)}. ${q.options[q.correctKey] || ''}</strong>`;
+                } else if (q.type === 'PGK' && q.options) {
+                    return `Kunci: <strong>${(q.correctKeys || []).map(k => `${String.fromCharCode(65 + k)}. ${q.options[k] || ''}`).join(' | ')}</strong>`;
+                } else if (q.type === 'BS') {
+                    return `Kunci: <strong>${typeof q.correctKey === 'object' ? JSON.stringify(q.correctKey) : (q.correctKey || 'BENAR')}</strong>`;
+                } else if (q.type === 'URUTAN') {
+                    return `Urutan: <strong>${(q.correctOrder || []).join(' ➔ ')}</strong>`;
+                } else if (q.type === 'JODOH') {
+                    return `Pasangan: <strong>${(q.pairs || []).map(p => `${p.left} ➔ ${p.right}`).join(' | ')}</strong>`;
+                }
+                return `Kunci: ${JSON.stringify(q.correctKey)}`;
             },
 
             openExamPreviewModal(subId, pkg) {
