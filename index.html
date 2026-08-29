@@ -547,7 +547,7 @@
                             <div class="text-center my-4">
                                 <img src="https://lh3.googleusercontent.com/d/146YuridIPzE7wTiCCWIoeeM8-yGWMeVK" alt="Logo SMAN 1 Kutowinangun" class="w-[64px] h-[64px] object-contain mx-auto mb-3 shadow-sm rounded-2xl" onerror="this.onerror=null; this.src='https://placehold.co/64x64/2563eb/ffffff?text=CBT';">
                                 <h2 class="text-lg sm:text-xl font-black text-slate-800 tracking-tight">CBT SMA NEGERI 1 KUTOWINANGUN</h2>
-                                <p class="text-xs text-slate-500 mt-1">Sistem Ujian Objektif Multi-Paket (Google Sheet Integrated)</p>
+                                <p class="text-xs text-slate-500 mt-1">Sistem Ujian Objektif Multi-Paket</p>
                             </div>
 
                             <div class="bg-slate-100 p-1.5 rounded-2xl flex mb-6 text-xs font-bold text-slate-600">
@@ -573,7 +573,7 @@
                                 </button>
                             </div>
 
-                            <div class="mt-8 border-t border-slate-200 pt-5 space-y-2">
+                           <!-- <div class="mt-8 border-t border-slate-200 pt-5 space-y-2">
                                 <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block text-center">Akses Cepat Pengujian:</span>
                                 <div class="grid grid-cols-3 gap-2">
                                     <button onclick="EduGuard.quickLogin('student', '1001')" class="bg-blue-50 text-blue-700 px-2 py-2 rounded-xl font-bold border border-blue-200 hover:bg-blue-100 transition text-[11px] text-center truncate">
@@ -586,7 +586,7 @@
                                         <i class="fa-solid fa-user-shield block mb-1"></i> Admin Utama
                                     </button>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 `;
@@ -618,8 +618,8 @@
                     if (btnTeacher) btnTeacher.className = 'flex-1 py-2.5 rounded-xl bg-white text-purple-600 shadow-sm transition font-bold';
                     container.innerHTML = `
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Nomor Induk Pegawai (NIP Guru)</label>
-                            <input type="text" id="loginIdInput" placeholder="Masukkan NIP Guru (Cth: 19850715)..." class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">ID Pegawai (ID Guru)</label>
+                            <input type="text" id="loginIdInput" placeholder="Masukkan ID Guru (Cth: 19850715)..." class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
                             <span class="text-[11px] text-slate-400 mt-1 block">Akun demo guru: 19850715 (Informatika), 19900210 (Matematika)</span>
                         </div>
                         <button onclick="EduGuard.login('teacher')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3.5 rounded-xl text-sm shadow-md transition active:scale-95 flex items-center justify-center gap-2">
