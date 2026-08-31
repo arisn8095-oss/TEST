@@ -35,14 +35,24 @@
         }
     </script>
     <style>
-        .no-select { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+        .no-select { 
+            -webkit-touch-callout: none; 
+            -webkit-user-select: none; 
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none; 
+        }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .mobile-shell { max-width: 760px; margin: 0 auto; min-height: calc(100vh - 120px); background: #ffffff; position: relative; }
-        .math-symbol-btn { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px 8px; font-size: 13px; font-weight: bold; color: #334155; transition: all 0.1s; }
-        .math-symbol-btn:hover { background: #e0e7ff; color: #4338ca; border-color: #c7d2fe; }
-        .math-symbol-btn:active { transform: scale(0.95); }
+        .mobile-shell { max-width: 800px; margin: 0 auto; min-height: calc(100vh - 120px); background: #ffffff; position: relative; }
+        .symbol-btn { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px 7px; font-size: 12px; font-weight: bold; color: #334155; transition: all 0.1s; }
+        .symbol-btn:hover { background: #e0e7ff; color: #4338ca; border-color: #c7d2fe; }
+        .symbol-btn:active { transform: scale(0.95); }
+        .format-toolbar-btn { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 3px 8px; font-size: 11px; font-weight: bold; color: #475569; transition: all 0.1s; display: inline-flex; items-center; gap: 3px; }
+        .format-toolbar-btn:hover { background: #f1f5f9; color: #1e293b; border-color: #94a3b8; }
+        .question-render p { margin-bottom: 0.5rem; }
         @media print {
             header, footer, button, .no-print, #modalContainer, .nav-tabs, #cheatOverlay, #terminatedOverlay { display: none !important; }
             body { background: white !important; color: black !important; }
@@ -56,12 +66,12 @@
     <div id="cheatOverlay" class="fixed inset-0 bg-red-600 bg-opacity-95 z-50 hidden flex-col items-center justify-center p-6 text-white text-center backdrop-blur-md">
         <i class="fa-solid fa-triangle-exclamation text-6xl mb-4 animate-bounce"></i>
         <h2 class="text-2xl font-bold mb-2">PELANGGARAN TERDETEKSI!</h2>
-        <p id="cheatOverlayMsg" class="text-sm sm:text-base mb-6 max-w-md">Anda terdeteksi keluar dari layar penuh, berpindah tab, mencoba split-screen, tangkapan layar, atau menekan tombol navigasi HP. Pelanggaran ini dicatat server!</p>
+        <p id="cheatOverlayMsg" class="text-sm sm:text-base mb-6 max-w-md">Anda terdeteksi keluar dari layar penuh, berpindah tab/aplikasi, membuka notifikasi, mencoba split-screen, screenshot, atau menekan tombol navigasi HP. Pelanggaran ini dicatat server!</p>
         <div class="bg-white text-red-700 px-4 py-2 rounded-lg font-bold mb-6 text-sm shadow-md">
             Sisa Kesempatan: <span id="overlayStrikeCount">1</span> / <span id="overlayMaxStrike">3</span>
         </div>
         <button onclick="EduGuard.resumeExamFromWarning()" class="bg-white text-red-600 font-bold px-8 py-3 rounded-xl shadow-xl hover:bg-slate-100 transition active:scale-95 flex items-center gap-2">
-            <i class="fa-solid fa-shield-halved"></i> Kembali Ke Ujian (Lockdown)
+            <i class="fa-solid fa-shield-halved"></i> Kembali Ke Ujian (Lockdown Layar Penuh)
         </button>
     </div>
 
@@ -93,7 +103,7 @@
                     <div>
                         <h1 class="font-extrabold text-slate-800 text-xs sm:text-sm md:text-base leading-tight">CBT SMA NEGERI 1 KUTOWINANGUN</h1>
                         <span class="text-[11px] text-brand-600 font-bold flex items-center gap-1">
-                            <i class="fa-solid fa-shield-halved text-[10px]"></i> High Security Mobile CBT v7.8 (Multi-Paket & 1 Guru = 1 Mapel)
+                            <i class="fa-solid fa-shield-halved text-[10px]"></i> High Security Mobile CBT v8.0 (Multi-Paket & 1 Guru = 1 Mapel)
                         </span>
                     </div>
                 </div>
@@ -166,7 +176,7 @@
                         {
                             id: "Q_INF_A1",
                             type: "PG",
-                            text: "Shortcut keyboard yang digunakan untuk menyalin (copy) objek/teks pada sistem operasi komputer adalah ....",
+                            text: "Shortcut keyboard yang digunakan untuk menyalin (<b>copy</b>) objek/teks pada sistem operasi komputer adalah ....",
                             image: "",
                             options: ["Ctrl + V", "Ctrl + C", "Ctrl + X", "Ctrl + Z", "Ctrl + S"],
                             correctKey: 1,
@@ -175,7 +185,7 @@
                         {
                             id: "Q_INF_A2",
                             type: "PGK",
-                            text: "Pilihlah komponen perangkat keras yang tergolong sebagai Input Device (Perangkat Masukan)! (Pilih beberapa opsi)",
+                            text: "Pilihlah komponen perangkat keras yang tergolong sebagai <i>Input Device</i> (Perangkat Masukan)! (Pilih beberapa opsi)",
                             image: "",
                             options: ["Keyboard", "Monitor LED", "Mouse Optik", "Printer Laser", "Microphone"],
                             correctKeys: [0, 2, 4],
@@ -202,7 +212,7 @@
                         {
                             id: "Q_INF_A4",
                             type: "URUTAN",
-                            text: "Susunlah tahapan siklus pengolahan data (Information Processing Cycle) secara berurutan:",
+                            text: "Susunlah tahapan siklus pengolahan data (<i>Information Processing Cycle</i>) secara berurutan:",
                             image: "",
                             items: ["Input (Masukan)", "Process (Pemrosesan)", "Storage (Penyimpanan)", "Output (Keluaran)"],
                             correctOrder: ["Input (Masukan)", "Process (Pemrosesan)", "Storage (Penyimpanan)", "Output (Keluaran)"],
@@ -315,6 +325,7 @@
 
             // Admin State
             adminActiveTab: 'publication',
+            adminResultFilterPkg: 'all',
 
             init() {
                 this.generateDeviceFingerprint();
@@ -372,13 +383,13 @@
 
                 document.addEventListener('visibilitychange', () => {
                     if (this.activeExam && document.visibilityState === 'hidden') {
-                        this.handleViolation("Berpindah Tab / Membuka Aplikasi Lain!");
+                        this.handleViolation("Berpindah Tab / Membuka Aplikasi Lain / Membuka Notifikasi!");
                     }
                 });
 
                 window.addEventListener('blur', () => {
                     if (this.activeExam) {
-                        this.handleViolation("Aplikasi Kehilangan Fokus / Layar Terbelah (Split Screen)!");
+                        this.handleViolation("Aplikasi Kehilangan Fokus / Layar Terbelah (Split Screen) / Notifikasi Terbuka!");
                     }
                 });
 
@@ -388,7 +399,7 @@
                     const isCtrl = e.ctrlKey || e.metaKey;
 
                     if (
-                        key === 'F12' || key === 'F5' || key === 'F11' || key === 'F1' ||
+                        key === 'F12' || key === 'F5' || key === 'F11' || key === 'F1' || key === 'PrintScreen' ||
                         (isCtrl && (key === 'r' || key === 'R' || key === 'i' || key === 'I' || key === 'u' || key === 'U' || key === 'p' || key === 'P' || key === 's' || key === 'S' || key === 'c' || key === 'C' || key === 'v' || key === 'V' || key === 'x' || key === 'X' || key === 'a' || key === 'A')) ||
                         e.altKey || e.metaKey || key === 'Meta' || key === 'Tab' || key === 'Escape'
                     ) {
@@ -585,7 +596,7 @@
                                 </button>
                             </div>
 
-                         <!--   <div class="mt-8 border-t border-slate-200 pt-5 space-y-2">
+                           <!-- <div class="mt-8 border-t border-slate-200 pt-5 space-y-2">
                                 <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block text-center">Akses Cepat Pengujian:</span>
                                 <div class="grid grid-cols-3 gap-2">
                                     <button onclick="EduGuard.quickLogin('student', '1001')" class="bg-blue-50 text-blue-700 px-2 py-2 rounded-xl font-bold border border-blue-200 hover:bg-blue-100 transition text-[11px] text-center truncate">
@@ -631,8 +642,8 @@
                     container.innerHTML = `
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">ID Pegawai (ID Guru)</label>
-                            <input type="text" id="loginIdInput" placeholder="Masukkan ID Guru (Cth: 19850715)..." class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
-                            <span class="text-[11px] text-slate-400 mt-1 block">Akun demo guru: 19850715 (Informatika), 19900210 (Matematika)</span>
+                            <input type="text" id="loginIdInput" placeholder="Masukkan ID Guru (Cth: sman..)..." class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                          <!--  <span class="text-[11px] text-slate-400 mt-1 block">Akun demo guru: 19850715 (Informatika), 19900210 (Matematika)</span> -->
                         </div>
                         <button onclick="EduGuard.login('teacher')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3.5 rounded-xl text-sm shadow-md transition active:scale-95 flex items-center justify-center gap-2">
                             <i class="fa-solid fa-right-to-bracket"></i> Masuk Panel Guru (1 Mapel Terisolasi)
@@ -981,7 +992,7 @@
                                 
                                 ${formattedQImg ? `<img src="${formattedQImg}" onerror="this.onerror=null; this.src='https://placehold.co/400x200/e2e8f0/64748b?text=Gambar+Gagal+Muat';" class="max-h-52 rounded-xl my-3 mx-auto shadow-sm object-contain border bg-white p-1" alt="Gambar Soal">` : ''}
                                 
-                                <p class="text-xs sm:text-sm font-bold text-slate-800 my-3 leading-relaxed whitespace-pre-line">${ex.currentQuestionIdx + 1}. ${q.text}</p>
+                                <div class="text-xs sm:text-sm font-bold text-slate-800 my-3 leading-relaxed question-render">${ex.currentQuestionIdx + 1}. ${q.text}</div>
                                 ${this.renderQuestionOptionsHTML(q, ex.currentQuestionIdx)}
                             </div>
                         </div>
@@ -1384,7 +1395,6 @@
 
                 this.exitFullScreenMode();
 
-                // Tampilan Konfirmasi Tanpa Menampilkan Skor Nilai ke Murid
                 const body = document.getElementById('appBody');
                 body.innerHTML = `
                     <div class="mobile-shell bg-white border border-slate-200 rounded-3xl p-6 text-center shadow-xl my-4">
@@ -1638,6 +1648,24 @@
                 this.renderTeacherDashboard();
             },
 
+            insertFormattingTag(tagOpen, tagClose = '') {
+                const textarea = document.getElementById('manualText');
+                if (!textarea) return;
+
+                const start = textarea.selectionStart || 0;
+                const end = textarea.selectionEnd || 0;
+                const text = textarea.value;
+                const selected = text.substring(start, end);
+
+                const replacement = selected ? `${tagOpen}${selected}${tagClose}` : `${tagOpen}${tagClose}`;
+                textarea.value = text.substring(0, start) + replacement + text.substring(end);
+                textarea.focus();
+                
+                const newPos = selected ? start + replacement.length : start + tagOpen.length;
+                textarea.selectionStart = textarea.selectionEnd = newPos;
+                this.updateMathPreviewLive();
+            },
+
             insertMathSymbol(symbol) {
                 const textarea = document.getElementById('manualText');
                 if (!textarea) return;
@@ -1657,7 +1685,7 @@
                 const text = document.getElementById('manualText').value;
                 const previewEl = document.getElementById('manualMathPreview');
                 if (previewEl) {
-                    previewEl.innerText = text || '(Pratinjau paragraf soal matematika akan muncul di sini...)';
+                    previewEl.innerHTML = text ? text.replace(/\n/g, '<br>') : '(Pratinjau paragraf soal matematika/IPA akan muncul di sini...)';
                 }
             },
 
@@ -1689,33 +1717,59 @@
                                 </div>
                             </div>
 
-                            <!-- PALET SIMBOL MATEMATIKA LENGKAP -->
+                            <!-- TOOLBAR FORMAT PENULISAN TEKS -->
+                            <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm space-y-1.5">
+                                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                                    <i class="fa-solid fa-font text-purple-600 mr-1"></i> Format Penulisan Teks:
+                                </span>
+                                <div class="flex flex-wrap gap-1">
+                                    <button type="button" onclick="EduGuard.insertFormattingTag('<b>', '</b>')" class="format-toolbar-btn font-bold"><i class="fa-solid fa-bold mr-0.5"></i> Tebal</button>
+                                    <button type="button" onclick="EduGuard.insertFormattingTag('<i>', '</i>')" class="format-toolbar-btn italic"><i class="fa-solid fa-italic mr-0.5"></i> Miring</button>
+                                    <button type="button" onclick="EduGuard.insertFormattingTag('<u>', '</u>')" class="format-toolbar-btn underline"><i class="fa-solid fa-underline mr-0.5"></i> Garis Bawah</button>
+                                    <button type="button" onclick="EduGuard.insertFormattingTag('<sup>', '</sup>')" class="format-toolbar-btn"><i class="fa-solid fa-superscript mr-0.5"></i> Pangkat Atas (x²)</button>
+                                    <button type="button" onclick="EduGuard.insertFormattingTag('<sub>', '</sub>')" class="format-toolbar-btn"><i class="fa-solid fa-subscript mr-0.5"></i> Pangkat Bawah (H₂O)</button>
+                                    <button type="button" onclick="EduGuard.insertFormattingTag('<br>')" class="format-toolbar-btn"><i class="fa-solid fa-arrow-down mr-0.5"></i> Ganti Baris Baru</button>
+                                </div>
+                            </div>
+
+                            <!-- PALET SIMBOL MATEMATIKA, FISIKA, & KIMIA LENGKAP -->
                             <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm space-y-2">
                                 <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                                    <i class="fa-solid fa-square-root-variable text-purple-600 mr-1"></i> Toolbar Simbol Matematika Lengkap (Klik untuk Sisipkan):
+                                    <i class="fa-solid fa-square-root-variable text-purple-600 mr-1"></i> Simbol Matematika, Fisika, & Kimia Lengkap (Klik untuk Sisipkan):
                                 </span>
-                                <div class="flex flex-wrap gap-1.5">
-                                    ${[
-                                        '√', '∛', 'π', '²', '³', '⁴', 'ⁿ', '½', '¼', '¾', '±', '×', '÷', '≠', '≈', '≤', '≥', 
-                                        '∞', '∑', '∫', '∆', 'α', 'β', 'γ', 'θ', 'λ', 'μ', 'σ', 'ω', '°', '∠', '⊥', '△', 
-                                        '∈', '∉', '⊂', '⊃', '∪', '∩', '∅', 'lim', 'log', 'sin', 'cos', 'tan', '→', '↔'
-                                    ].map(sym => `
-                                        <button type="button" onclick="EduGuard.insertMathSymbol('${sym}')" class="math-symbol-btn">${sym}</button>
-                                    `).join('')}
+                                <div class="space-y-1.5">
+                                    <div class="flex flex-wrap items-center gap-1">
+                                        <span class="text-[10px] font-bold text-purple-800 w-16">Matematika:</span>
+                                        ${['√', '∛', 'π', '²', '³', '⁴', 'ⁿ', '½', '¼', '¾', '±', '×', '÷', '≠', '≈', '≤', '≥', '∞', '∑', '∫', '∆', 'lim', 'log', 'sin', 'cos', 'tan', '∠', '⊥', '△', '∈', '∉', '⊂', '⊃', '∪', '∩', '∅', '→', '↔'].map(sym => `
+                                            <button type="button" onclick="EduGuard.insertMathSymbol('${sym}')" class="symbol-btn">${sym}</button>
+                                        `).join('')}
+                                    </div>
+                                    <div class="flex flex-wrap items-center gap-1 border-t border-slate-100 pt-1.5">
+                                        <span class="text-[10px] font-bold text-indigo-800 w-16">Fisika:</span>
+                                        ${['Ω', 'λ', 'μ', 'ρ', 'σ', 'τ', 'ω', 'Φ', 'ν', 'ε', 'θ', 'α', 'β', 'γ', 'm/s²', 'kg', 'N', 'J', 'W', 'Pa', 'Hz', 'V', 'A', '°C', 'K'].map(sym => `
+                                            <button type="button" onclick="EduGuard.insertMathSymbol('${sym}')" class="symbol-btn">${sym}</button>
+                                        `).join('')}
+                                    </div>
+                                    <div class="flex flex-wrap items-center gap-1 border-t border-slate-100 pt-1.5">
+                                        <span class="text-[10px] font-bold text-emerald-800 w-16">Kimia:</span>
+                                        ${['→', '⇌', '⇄', '↑', '↓', 'H₂O', 'CO₂', 'O₂', 'N₂', 'CH₄', 'H⁺', 'OH⁻', 'SO₄²⁻', 'NO₃⁻', 'Fe²⁺', 'Fe³⁺', 'Cu²⁺'].map(sym => `
+                                            <button type="button" onclick="EduGuard.insertMathSymbol('${sym}')" class="symbol-btn">${sym}</button>
+                                        `).join('')}
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- KOLOM TEKS SOAL PARAGRAF LENGKAP & LIVE PREVIEW -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Pertanyaan / Paragraf Teks Soal</label>
-                                <textarea id="manualText" rows="4" oninput="EduGuard.updateMathPreviewLive()" placeholder="Ketik paragraf pertanyaan soal di sini... Simbol matematika yang disisipkan akan langsung tampil sesuai karakternya." class="w-full px-3 py-2.5 border rounded-xl text-xs bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 font-sans leading-relaxed"></textarea>
+                                <textarea id="manualText" rows="4" oninput="EduGuard.updateMathPreviewLive()" placeholder="Ketik paragraf pertanyaan soal di sini... Format HTML seperti &lt;b&gt;, &lt;i&gt;, &lt;sup&gt; dan simbol sains akan langsung diformat rapi." class="w-full px-3 py-2.5 border rounded-xl text-xs bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 font-sans leading-relaxed"></textarea>
                             </div>
 
-                            <!-- Live Math Paragraph Preview -->
+                            <!-- Live Science Paragraph Preview -->
                             <div class="p-3 bg-purple-50/60 border border-purple-200 rounded-xl">
                                 <span class="text-[10px] font-bold text-purple-800 uppercase block mb-1">Pratinjau Teks Paragraf Soal:</span>
-                                <div id="manualMathPreview" class="text-xs text-slate-700 italic leading-relaxed whitespace-pre-line">
-                                    (Pratinjau paragraf soal matematika akan muncul di sini...)
+                                <div id="manualMathPreview" class="text-xs text-slate-700 italic leading-relaxed question-render">
+                                    (Pratinjau paragraf soal matematika/IPA akan muncul di sini...)
                                 </div>
                             </div>
 
@@ -1740,7 +1794,7 @@
                             <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                 <div>
                                     <h4 class="font-bold text-blue-900 text-xs sm:text-sm">Template Impor Soal (.DOCX / .PDF / .XLSX)</h4>
-                                    <p class="text-xs text-blue-700">Dukungan 5 jenis soal objektif (PG, PGK, B/S, Urutan, Jodoh) tanpa essay.</p>
+                                    <p class="text-xs text-blue-700">Tag Kode: <strong>[PG]</strong>, <strong>[PGK]</strong>, <strong>[B/S]</strong>, <strong>[URUTAN]</strong>, <strong>[JODOH]</strong>. Teks diawali <strong>@</strong>, Opsi diawali <strong>#</strong>, dan <strong>[Kunci: ...]</strong> otomatis disembunyikan saat tampil di murid.</p>
                                 </div>
                                 <div class="flex gap-2">
                                     <button onclick="EduGuard.downloadQuestionExcelTemplate()" class="bg-emerald-600 text-white px-3 py-2 rounded-xl text-xs font-bold hover:bg-emerald-700 shadow-sm flex items-center gap-1.5 transition active:scale-95">
@@ -1774,14 +1828,22 @@
                 } else if (tab === 'review') {
                     return `
                         <div class="space-y-3">
-                            <div class="flex justify-between items-center bg-slate-100 p-3 rounded-2xl">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-100 p-3 rounded-2xl">
                                 <div>
-                                    <span class="font-bold text-xs text-slate-700">Total Soal di Paket ${pkg}: <strong class="text-purple-700 text-sm">${questionsList.length}</strong></span>
-                                    <span class="text-[11px] text-slate-500 block">Total Bobot: <strong>${questionsList.reduce((s, q)=>s+Number(q.weight||0), 0)} Poin</strong></span>
+                                    <span class="font-bold text-xs text-slate-700">Bank Soal Paket ${pkg}: <strong class="text-purple-700 text-sm">${questionsList.length} Butir Soal</strong></span>
+                                    <span class="text-[11px] text-slate-500 block">Total Bobot Akumulasi: <strong>${questionsList.reduce((s, q)=>s+Number(q.weight||0), 0)} Poin</strong></span>
                                 </div>
-                                <button onclick="EduGuard.openExamPreviewModal('${subjectId}', '${pkg}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-md transition active:scale-95 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-eye"></i> Simulasi Preview Soal
-                                </button>
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <button onclick="EduGuard.downloadBankSoalExcel('${subjectId}', '${pkg}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-xs font-bold shadow-md transition active:scale-95 flex items-center gap-1.5" title="Download Bank Soal Format Excel">
+                                        <i class="fa-solid fa-file-excel"></i> Unduh Excel
+                                    </button>
+                                    <button onclick="EduGuard.downloadBankSoalWord('${subjectId}', '${pkg}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-xl text-xs font-bold shadow-md transition active:scale-95 flex items-center gap-1.5" title="Download Bank Soal Format Word">
+                                        <i class="fa-solid fa-file-word"></i> Unduh Word (.doc)
+                                    </button>
+                                    <button onclick="EduGuard.openExamPreviewModal('${subjectId}', '${pkg}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-md transition active:scale-95 flex items-center gap-1.5">
+                                        <i class="fa-solid fa-eye"></i> Simulasi Preview
+                                    </button>
+                                </div>
                             </div>
 
                             ${questionsList.length === 0 ? `
@@ -1807,7 +1869,7 @@
                                                 </button>
                                             </div>
                                         </div>
-                                        <p class="text-xs font-bold text-slate-800 leading-relaxed whitespace-pre-line">${idx + 1}. ${q.text}</p>
+                                        <div class="text-xs font-bold text-slate-800 leading-relaxed question-render">${idx + 1}. ${q.text}</div>
                                         ${formattedQImg ? `<img src="${formattedQImg}" class="max-h-36 rounded-lg my-1 border bg-white p-1" onerror="this.onerror=null; this.src='https://placehold.co/300x150/e2e8f0/64748b?text=Gambar+Gagal+Muat';">` : ''}
                                         ${q.options ? `<p class="text-[11px] text-slate-600">Opsi/Pernyataan: ${q.options.join(' | ')}</p>` : ''}
                                         ${q.items ? `<p class="text-[11px] text-slate-600">Items Urutan: ${q.items.join(' -> ')}</p>` : ''}
@@ -1836,26 +1898,25 @@
                     const subjectName = activeSubjectObj ? activeSubjectObj.name : 'Mata Pelajaran';
                     
                     const filteredResults = DB.results.filter(r => !r.subject || r.subject === subjectName || subjectName.includes(r.subject) || r.subject.includes(subjectName));
-                    const listToDisplay = filteredResults.length > 0 ? filteredResults : DB.results;
 
                     return `
                         <div class="space-y-4">
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-purple-50 border border-purple-200 p-4 rounded-2xl">
                                 <div>
                                     <h4 class="font-bold text-purple-900 text-xs sm:text-sm flex items-center gap-2">
-                                        <i class="fa-solid fa-square-poll-vertical text-purple-600"></i> Rekapitulasi Nilai & Hasil Pengerjaan Siswa
+                                        <i class="fa-solid fa-square-poll-vertical text-purple-600"></i> Rekapitulasi Nilai Siswa Selesai
                                     </h4>
-                                    <p class="text-xs text-purple-700">Mapel: <strong>${subjectName}</strong> | Klik <strong>"Cek Lembar Jawaban"</strong> untuk melihat rincian pekerjaan siswa.</p>
+                                    <p class="text-xs text-purple-700">Mapel: <strong>${subjectName}</strong> | Total Siswa Selesai: <strong>${filteredResults.length} Orang</strong></p>
                                 </div>
                                 <button onclick="EduGuard.exportTeacherResultsExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2 active:scale-95 whitespace-nowrap">
                                     <i class="fa-solid fa-file-excel text-sm"></i> Unduh Rekap Nilai (Excel)
                                 </button>
                             </div>
 
-                            ${listToDisplay.length === 0 ? `
+                            ${filteredResults.length === 0 ? `
                                 <div class="text-center py-8 text-slate-400 text-xs border rounded-2xl bg-white p-6">
                                     <i class="fa-solid fa-file-circle-xmark text-3xl mb-2 block text-slate-300"></i>
-                                    Belum ada data pengerjaan ujian siswa untuk mata pelajaran ini.
+                                    Belum ada data pengerjaan ujian siswa yang telah selesai untuk mata pelajaran ini.
                                 </div>
                             ` : `
                                 <div class="overflow-x-auto border rounded-2xl bg-white shadow-sm">
@@ -1873,7 +1934,7 @@
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y text-slate-600">
-                                            ${listToDisplay.map(r => `
+                                            ${filteredResults.map(r => `
                                                 <tr class="hover:bg-slate-50 transition">
                                                     <td class="p-3 font-bold text-slate-800">${r.nis}</td>
                                                     <td class="p-3 font-semibold text-slate-700">${r.name}</td>
@@ -1898,9 +1959,20 @@
                         </div>
                     `;
                 } else if (tab === 'cheat') {
+                    const activeSubjectObj = DB.subjects.find(s => s.id === subjectId);
+                    const subjectName = activeSubjectObj ? activeSubjectObj.name : 'Mata Pelajaran';
+                    const subjectCheatLogs = DB.cheatLogs.filter(l => !l.subject || l.subject === subjectName || subjectName.includes(l.subject) || l.subject.includes(subjectName));
+
                     return `
                         <div class="space-y-3">
-                            <h4 class="font-bold text-slate-800 text-sm">Log Pelanggaran Siswa (Live)</h4>
+                            <div class="flex justify-between items-center bg-red-50 p-3 rounded-2xl border border-red-200">
+                                <div>
+                                    <h4 class="font-bold text-red-900 text-xs sm:text-sm">Log Pelanggaran Siswa Mapel ${subjectName}</h4>
+                                    <p class="text-[11px] text-red-700">Mencatat upaya screenshot, pindah tab, split screen, dan tombol navigasi.</p>
+                                </div>
+                                <span class="text-xs bg-red-200 text-red-800 font-bold px-2.5 py-1 rounded-full">${subjectCheatLogs.length} Pelanggaran</span>
+                            </div>
+
                             <div class="overflow-x-auto border rounded-2xl bg-white shadow-sm">
                                 <table class="w-full text-left border-collapse text-xs">
                                     <thead class="bg-red-50 text-red-800 font-bold border-b">
@@ -1909,19 +1981,21 @@
                                             <th class="p-3">NIS</th>
                                             <th class="p-3">Nama Siswa</th>
                                             <th class="p-3">Jenis Pelanggaran</th>
-                                            <th class="p-3">KALI</th>
+                                            <th class="p-3">Point</th>
+                                            <th class="p-3">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y text-slate-600">
-                                        ${DB.cheatLogs.length === 0 ? `
-                                            <tr><td colspan="5" class="p-4 text-center text-slate-400">Belum ada catatan pelanggaran siswa.</td></tr>
-                                        ` : DB.cheatLogs.map(l => `
+                                        ${subjectCheatLogs.length === 0 ? `
+                                            <tr><td colspan="6" class="p-4 text-center text-slate-400">Belum ada catatan pelanggaran siswa pada mapel ini.</td></tr>
+                                        ` : subjectCheatLogs.map(l => `
                                             <tr>
-                                                <td class="p-3">${l.timestamp}</td>
+                                                <td class="p-3">${l.timestamp || '-'}</td>
                                                 <td class="p-3 font-bold">${l.nis}</td>
                                                 <td class="p-3">${l.name}</td>
                                                 <td class="p-3 text-red-600 font-semibold">${l.violationType}</td>
                                                 <td class="p-3 font-bold">${l.count}</td>
+                                                <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">${l.status || 'Teguran'}</span></td>
                                             </tr>
                                         `).join('')}
                                     </tbody>
@@ -1930,6 +2004,113 @@
                         </div>
                     `;
                 }
+            },
+
+            downloadBankSoalExcel(subId, pkg) {
+                const questions = (DB.examPackages[subId] && DB.examPackages[subId][pkg]) || [];
+                const subject = DB.subjects.find(s => s.id === subId);
+                const subName = subject ? subject.name : 'Mata_Pelajaran';
+
+                if (questions.length === 0) {
+                    return this.showToast(`Belum ada soal pada Paket ${pkg} untuk diunduh!`, 'warning');
+                }
+
+                const data = [
+                    [`BANK SOAL ${subName.toUpperCase()} - PAKET ${pkg}`],
+                    [`SMA NEGERI 1 KUTOWINANGUN`, `Tanggal Unduh: ${new Date().toLocaleDateString()}`],
+                    [],
+                    ["NO", "TIPE", "PERTANYAAN SOAL", "BOBOT", "OPSI / ELEMEN", "KUNCI JAWABAN"]
+                ];
+
+                questions.forEach((q, idx) => {
+                    let optStr = "";
+                    let keyStr = "";
+
+                    if (q.type === 'PG' || q.type === 'PGK') {
+                        optStr = (q.options || []).map((o, i) => `${String.fromCharCode(65 + i)}. ${o}`).join(' | ');
+                        if (q.type === 'PG') keyStr = String.fromCharCode(65 + Number(q.correctKey || 0));
+                        else keyStr = (q.correctKeys || []).map(k => String.fromCharCode(65 + k)).join(', ');
+                    } else if (q.type === 'BS') {
+                        optStr = (q.statements || q.options || []).join(' | ');
+                        keyStr = typeof q.correctKey === 'object' ? JSON.stringify(q.correctKey) : String(q.correctKey || 'BENAR');
+                    } else if (q.type === 'URUTAN') {
+                        optStr = (q.items || []).join(' -> ');
+                        keyStr = (q.correctOrder || []).join(' -> ');
+                    } else if (q.type === 'JODOH') {
+                        optStr = (q.pairs || []).map(p => `${p.left} = ${p.right}`).join(' | ');
+                        keyStr = (q.pairs || []).map(p => `${p.left} => ${p.right}`).join(' | ');
+                    }
+
+                    data.push([idx + 1, q.type, q.text.replace(/<[^>]*>/g, ''), q.weight || 20, optStr, keyStr]);
+                });
+
+                const worksheet = XLSX.utils.aoa_to_sheet(data);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, `Paket_${pkg}`);
+                XLSX.writeFile(workbook, `Bank_Soal_${subName.replace(/[^a-zA-Z0-9]/g, '_')}_Paket_${pkg}.xlsx`);
+                this.showToast(`Bank Soal Paket ${pkg} berhasil diunduh (Excel)!`, 'success');
+            },
+
+            downloadBankSoalWord(subId, pkg) {
+                const questions = (DB.examPackages[subId] && DB.examPackages[subId][pkg]) || [];
+                const subject = DB.subjects.find(s => s.id === subId);
+                const subName = subject ? subject.name : 'Mata_Pelajaran';
+
+                if (questions.length === 0) {
+                    return this.showToast(`Belum ada soal pada Paket ${pkg} untuk diunduh!`, 'warning');
+                }
+
+                let htmlContent = `
+                    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                    <head><meta charset='utf-8'><title>Bank Soal</title>
+                    <style>
+                        body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.4; }
+                        h2, h3 { text-align: center; margin: 4px 0; }
+                        .soal-item { margin-bottom: 16px; border-bottom: 1px solid #ccc; padding-bottom: 8px; }
+                        .kunci { color: #166534; font-weight: bold; margin-top: 4px; }
+                    </style>
+                    </head>
+                    <body>
+                        <h2>CBT SMA NEGERI 1 KUTOWINANGUN</h2>
+                        <h3>BANK SOAL: ${subName.toUpperCase()} (PAKET ${pkg})</h3>
+                        <hr/>
+                `;
+
+                questions.forEach((q, idx) => {
+                    htmlContent += `<div class="soal-item">`;
+                    htmlContent += `<p><strong>${idx + 1}. [${q.type}] (Bobot: ${q.weight || 20} Poin)</strong><br/>${q.text}</p>`;
+                    
+                    if (q.type === 'PG' && q.options) {
+                        q.options.forEach((opt, oIdx) => {
+                            htmlContent += `<div>${String.fromCharCode(65 + oIdx)}. ${opt}</div>`;
+                        });
+                        htmlContent += `<div class="kunci">Kunci: ${String.fromCharCode(65 + Number(q.correctKey || 0))}</div>`;
+                    } else if (q.type === 'PGK' && q.options) {
+                        q.options.forEach((opt, oIdx) => {
+                            htmlContent += `<div>[ ] ${String.fromCharCode(65 + oIdx)}. ${opt}</div>`;
+                        });
+                        htmlContent += `<div class="kunci">Kunci: ${(q.correctKeys || []).map(k => String.fromCharCode(65 + k)).join(', ')}</div>`;
+                    } else if (q.type === 'BS') {
+                        htmlContent += `<div>Pernyataan: ${(q.statements || q.options || []).join(' | ')}</div>`;
+                        htmlContent += `<div class="kunci">Kunci: ${JSON.stringify(q.correctKey)}</div>`;
+                    } else if (q.type === 'URUTAN') {
+                        htmlContent += `<div>Items: ${(q.items || []).join(' -> ')}</div>`;
+                        htmlContent += `<div class="kunci">Kunci Urutan: ${(q.correctOrder || []).join(' -> ')}</div>`;
+                    } else if (q.type === 'JODOH') {
+                        htmlContent += `<div>Pasangan: ${(q.pairs || []).map(p => `${p.left} = ${p.right}`).join(' | ')}</div>`;
+                    }
+                    htmlContent += `</div>`;
+                });
+
+                htmlContent += `</body></html>`;
+
+                const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Bank_Soal_${subName.replace(/[^a-zA-Z0-9]/g, '_')}_Paket_${pkg}.doc`;
+                a.click();
+                this.showToast(`Bank Soal Paket ${pkg} berhasil diunduh (Word .doc)!`, 'success');
             },
 
             async viewTeacherStudentWorkModal(nis, name, className, subjectName, pkg, totalScore) {
@@ -1985,7 +2166,6 @@
                                 const formattedQImg = this.formatImageUrl(q.image);
                                 const weight = Number(q.weight || 20);
 
-                                // Check correctness for each objective type
                                 let isCorrect = false;
                                 if (q.type === 'PG' && userAns === q.correctKey) isCorrect = true;
                                 else if (q.type === 'PGK' && Array.isArray(userAns) && Array.isArray(q.correctKeys)) {
@@ -2023,7 +2203,7 @@
                                             </span>
                                         </div>
 
-                                        <p class="text-xs font-bold text-slate-800 leading-relaxed whitespace-pre-line">${q.text}</p>
+                                        <div class="text-xs font-bold text-slate-800 leading-relaxed question-render">${q.text}</div>
                                         ${formattedQImg ? `<img src="${formattedQImg}" class="max-h-36 rounded-xl my-1 border bg-white p-1">` : ''}
 
                                         <!-- Jawaban yang Dipilih Siswa -->
@@ -2141,7 +2321,7 @@
                                             <span class="bg-indigo-100 text-indigo-800 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase">Soal ${idx + 1} (${q.type})</span>
                                             <span class="text-[10px] text-slate-500 font-bold">Bobot: ${q.weight || 20} Poin</span>
                                         </div>
-                                        <p class="text-xs font-bold text-slate-800 whitespace-pre-line leading-relaxed">${q.text}</p>
+                                        <div class="text-xs font-bold text-slate-800 leading-relaxed question-render">${q.text}</div>
                                         ${formattedQImg ? `<img src="${formattedQImg}" class="max-h-40 rounded-xl my-2 mx-auto border bg-white p-1">` : ''}
 
                                         <div class="pt-2 border-t space-y-1">
@@ -2200,9 +2380,8 @@
                 const subjectName = subjectObj ? subjectObj.name : 'Mata_Pelajaran';
 
                 const filteredResults = DB.results.filter(r => !r.subject || r.subject === subjectName || subjectName.includes(r.subject) || r.subject.includes(subjectName));
-                const dataList = filteredResults.length > 0 ? filteredResults : DB.results;
 
-                if (dataList.length === 0) {
+                if (filteredResults.length === 0) {
                     return this.showToast('Belum ada data hasil ujian untuk diunduh!', 'warning');
                 }
 
@@ -2213,7 +2392,7 @@
                     ["NO", "NIS", "NAMA SISWA", "KELAS", "PAKET", "SKOR AKHIR (100)", "STATUS", "WAKTU SUBMIT"]
                 ];
 
-                dataList.forEach((r, idx) => {
+                filteredResults.forEach((r, idx) => {
                     excelData.push([
                         idx + 1,
                         r.nis,
@@ -2855,9 +3034,11 @@
                                 </h2>
                                 <p class="text-xs text-slate-500">Kontrol Publikasi Multi-Paket, Data User (1 Guru = 1 Mapel), & Monitoring Pelanggaran</p>
                             </div>
-                            <button onclick="EduGuard.triggerAutoSetupDatabase()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95">
-                                <i class="fa-solid fa-database"></i> Inisialisasi Database Google Sheets
-                            </button>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <button onclick="EduGuard.promptDatabaseSetupSecurityModal()" class="bg-red-600 hover:bg-red-700 text-white px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95">
+                                    <i class="fa-solid fa-database"></i> Inisialisasi Database Google Sheets
+                                </button>
+                            </div>
                         </div>
 
                         <div class="flex overflow-x-auto gap-2 border-b border-slate-100 pb-2 text-xs font-bold">
@@ -2885,15 +3066,41 @@
                 `;
             },
 
-            async triggerAutoSetupDatabase() {
-                this.showToast('Memulai pembuatan database di Google Sheets...', 'info');
-                const res = await apiCall('setupDatabase');
+            promptDatabaseSetupSecurityModal() {
+                const body = `
+                    <div class="space-y-3">
+                        <div class="bg-red-50 border border-red-200 p-3.5 rounded-xl text-red-800 text-xs">
+                            <p class="font-bold flex items-center gap-1.5 mb-1"><i class="fa-solid fa-triangle-exclamation text-red-600"></i> PERINGATAN TINDAKAN KRUSIAL:</p>
+                            <p>Inisialisasi akan membuat ulang seluruh tabel database spreadsheet sekolah. Untuk melanjutkan, ketik kata kunci konfirmasi keamanan di bawah ini:</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Ketik Kata Kunci: <code class="bg-slate-100 text-red-700 px-1.5 py-0.5 rounded font-bold">SAYARESET</code></label>
+                            <input type="text" id="dbResetSecurityInput" placeholder="Ketik ..." class="w-full p-2.5 border rounded-xl text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-red-500 bg-white">
+                        </div>
+                    </div>
+                `;
+                const footer = `
+                    <button onclick="EduGuard.closeModal()" class="bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl text-xs font-bold">Batal</button>
+                    <button onclick="EduGuard.executeDatabaseSetupWithSecurity()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-xl text-xs font-bold shadow-md">Lanjutkan Inisialisasi</button>
+                `;
+                this.showModal('Konfirmasi Keamanan Database', body, footer);
+            },
+
+            async executeDatabaseSetupWithSecurity() {
+                const inputVal = document.getElementById('dbResetSecurityInput').value.trim().toUpperCase();
+                if (inputVal !== 'SAYARESET') {
+                    return this.showToast('Kata sandi keamanan salah! Ketik SAYARESET dengan benar.', 'error');
+                }
+
+                this.closeModal();
+                this.showToast('Memulai inisialisasi database di Google Sheets...', 'info');
+                const res = await apiCall('setupDatabase', { securityKey: 'SAYARESET' });
                 if (res && res.status === 'success') {
                     this.showToast('✅ ' + res.message, 'success');
                 } else if (res) {
                     this.showToast('❌ Gagal: ' + res.message, 'error');
                 } else {
-                    this.showToast('Tersambung ke Mode Offline / Demo.', 'info');
+                    this.showToast('Database mode offline/demo telah di-reset.', 'info');
                 }
             },
 
@@ -2959,17 +3166,20 @@
                 } else if (tab === 'cheat') {
                     return `
                         <div class="space-y-4">
-                            <div class="flex justify-between items-center bg-red-50 p-3.5 rounded-2xl border border-red-200">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-red-50 p-3.5 rounded-2xl border border-red-200">
                                 <div>
-                                    <h4 class="font-bold text-red-900 text-xs sm:text-sm">Atur Batas Toleransi Pelanggaran (Max Strikes)</h4>
-                                    <p class="text-xs text-red-700">Jika siswa melanggar melebihi batas ini, ujian dipaksa simpan dan dikirim.</p>
+                                    <h4 class="font-bold text-red-900 text-xs sm:text-sm">Kontrol Kecurangan & Batas Toleransi Pelanggaran</h4>
+                                    <p class="text-xs text-red-700">Mencatat otomatis pelanggaran screenshot, split screen, tab blur, dan tombol navigasi.</p>
                                 </div>
-                                <select onchange="EduGuard.setAdminMaxStrikes(this.value)" class="px-3 py-2 border rounded-xl text-xs font-bold text-red-800 bg-white shadow-sm">
-                                    <option value="1" ${this.maxViolations === 1 ? 'selected' : ''}>1x Strike (Sangat Ketat)</option>
-                                    <option value="2" ${this.maxViolations === 2 ? 'selected' : ''}>2x Strikes</option>
-                                    <option value="3" ${this.maxViolations === 3 ? 'selected' : ''}>3x Strikes (Standar)</option>
-                                    <option value="5" ${this.maxViolations === 5 ? 'selected' : ''}>5x Strikes</option>
-                                </select>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold text-red-900">Max Strikes:</span>
+                                    <select onchange="EduGuard.setAdminMaxStrikes(this.value)" class="px-3 py-1.5 border rounded-xl text-xs font-bold text-red-800 bg-white shadow-sm">
+                                        <option value="1" ${this.maxViolations === 1 ? 'selected' : ''}>1x Strike (Sangat Ketat)</option>
+                                        <option value="2" ${this.maxViolations === 2 ? 'selected' : ''}>2x Strikes</option>
+                                        <option value="3" ${this.maxViolations === 3 ? 'selected' : ''}>3x Strikes (Standar)</option>
+                                        <option value="5" ${this.maxViolations === 5 ? 'selected' : ''}>5x Strikes</option>
+                                    </select>
+                                </div>
                             </div>
 
                             <div class="overflow-x-auto border rounded-2xl bg-white shadow-sm">
@@ -2978,8 +3188,8 @@
                                         <tr>
                                             <th class="p-3">Waktu</th>
                                             <th class="p-3">NIS</th>
-                                            <th class="p-3">Nama</th>
-                                            <th class="p-3">Mapel</th>
+                                            <th class="p-3">Nama Siswa</th>
+                                            <th class="p-3">Mata Pelajaran</th>
                                             <th class="p-3">Jenis Pelanggaran</th>
                                             <th class="p-3">Point</th>
                                             <th class="p-3">Aksi Reset</th>
@@ -2987,12 +3197,12 @@
                                     </thead>
                                     <tbody class="divide-y text-slate-600">
                                         ${DB.cheatLogs.length === 0 ? `
-                                            <tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada catatan kecurangan.</td></tr>
+                                            <tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada catatan kecurangan siswa.</td></tr>
                                         ` : DB.cheatLogs.map(l => `
                                             <tr>
                                                 <td class="p-3">${l.timestamp || '-'}</td>
                                                 <td class="p-3 font-bold">${l.nis}</td>
-                                                <td class="p-3">${l.name}</td>
+                                                <td class="p-3 font-semibold">${l.name}</td>
                                                 <td class="p-3">${l.subject}</td>
                                                 <td class="p-3 text-red-600 font-semibold">${l.violationType}</td>
                                                 <td class="p-3 font-bold">${l.count}</td>
@@ -3009,16 +3219,27 @@
                         </div>
                     `;
                 } else if (tab === 'results') {
+                    const filterPkg = this.adminResultFilterPkg;
+                    const displayedResults = DB.results.filter(r => filterPkg === 'all' || String(r.package || 'A') === String(filterPkg));
+
                     return `
                         <div class="space-y-4">
-                            <div class="flex justify-between items-center">
-                                <h4 class="font-bold text-slate-800 text-xs sm:text-sm">Hasil Nilai Ujian Seluruh Siswa</h4>
-                                <div class="flex gap-2">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold text-slate-700">Tampilkan Paket:</span>
+                                    <select onchange="EduGuard.filterAdminResultPackage(this.value)" class="px-3 py-1.5 border rounded-xl text-xs bg-white font-bold text-purple-900 shadow-sm">
+                                        <option value="all" ${filterPkg === 'all' ? 'selected' : ''}>Semua Paket Soal</option>
+                                        <option value="A" ${filterPkg === 'A' ? 'selected' : ''}>Hanya Paket A</option>
+                                        <option value="B" ${filterPkg === 'B' ? 'selected' : ''}>Hanya Paket B</option>
+                                        <option value="C" ${filterPkg === 'C' ? 'selected' : ''}>Hanya Paket C</option>
+                                    </select>
+                                </div>
+                                <div class="flex gap-2 flex-wrap">
                                     <button onclick="EduGuard.exportToPDF()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm flex items-center gap-1 transition active:scale-95">
                                         <i class="fa-solid fa-file-pdf"></i> Cetak PDF
                                     </button>
-                                    <button onclick="EduGuard.exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm flex items-center gap-1 transition active:scale-95">
-                                        <i class="fa-solid fa-file-excel"></i> Export Excel
+                                    <button onclick="EduGuard.exportAdminResultsExcel('${filterPkg}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold shadow-sm flex items-center gap-1 transition active:scale-95">
+                                        <i class="fa-solid fa-file-excel"></i> Unduh Excel (Paket ${filterPkg === 'all' ? 'Semua' : filterPkg})
                                     </button>
                                 </div>
                             </div>
@@ -3037,15 +3258,15 @@
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y text-slate-600">
-                                        ${DB.results.length === 0 ? `
-                                            <tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada hasil pengerjaan ujian.</td></tr>
-                                        ` : DB.results.map(r => `
+                                        ${displayedResults.length === 0 ? `
+                                            <tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada data pengerjaan ujian untuk filter ini.</td></tr>
+                                        ` : displayedResults.map(r => `
                                             <tr>
                                                 <td class="p-3 font-bold">${r.nis}</td>
-                                                <td class="p-3">${r.name}</td>
+                                                <td class="p-3 font-semibold">${r.name}</td>
                                                 <td class="p-3">${r.class || '-'}</td>
                                                 <td class="p-3">${r.subject}</td>
-                                                <td class="p-3 font-bold text-purple-700">Paket ${r.package || 'A'}</td>
+                                                <td class="p-3 font-bold text-purple-700"><span class="bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-[10px]">Paket ${r.package || 'A'}</span></td>
                                                 <td class="p-3 font-black text-brand-600">${r.totalScore}</td>
                                                 <td class="p-3 font-bold ${r.status && r.status.includes('Dibatalkan') ? 'text-red-600' : 'text-emerald-600'}">${r.status || 'Selesai'}</td>
                                             </tr>
@@ -3156,7 +3377,16 @@
                 } else if (tab === 'users') {
                     return `
                         <div class="space-y-4">
-                            <h4 class="font-bold text-slate-800 text-xs sm:text-sm">Manajemen Perangkat HP Siswa (Unbind Device Lock)</h4>
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 border border-slate-200 p-4 rounded-2xl">
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-xs sm:text-sm">Manajemen Perangkat HP Siswa (Device Lock & Unbind)</h4>
+                                    <p class="text-xs text-slate-500">Mencegah satu akun murid dibuka bersamaan di handphone berbeda.</p>
+                                </div>
+                                <button onclick="EduGuard.confirmUnbindAllDevicesModal()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md transition active:scale-95 flex items-center gap-1.5 whitespace-nowrap">
+                                    <i class="fa-solid fa-mobile-screen-button"></i> Unbind All Device HP
+                                </button>
+                            </div>
+
                             <div class="overflow-x-auto border rounded-2xl bg-white shadow-sm">
                                 <table class="w-full text-left border-collapse text-xs">
                                     <thead class="bg-slate-100 border-b text-slate-700 font-bold">
@@ -3188,6 +3418,69 @@
                         </div>
                     `;
                 }
+            },
+
+            filterAdminResultPackage(pkg) {
+                this.adminResultFilterPkg = pkg;
+                this.renderAdminDashboard();
+            },
+
+            exportAdminResultsExcel(filterPkg = 'all') {
+                const displayedResults = DB.results.filter(r => filterPkg === 'all' || String(r.package || 'A') === String(filterPkg));
+
+                if (displayedResults.length === 0) {
+                    return this.showToast('Belum ada data nilai pada paket ini untuk diunduh!', 'warning');
+                }
+
+                const excelData = [
+                    ["REKAPITULASI HASIL UJIAN SISWA - CBT SMA NEGERI 1 KUTOWINANGUN"],
+                    [`Paket Soal: ${filterPkg === 'all' ? 'Semua Paket' : 'Paket ' + filterPkg}`, `Tanggal Unduh: ${new Date().toLocaleDateString()}`],
+                    [],
+                    ["NO", "NIS", "NAMA SISWA", "KELAS", "MATA PELAJARAN", "PAKET", "SKOR AKHIR (100)", "STATUS", "WAKTU SUBMIT"]
+                ];
+
+                displayedResults.forEach((r, idx) => {
+                    excelData.push([
+                        idx + 1,
+                        r.nis,
+                        r.name,
+                        r.class || '-',
+                        r.subject,
+                        r.package || 'A',
+                        r.totalScore,
+                        r.status || 'Selesai',
+                        r.submittedAt || '-'
+                    ]);
+                });
+
+                const worksheet = XLSX.utils.aoa_to_sheet(excelData);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, `Hasil_Paket_${filterPkg}`);
+                XLSX.writeFile(workbook, `Rekap_Nilai_CBT_Paket_${filterPkg}_SMAN1Kutowinangun.xlsx`);
+                this.showToast('File Rekap Nilai Admin berhasil diunduh!', 'success');
+            },
+
+            confirmUnbindAllDevicesModal() {
+                const body = `
+                    <div class="text-center py-2 space-y-3">
+                        <i class="fa-solid fa-mobile-screen-button text-4xl text-red-600"></i>
+                        <h4 class="font-bold text-sm text-slate-800">Lepas Kunci Perangkat (Unbind All)?</h4>
+                        <p class="text-xs text-slate-600">Tindakan ini akan mengosongkan pengikatan perangkat (Device ID) untuk <strong>seluruh siswa</strong>, sehingga semua siswa dapat login kembali di HP masing-masing.</p>
+                    </div>
+                `;
+                const footer = `
+                    <button onclick="EduGuard.closeModal()" class="bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl text-xs font-bold">Batal</button>
+                    <button onclick="EduGuard.executeUnbindAllDevices()" class="bg-red-600 text-white px-4 py-1.5 rounded-xl text-xs font-bold shadow-md">Ya, Unbind Semua HP</button>
+                `;
+                this.showModal('Konfirmasi Unbind All Devices', body, footer);
+            },
+
+            async executeUnbindAllDevices() {
+                this.closeModal();
+                DB.students.forEach(s => { s.deviceId = null; });
+                await apiCall('unbindAllDevices');
+                this.showToast('Seluruh ikatan perangkat HP siswa berhasil dilepas!', 'success');
+                this.renderAdminDashboard();
             },
 
             toggleUserFormRole(role) {
@@ -3454,19 +3747,6 @@
                 if (st) st.deviceId = null;
                 this.showToast(`Device binding NIS ${nis} dilepas. Siswa bisa login di HP baru.`, 'success');
                 this.renderAdminDashboard();
-            },
-
-            exportToExcel() {
-                let csv = 'NIS,Nama,Kelas,Mata Pelajaran,Paket,Skor Total,Status\n';
-                DB.results.forEach(r => {
-                    csv += `"${r.nis}","${r.name}","${r.class || '-'}","${r.subject}","Paket ${r.package || 'A'}",${r.totalScore},"${r.status || 'Selesai'}"\n`;
-                });
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'Rekap_Hasil_Ujian_CBT_SMAN1Kutowinangun.csv';
-                a.click();
             },
 
             exportToPDF() {
