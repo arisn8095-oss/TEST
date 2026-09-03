@@ -35,24 +35,14 @@
         }
     </script>
     <style>
-        .no-select { 
-            -webkit-touch-callout: none; 
-            -webkit-user-select: none; 
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none; 
-        }
+        .no-select { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .mobile-shell { max-width: 800px; margin: 0 auto; min-height: calc(100vh - 120px); background: #ffffff; position: relative; }
-        .symbol-btn { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px 7px; font-size: 12px; font-weight: bold; color: #334155; transition: all 0.1s; }
-        .symbol-btn:hover { background: #e0e7ff; color: #4338ca; border-color: #c7d2fe; }
-        .symbol-btn:active { transform: scale(0.95); }
-        .format-toolbar-btn { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 3px 8px; font-size: 11px; font-weight: bold; color: #475569; transition: all 0.1s; display: inline-flex; items-center; gap: 3px; }
-        .format-toolbar-btn:hover { background: #f1f5f9; color: #1e293b; border-color: #94a3b8; }
-        .question-render p { margin-bottom: 0.5rem; }
+        .mobile-shell { max-width: 760px; margin: 0 auto; min-height: calc(100vh - 120px); background: #ffffff; position: relative; }
+        .math-symbol-btn { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px 8px; font-size: 13px; font-weight: bold; color: #334155; transition: all 0.1s; }
+        .math-symbol-btn:hover { background: #e0e7ff; color: #4338ca; border-color: #c7d2fe; }
+        .math-symbol-btn:active { transform: scale(0.95); }
         @media print {
             header, footer, button, .no-print, #modalContainer, .nav-tabs, #cheatOverlay, #terminatedOverlay { display: none !important; }
             body { background: white !important; color: black !important; }
@@ -66,12 +56,12 @@
     <div id="cheatOverlay" class="fixed inset-0 bg-red-600 bg-opacity-95 z-50 hidden flex-col items-center justify-center p-6 text-white text-center backdrop-blur-md">
         <i class="fa-solid fa-triangle-exclamation text-6xl mb-4 animate-bounce"></i>
         <h2 class="text-2xl font-bold mb-2">PELANGGARAN TERDETEKSI!</h2>
-        <p id="cheatOverlayMsg" class="text-sm sm:text-base mb-6 max-w-md">Anda terdeteksi keluar dari layar penuh, berpindah tab/aplikasi, membuka notifikasi, mencoba split-screen, screenshot, atau menekan tombol navigasi HP. Pelanggaran ini dicatat server!</p>
+        <p id="cheatOverlayMsg" class="text-sm sm:text-base mb-6 max-w-md">Anda terdeteksi keluar dari layar penuh, berpindah tab, mencoba split-screen, tangkapan layar, atau menekan tombol navigasi HP. Pelanggaran ini dicatat server!</p>
         <div class="bg-white text-red-700 px-4 py-2 rounded-lg font-bold mb-6 text-sm shadow-md">
             Sisa Kesempatan: <span id="overlayStrikeCount">1</span> / <span id="overlayMaxStrike">3</span>
         </div>
         <button onclick="EduGuard.resumeExamFromWarning()" class="bg-white text-red-600 font-bold px-8 py-3 rounded-xl shadow-xl hover:bg-slate-100 transition active:scale-95 flex items-center gap-2">
-            <i class="fa-solid fa-shield-halved"></i> Kembali Ke Ujian (Lockdown Layar Penuh)
+            <i class="fa-solid fa-shield-halved"></i> Kembali Ke Ujian (Lockdown)
         </button>
     </div>
 
@@ -103,7 +93,7 @@
                     <div>
                         <h1 class="font-extrabold text-slate-800 text-xs sm:text-sm md:text-base leading-tight">CBT SMA NEGERI 1 KUTOWINANGUN</h1>
                         <span class="text-[11px] text-brand-600 font-bold flex items-center gap-1">
-                            <i class="fa-solid fa-shield-halved text-[10px]"></i> High Security Mobile CBT v8.0 (Multi-Paket & 1 Guru = 1 Mapel)
+                            <i class="fa-solid fa-shield-halved text-[10px]"></i> High Security Mobile CBT v7.5 (Multi-Paket & 1 Guru = 1 Mapel)
                         </span>
                     </div>
                 </div>
@@ -132,9 +122,8 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXdJg8-PLdA7NjUZktkKeJO-nPd8p58xNugR7W8nAm6276RBiHFRg4OsaWX8iA64h4/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCLH2hfCE6rzh5FXXZEd9GqaE-NwIsHTCiDN-CYIV1FRRl11gIndauYt4EW9VWIixV/exec";
 
-        // LOCAL MEMORY STATE (Objektif Murni, 100 Poin Total, 1 Guru = 1 Mapel Mandiri)
         const DB = {
             admin: { id: "ADMIN01", name: "Administrator Utama", role: "admin" },
             teachers: [
@@ -176,118 +165,22 @@
                         {
                             id: "Q_INF_A1",
                             type: "PG",
-                            text: "Shortcut keyboard yang digunakan untuk menyalin (<b>copy</b>) objek/teks pada sistem operasi komputer adalah ....",
+                            text: "Shortcut keyboard yang digunakan untuk menyalin (copy) objek/teks pada sistem operasi komputer adalah ....",
                             image: "",
                             options: ["Ctrl + V", "Ctrl + C", "Ctrl + X", "Ctrl + Z", "Ctrl + S"],
                             correctKey: 1,
                             weight: 20
-                        },
-                        {
-                            id: "Q_INF_A2",
-                            type: "PGK",
-                            text: "Pilihlah komponen perangkat keras yang tergolong sebagai <i>Input Device</i> (Perangkat Masukan)! (Pilih beberapa opsi)",
-                            image: "",
-                            options: ["Keyboard", "Monitor LED", "Mouse Optik", "Printer Laser", "Microphone"],
-                            correctKeys: [0, 2, 4],
-                            weight: 20
-                        },
-                        {
-                            id: "Q_INF_A3",
-                            type: "BS",
-                            text: "Tentukan nilai kebenaran untuk masing-masing pernyataan arsitektur komputer berikut:",
-                            image: "",
-                            statements: [
-                                "RAM bersifat volatile sehingga data hilang ketika daya listrik terputus.",
-                                "SSD memiliki kecepatan akses data yang lebih lambat dibanding HDD mekanik.",
-                                "Sistem Operasi berfungsi sebagai jembatan antara hardware dan pengguna."
-                            ],
-                            options: [
-                                "RAM bersifat volatile sehingga data hilang ketika daya listrik terputus.",
-                                "SSD memiliki kecepatan akses data yang lebih lambat dibanding HDD mekanik.",
-                                "Sistem Operasi berfungsi sebagai jembatan antara hardware dan pengguna."
-                            ],
-                            correctKey: { 0: "BENAR", 1: "SALAH", 2: "BENAR" },
-                            weight: 20
-                        },
-                        {
-                            id: "Q_INF_A4",
-                            type: "URUTAN",
-                            text: "Susunlah tahapan siklus pengolahan data (<i>Information Processing Cycle</i>) secara berurutan:",
-                            image: "",
-                            items: ["Input (Masukan)", "Process (Pemrosesan)", "Storage (Penyimpanan)", "Output (Keluaran)"],
-                            correctOrder: ["Input (Masukan)", "Process (Pemrosesan)", "Storage (Penyimpanan)", "Output (Keluaran)"],
-                            weight: 20
-                        },
-                        {
-                            id: "Q_INF_A5",
-                            type: "JODOH",
-                            text: "Pasangkan klasifikasi jaringan komputer berikut dengan jangkauan wilayahnya yang tepat:",
-                            image: "",
-                            pairs: [
-                                { left: "LAN (Local Area Network)", right: "Jangkauan lokal dalam satu ruangan, gedung, atau sekolah" },
-                                { left: "MAN (Metropolitan Area Network)", right: "Jangkauan antar gedung dalam satu kawasan kota" },
-                                { left: "WAN (Wide Area Network)", right: "Jangkauan luas mencakup antar kota, pulau, dan negara" }
-                            ],
-                            weight: 20
                         }
                     ],
-                    "B": [
-                        {
-                            id: "Q_INF_B1",
-                            type: "PG",
-                            text: "Topologi jaringan komputer yang semua nodenya terhubung langsung ke switch/hub pusat disebut topologi ....",
-                            options: ["Bus", "Ring", "Star", "Mesh", "Tree"],
-                            correctKey: 2,
-                            weight: 50
-                        },
-                        {
-                            id: "Q_INF_B2",
-                            type: "BS",
-                            text: "Protokol HTTP mentransmisikan data dalam bentuk teks terenkripsi secara otomatis.",
-                            options: ["BENAR", "SALAH"],
-                            correctKey: "SALAH",
-                            weight: 50
-                        }
-                    ]
+                    "B": []
                 },
                 "SUB-19900210": {
-                    "A": [
-                        {
-                            id: "Q_MAT_A1",
-                            type: "PG",
-                            text: "Nilai dari lim (x → 0) dari (sin 4x) / (2x) adalah ....",
-                            options: ["0", "1", "2", "4", "8"],
-                            correctKey: 2,
-                            weight: 50
-                        },
-                        {
-                            id: "Q_MAT_A2",
-                            type: "PGK",
-                            text: "Diketahui fungsi f(x) = 2x² + 4x - 5. Manakah pernyataan berikut yang bernilai benar? (Pilih semua yang tepat)",
-                            options: ["Turunan pertama f'(x) = 4x + 4", "Nilai f'(1) = 8", "Kurva membuka ke bawah", "Titik stasioner berada di x = -1"],
-                            correctKeys: [0, 1, 3],
-                            weight: 50
-                        }
-                    ]
+                    "A": []
                 }
             },
             cheatLogs: [],
-            results: [
-                { rowIdx: 2, nis: "1003", name: "Candra Wijaya", class: "XII IPS 1", subject: "Informatika", package: "A", scorePG: 100, totalScore: 100, status: "Selesai", submittedAt: "08:15:00" }
-            ],
-            studentAnswersMap: {
-                "1003_Informatika_A": {
-                    0: 1,
-                    1: [0, 2, 4],
-                    2: { 0: "BENAR", 1: "SALAH", 2: "BENAR" },
-                    3: ["Input (Masukan)", "Process (Pemrosesan)", "Storage (Penyimpanan)", "Output (Keluaran)"],
-                    4: [
-                        { left: "LAN (Local Area Network)", userRight: "Jangkauan lokal dalam satu ruangan, gedung, atau sekolah" },
-                        { left: "MAN (Metropolitan Area Network)", userRight: "Jangkauan antar gedung dalam satu kawasan kota" },
-                        { left: "WAN (Wide Area Network)", userRight: "Jangkauan luas mencakup antar kota, pulau, dan negara" }
-                    ]
-                }
-            }
+            results: [],
+            studentAnswersMap: {}
         };
 
         async function apiCall(action, payload = {}) {
@@ -312,20 +205,24 @@
             activeExam: null,
             examTimerInterval: null,
             studentExamSyncInterval: null,
+            adminRealtimeSyncInterval: null,
+            teacherRealtimeSyncInterval: null,
             remainingSeconds: 0,
             userAnswers: {},
             violationsCount: 0,
             maxViolations: 3,
             deviceFingerprint: null,
             
-            // Teacher State
+            // 1-Minute Minimum Question Timer State
+            questionViewSecondsLeft: 60,
+            questionTimerInterval: null,
+            unlockedQuestionsMap: {}, // Tracks questions whose 1-min duration has elapsed
+            
             teacherActiveTab: 'manual', 
             teacherSelectedSubject: 'SUB-19850715',
             teacherSelectedPkg: 'A',
 
-            // Admin State
             adminActiveTab: 'publication',
-            adminResultFilterPkg: 'all',
 
             init() {
                 this.generateDeviceFingerprint();
@@ -339,7 +236,6 @@
                 if (!url || typeof url !== 'string') return '';
                 url = url.trim();
                 if (!url) return '';
-                
                 const match = url.match(/(?:file\/d\/|id=|d\/)([a-zA-Z0-9_-]{25,})/);
                 if (match && match[1]) {
                     return `https://lh3.googleusercontent.com/d/${match[1]}`;
@@ -362,6 +258,15 @@
                 document.addEventListener('paste', e => { if (this.activeExam) e.preventDefault(); });
                 document.addEventListener('cut', e => { if (this.activeExam) e.preventDefault(); });
                 
+                // Block Screenshot attempts via key combinations or touch gestures
+                document.addEventListener('keyup', e => {
+                    if (!this.activeExam) return;
+                    if (e.key === 'PrintScreen') {
+                        navigator.clipboard.writeText('');
+                        this.handleViolation("Percobaan Tangkapan Layar (Screenshot) Terdeteksi!");
+                    }
+                });
+
                 window.addEventListener('popstate', () => {
                     if (this.activeExam) {
                         history.pushState(null, document.title, location.href);
@@ -372,7 +277,7 @@
                 const handleFullscreenChange = () => {
                     const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
                     if (this.activeExam && !isFullscreen) {
-                        this.handleViolation("Siswa Keluar dari Layar Penuh (Fullscreen Lockdown)!");
+                        this.handleViolation("Siswa Keluar dari Layar Penuh (Fullscreen Lockdown & Notifikasi Terblokir)!");
                     }
                 };
 
@@ -383,7 +288,7 @@
 
                 document.addEventListener('visibilitychange', () => {
                     if (this.activeExam && document.visibilityState === 'hidden') {
-                        this.handleViolation("Berpindah Tab / Membuka Aplikasi Lain / Membuka Notifikasi!");
+                        this.handleViolation("Berpindah Tab / Membuka Aplikasi Lain / Split Layer!");
                     }
                 });
 
@@ -405,7 +310,7 @@
                     ) {
                         e.preventDefault();
                         e.stopPropagation();
-                        this.handleViolation(`Pintasan Tombol (${e.key || 'Shortcut'}) Dilarang!`);
+                        this.handleViolation(`Pintasan Tombol / Screenshot (${e.key || 'Shortcut'}) Dilarang!`);
                         return false;
                     }
                 });
@@ -426,7 +331,10 @@
                 } catch(e) {}
 
                 if (window.FlutterExamBridge) {
-                    try { window.FlutterExamBridge.postMessage('ENABLE_IMMERSIVE_STICKY'); } catch(e){}
+                    try { 
+                        window.FlutterExamBridge.postMessage('ENABLE_IMMERSIVE_STICKY'); 
+                        window.FlutterExamBridge.postMessage('DISABLE_NOTIFICATIONS_AND_SCREENSHOTS');
+                    } catch(e){}
                 }
 
                 if (screen.orientation && screen.orientation.lock) {
@@ -561,6 +469,9 @@
 
             renderLoginView() {
                 if (this.studentExamSyncInterval) clearInterval(this.studentExamSyncInterval);
+                if (this.adminRealtimeSyncInterval) clearInterval(this.adminRealtimeSyncInterval);
+                if (this.teacherRealtimeSyncInterval) clearInterval(this.teacherRealtimeSyncInterval);
+
                 const body = document.getElementById('appBody');
                 document.getElementById('topUserBar').classList.add('hidden');
 
@@ -570,7 +481,7 @@
                             <div class="text-center my-4">
                                 <img src="https://lh3.googleusercontent.com/d/146YuridIPzE7wTiCCWIoeeM8-yGWMeVK" alt="Logo SMAN 1 Kutowinangun" class="w-[64px] h-[64px] object-contain mx-auto mb-3 shadow-sm rounded-2xl" onerror="this.onerror=null; this.src='https://placehold.co/64x64/2563eb/ffffff?text=CBT';">
                                 <h2 class="text-lg sm:text-xl font-black text-slate-800 tracking-tight">CBT SMA NEGERI 1 KUTOWINANGUN</h2>
-                                <p class="text-xs text-slate-500 mt-1">Sistem Ujian Objektif Multi-Paket</p>
+                                <p class="text-xs text-slate-500 mt-1">Sistem Ujian Objektif Multi-Paket (Google Sheet Integrated)</p>
                             </div>
 
                             <div class="bg-slate-100 p-1.5 rounded-2xl flex mb-6 text-xs font-bold text-slate-600">
@@ -596,7 +507,7 @@
                                 </button>
                             </div>
 
-                           <!-- <div class="mt-8 border-t border-slate-200 pt-5 space-y-2">
+                            <div class="mt-8 border-t border-slate-200 pt-5 space-y-2">
                                 <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block text-center">Akses Cepat Pengujian:</span>
                                 <div class="grid grid-cols-3 gap-2">
                                     <button onclick="EduGuard.quickLogin('student', '1001')" class="bg-blue-50 text-blue-700 px-2 py-2 rounded-xl font-bold border border-blue-200 hover:bg-blue-100 transition text-[11px] text-center truncate">
@@ -609,7 +520,7 @@
                                         <i class="fa-solid fa-user-shield block mb-1"></i> Admin Utama
                                     </button>
                                 </div>
-                            </div> -->
+                            </div>
                         </div>
                     </div>
                 `;
@@ -641,9 +552,9 @@
                     if (btnTeacher) btnTeacher.className = 'flex-1 py-2.5 rounded-xl bg-white text-purple-600 shadow-sm transition font-bold';
                     container.innerHTML = `
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">ID Pegawai (ID Guru)</label>
-                            <input type="text" id="loginIdInput" placeholder="Masukkan ID Guru (Cth: sman..)..." class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
-                          <!--  <span class="text-[11px] text-slate-400 mt-1 block">Akun demo guru: 19850715 (Informatika), 19900210 (Matematika)</span> -->
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Nomor Induk Pegawai (NIP Guru)</label>
+                            <input type="text" id="loginIdInput" placeholder="Masukkan NIP Guru (Cth: 19850715)..." class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                            <span class="text-[11px] text-slate-400 mt-1 block">Akun demo guru: 19850715 (Informatika), 19900210 (Matematika)</span>
                         </div>
                         <button onclick="EduGuard.login('teacher')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3.5 rounded-xl text-sm shadow-md transition active:scale-95 flex items-center justify-center gap-2">
                             <i class="fa-solid fa-right-to-bracket"></i> Masuk Panel Guru (1 Mapel Terisolasi)
@@ -718,6 +629,8 @@
             logout() {
                 if (this.examTimerInterval) clearInterval(this.examTimerInterval);
                 if (this.studentExamSyncInterval) clearInterval(this.studentExamSyncInterval);
+                if (this.adminRealtimeSyncInterval) clearInterval(this.adminRealtimeSyncInterval);
+                if (this.teacherRealtimeSyncInterval) clearInterval(this.teacherRealtimeSyncInterval);
                 this.exitFullScreenMode();
                 this.activeExam = null;
                 this.currentUser = null;
@@ -828,7 +741,6 @@
                                 </span>
                             </div>
 
-                            <!-- Daftar Paket Soal Terpisah -->
                             <div class="space-y-2.5">
                                 ${publishedPkgs.map(pkg => {
                                     const isDone = this.hasStudentCompletedPackage(sub.name, pkg);
@@ -935,10 +847,72 @@
                 this.userAnswers = {};
                 this.violationsCount = 0;
                 this.remainingSeconds = pkgDuration * 60;
+                this.unlockedQuestionsMap = {};
 
                 this.renderExamInterface();
                 this.startTimer();
-                this.showToast('Mode Ujian Lockdown Aktif! Fokus hanya pada lembar pengerjaan.', 'info');
+                this.startQuestionDurationTimer();
+                this.showToast('Mode Ujian Lockdown Aktif! Notifikasi dan Screenshot dinonaktifkan.', 'info');
+            },
+
+            startQuestionDurationTimer() {
+                if (this.questionTimerInterval) clearInterval(this.questionTimerInterval);
+                const currentIdx = this.activeExam.currentQuestionIdx;
+                
+                if (this.unlockedQuestionsMap[currentIdx]) {
+                    this.questionViewSecondsLeft = 0;
+                    this.updateQuestionNextButtonState();
+                    return;
+                }
+
+                this.questionViewSecondsLeft = 60; // Minimal 1 menit (60 detik) mengerjakan per soal
+                this.updateQuestionNextButtonState();
+
+                this.questionTimerInterval = setInterval(() => {
+                    this.questionViewSecondsLeft--;
+                    this.updateQuestionNextButtonState();
+                    
+                    if (this.questionViewSecondsLeft <= 0) {
+                        clearInterval(this.questionTimerInterval);
+                        this.unlockedQuestionsMap[currentIdx] = true;
+                        this.updateQuestionNextButtonState();
+                    }
+                }, 1000);
+            },
+
+            updateQuestionNextButtonState() {
+                const nextBtn = document.getElementById('examNextBtn');
+                const timerInfo = document.getElementById('questionMinTimerInfo');
+                const ex = this.activeExam;
+                if (!ex) return;
+
+                const isUnlocked = this.unlockedQuestionsMap[ex.currentQuestionIdx] || this.questionViewSecondsLeft <= 0;
+
+                if (timerInfo) {
+                    if (!isUnlocked) {
+                        timerInfo.innerHTML = `<i class="fa-solid fa-clock-rotate-left mr-1"></i> Wajib baca & kerjakan minimal 1 menit: <strong>${this.questionViewSecondsLeft}d</strong>`;
+                        timerInfo.className = "text-[11px] font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200";
+                    } else {
+                        timerInfo.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> Durasi 1 menit terpenuhi (Navigasi Terbuka)`;
+                        timerInfo.className = "text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200";
+                    }
+                }
+
+                if (nextBtn) {
+                    if (!isUnlocked) {
+                        nextBtn.disabled = true;
+                        nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                        nextBtn.classList.remove('hover:bg-brand-700', 'hover:bg-emerald-700');
+                    } else {
+                        nextBtn.disabled = false;
+                        nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        if (ex.currentQuestionIdx === ex.questions.length - 1) {
+                            nextBtn.classList.add('hover:bg-emerald-700');
+                        } else {
+                            nextBtn.classList.add('hover:bg-brand-700');
+                        }
+                    }
+                }
             },
 
             renderExamInterface() {
@@ -950,7 +924,6 @@
                 body.innerHTML = `
                     <div class="mobile-shell bg-white border border-slate-200 rounded-3xl flex flex-col justify-between p-4 sm:p-5 shadow-xl my-2">
                         <div>
-                            <!-- Header Ujian -->
                             <div class="flex justify-between items-center bg-slate-900 text-white p-3 sm:p-4 rounded-2xl mb-4 shadow-md">
                                 <div>
                                     <h4 class="font-black text-xs sm:text-sm text-white">${ex.subjectName} (Paket ${ex.package})</h4>
@@ -958,32 +931,35 @@
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <span class="text-[10px] bg-red-600 text-white font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
-                                        <i class="fa-solid fa-lock text-[9px]"></i> Immersive
+                                        <i class="fa-solid fa-shield-halved text-[9px]"></i> Super Secure
                                     </span>
                                     <span id="examTimerDisplay" class="font-mono text-sm sm:text-base font-black text-amber-400">00:00:00</span>
                                 </div>
                             </div>
 
-                            <!-- Palet Nomor Soal Interaktif -->
-                            <div class="bg-slate-100 p-2.5 rounded-2xl mb-4 border border-slate-200">
-                                <div class="flex justify-between items-center mb-1.5 px-1">
-                                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Palet Navigasi Soal:</span>
-                                    <span class="text-[10px] text-slate-600 font-bold">Terjawab: ${this.getAnsweredCount()}/${ex.questions.length}</span>
+                            <div class="flex flex-col sm:flex-row justify-between items-center gap-2 mb-3">
+                                <div class="bg-slate-100 p-2.5 rounded-2xl border border-slate-200 flex-1 w-full">
+                                    <div class="flex justify-between items-center mb-1.5 px-1">
+                                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Palet Navigasi Soal:</span>
+                                        <span class="text-[10px] text-slate-600 font-bold">Terjawab: ${this.getAnsweredCount()}/${ex.questions.length}</span>
+                                    </div>
+                                    <div class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1">
+                                        ${ex.questions.map((qItem, idx) => {
+                                            const isAnswered = this.isQuestionAnswered(idx, qItem);
+                                            const isCurrent = idx === ex.currentQuestionIdx;
+                                            return `
+                                                <button onclick="EduGuard.jumpToQuestion(${idx})" class="w-8 h-8 rounded-xl font-bold text-xs flex items-center justify-center transition ${isCurrent ? 'ring-2 ring-brand-500 font-black' : ''} ${isAnswered ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-slate-700 border border-slate-300'}">
+                                                    ${idx + 1}
+                                                </button>
+                                            `;
+                                        }).join('')}
+                                    </div>
                                 </div>
-                                <div class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1">
-                                    ${ex.questions.map((qItem, idx) => {
-                                        const isAnswered = this.isQuestionAnswered(idx, qItem);
-                                        const isCurrent = idx === ex.currentQuestionIdx;
-                                        return `
-                                            <button onclick="EduGuard.jumpToQuestion(${idx})" class="w-8 h-8 rounded-xl font-bold text-xs flex items-center justify-center transition ${isCurrent ? 'ring-2 ring-brand-500 font-black' : ''} ${isAnswered ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-slate-700 border border-slate-300'}">
-                                                ${idx + 1}
-                                            </button>
-                                        `;
-                                    }).join('')}
+                                <div id="questionMinTimerInfo" class="text-[11px] font-bold text-amber-600 bg-amber-50 px-3 py-2 rounded-xl border border-amber-200 whitespace-nowrap">
+                                    <i class="fa-solid fa-clock-rotate-left mr-1"></i> Memuat durasi soal...
                                 </div>
                             </div>
 
-                            <!-- Konten Soal -->
                             <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50 mb-4 shadow-sm">
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="bg-brand-100 text-brand-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase">${q.type === 'BS' ? 'BENAR / SALAH [B/S]' : q.type}</span>
@@ -992,28 +968,29 @@
                                 
                                 ${formattedQImg ? `<img src="${formattedQImg}" onerror="this.onerror=null; this.src='https://placehold.co/400x200/e2e8f0/64748b?text=Gambar+Gagal+Muat';" class="max-h-52 rounded-xl my-3 mx-auto shadow-sm object-contain border bg-white p-1" alt="Gambar Soal">` : ''}
                                 
-                                <div class="text-xs sm:text-sm font-bold text-slate-800 my-3 leading-relaxed question-render">${ex.currentQuestionIdx + 1}. ${q.text}</div>
+                                <p class="text-xs sm:text-sm font-bold text-slate-800 my-3 leading-relaxed whitespace-pre-line">${ex.currentQuestionIdx + 1}. ${q.text}</p>
                                 ${this.renderQuestionOptionsHTML(q, ex.currentQuestionIdx)}
                             </div>
                         </div>
 
-                        <!-- Tombol Navigasi Soal -->
                         <div class="flex gap-2 pt-2 border-t border-slate-200">
                             <button onclick="EduGuard.prevQuestion()" ${ex.currentQuestionIdx === 0 ? 'disabled' : ''} class="w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-3 rounded-xl text-xs disabled:opacity-40 transition active:scale-95 flex items-center justify-center gap-1">
                                 <i class="fa-solid fa-arrow-left"></i> Sebelum
                             </button>
                             ${ex.currentQuestionIdx === ex.questions.length - 1 ? `
-                                <button onclick="EduGuard.confirmSubmitExam()" class="w-2/3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1">
+                                <button id="examNextBtn" onclick="EduGuard.confirmSubmitExam()" class="w-2/3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1">
                                     <i class="fa-solid fa-paper-plane"></i> Selesai & Kirim Ujian
                                 </button>
                             ` : `
-                                <button onclick="EduGuard.nextQuestion()" class="w-2/3 bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1">
+                                <button id="examNextBtn" onclick="EduGuard.nextQuestion()" class="w-2/3 bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1">
                                     Lanjut <i class="fa-solid fa-arrow-right"></i>
                                 </button>
                             `}
                         </div>
                     </div>
                 `;
+
+                this.updateQuestionNextButtonState();
             },
 
             isQuestionAnswered(qIdx, q) {
@@ -1226,13 +1203,19 @@
                 if (idx >= 0 && idx < this.activeExam.questions.length) {
                     this.activeExam.currentQuestionIdx = idx;
                     this.renderExamInterface();
+                    this.startQuestionDurationTimer();
                 }
             },
 
             nextQuestion() {
-                if (this.activeExam.currentQuestionIdx < this.activeExam.questions.length - 1) {
-                    this.activeExam.currentQuestionIdx++;
+                const ex = this.activeExam;
+                if (!this.unlockedQuestionsMap[ex.currentQuestionIdx] && this.questionViewSecondsLeft > 0) {
+                    return this.showToast('Harap selesaikan minimal 1 menit pengerjaan pada butir soal ini!', 'warning');
+                }
+                if (ex.currentQuestionIdx < ex.questions.length - 1) {
+                    ex.currentQuestionIdx++;
                     this.renderExamInterface();
+                    this.startQuestionDurationTimer();
                 }
             },
 
@@ -1240,6 +1223,7 @@
                 if (this.activeExam.currentQuestionIdx > 0) {
                     this.activeExam.currentQuestionIdx--;
                     this.renderExamInterface();
+                    this.startQuestionDurationTimer();
                 }
             },
 
@@ -1306,9 +1290,9 @@
                 if (unansweredList.length > 0) {
                     confirmBody += `
                         <div class="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs text-left">
-                            <p class="font-bold mb-1 flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation"></i> Peringatan: Masih ada ${unansweredList.length} butir soal belum selesai!</p>
-                            <p class="text-[11px]">Nomor soal belum terjawab: <strong>${unansweredList.join(', ')}</strong></p>
-                            <p class="text-[11px] mt-1 text-red-600 font-semibold">Silakan periksa kembali palet nomor sebelum mengirim jawaban.</p>
+                            <p class="font-bold mb-1 flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation"></i> PERINGATAN KERAS: Masih ada ${unansweredList.length} butir soal belum terjawab!</p>
+                            <p class="text-[11px]">Nomor soal belum terisi: <strong>${unansweredList.join(', ')}</strong></p>
+                            <p class="text-[11px] mt-1 text-red-600 font-semibold">Sistem menyarankan Anda memeriksa kembali palet nomor agar nilai maksimal.</p>
                         </div>
                     `;
                 } else {
@@ -1330,6 +1314,7 @@
 
             async submitExam(isAutoSubmit = false) {
                 if (this.examTimerInterval) clearInterval(this.examTimerInterval);
+                if (this.questionTimerInterval) clearInterval(this.questionTimerInterval);
 
                 let totalPGScore = 0;
                 this.activeExam.questions.forEach((q, idx) => {
@@ -1426,7 +1411,6 @@
 
                 this.ensureSubjectsUpToDate();
                 
-                // ISOLASI KETAT: 1 Guru Hanya Memegang 1 Mata Pelajaran Miliknya Sendiri
                 let assignedSub = DB.subjects.find(s => String(s.teacherNip) === String(tc.nip) || s.id === tc.subjectId);
                 if (!assignedSub) {
                     assignedSub = {
@@ -1463,7 +1447,6 @@
 
                 body.innerHTML = `
                     <div class="bg-white border border-slate-200 rounded-3xl p-4 sm:p-6 shadow-sm space-y-5">
-                        
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                             <div>
                                 <h2 class="text-lg sm:text-xl font-extrabold text-slate-800 flex items-center gap-2">
@@ -1472,7 +1455,6 @@
                                 <p class="text-xs text-slate-500 mt-0.5">${tc.name} | NIP: ${tc.nip}</p>
                             </div>
                             
-                            <!-- Terisolasi Penuh: Mapel Guru Terikat NIP & Pilihan Paket Mandiri -->
                             <div class="flex items-center gap-2 flex-wrap">
                                 <div class="px-3 py-1.5 border border-purple-200 rounded-xl text-xs font-bold text-purple-900 bg-purple-50 flex items-center gap-1.5 shadow-sm">
                                     <i class="fa-solid fa-book-bookmark text-purple-600"></i>
@@ -1491,7 +1473,6 @@
                             </div>
                         </div>
 
-                        <!-- MODUL PENGATURAN TOKEN & DURASI PAKET SOAL -->
                         <div class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
@@ -1527,7 +1508,6 @@
                             </div>
                         </div>
 
-                        <!-- Status Akumulasi Poin Paket (Target 100 Poin) -->
                         <div class="flex items-center justify-between p-3 rounded-2xl border ${totalWeight === 100 ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-amber-50 border-amber-200 text-amber-800'} text-xs">
                             <div class="flex items-center gap-2">
                                 <i class="fa-solid ${totalWeight === 100 ? 'fa-circle-check text-emerald-600' : 'fa-triangle-exclamation text-amber-600'} text-base"></i>
@@ -1538,7 +1518,6 @@
                             </span>
                         </div>
 
-                        <!-- Sub-Navigation Tabs Guru -->
                         <div class="flex overflow-x-auto gap-2 border-b border-slate-100 pb-2 text-xs font-bold">
                             <button onclick="EduGuard.switchTeacherTab('manual')" class="px-3 py-2 rounded-xl flex items-center gap-1.5 whitespace-nowrap transition ${activeTab === 'manual' ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'text-slate-500 hover:bg-slate-50'}">
                                 <i class="fa-solid fa-pen-to-square"></i> 1. Input Soal Manual & Simbol
@@ -1547,25 +1526,72 @@
                                 <i class="fa-solid fa-file-arrow-up"></i> 2. Import Soal (.DOCX/.PDF/.XLSX)
                             </button>
                             <button onclick="EduGuard.switchTeacherTab('review')" class="px-3 py-2 rounded-xl flex items-center gap-1.5 whitespace-nowrap transition ${activeTab === 'review' ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'text-slate-500 hover:bg-slate-50'}">
-                                <i class="fa-solid fa-list-check"></i> 3. Cek Soal & Preview (${questionsList.length})
+                                <i class="fa-solid fa-list-check"></i> 3. Cek Soal & Preview (Realtime)
                             </button>
                             <button onclick="EduGuard.switchTeacherTab('finalize')" class="px-3 py-2 rounded-xl flex items-center gap-1.5 whitespace-nowrap transition ${activeTab === 'finalize' ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'text-slate-500 hover:bg-slate-50'}">
                                 <i class="fa-solid fa-lock"></i> 4. Finalisasi Paket
                             </button>
                             <button onclick="EduGuard.switchTeacherTab('results')" class="px-3 py-2 rounded-xl flex items-center gap-1.5 whitespace-nowrap transition ${activeTab === 'results' ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'text-slate-500 hover:bg-slate-50'}">
-                                <i class="fa-solid fa-square-poll-vertical"></i> 5. Rekap Nilai Siswa
+                                <i class="fa-solid fa-square-poll-vertical"></i> 5. Rekap Nilai Siswa (Realtime)
                             </button>
                             <button onclick="EduGuard.switchTeacherTab('cheat')" class="px-3 py-2 rounded-xl flex items-center gap-1.5 whitespace-nowrap transition ${activeTab === 'cheat' ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'text-slate-500 hover:bg-slate-50'}">
-                                <i class="fa-solid fa-shield-virus"></i> 6. Log Pelanggaran
+                                <i class="fa-solid fa-shield-virus"></i> 6. Log Pelanggaran (Realtime)
                             </button>
                         </div>
 
                         <div id="teacherTabContent" class="pt-2">
                             ${this.renderTeacherTabContent(activeTab, activeSub, activePkg, questionsList, isFinalized)}
                         </div>
-
                     </div>
                 `;
+
+                if (this.teacherRealtimeSyncInterval) clearInterval(this.teacherRealtimeSyncInterval);
+                if (activeTab === 'review' || activeTab === 'results' || activeTab === 'cheat') {
+                    this.teacherRealtimeSyncInterval = setInterval(async () => {
+                        if (this.currentUser && this.currentUser.role === 'teacher') {
+                            const remoteQ = await apiCall('getQuestions', { subjectId: activeSub, package: activePkg });
+                            if (remoteQ && remoteQ.status === 'success' && Array.isArray(remoteQ.data)) {
+                                if (!DB.examPackages[activeSub]) DB.examPackages[activeSub] = {};
+                                DB.examPackages[activeSub][activePkg] = remoteQ.data;
+                            }
+                            const remoteRes = await apiCall('getResults');
+                            if (remoteRes && remoteRes.status === 'success' && Array.isArray(remoteRes.data)) {
+                                DB.results = remoteRes.data;
+                            }
+                            const remoteCheat = await apiCall('getCheatLogs');
+                            if (remoteCheat && remoteCheat.status === 'success' && Array.isArray(remoteCheat.data)) {
+                                DB.cheatLogs = remoteCheat.data;
+                            }
+
+                            if (activeTab === 'review') {
+                                const container = document.getElementById('teacherReviewQuestionsContainer');
+                                if (container) {
+                                    const currentQList = (DB.examPackages[activeSub] && DB.examPackages[activeSub][activePkg]) || [];
+                                    container.innerHTML = this.renderTeacherReviewQuestionsListHTML(currentQList);
+                                }
+                            } else if (activeTab === 'results') {
+                                const tbody = document.getElementById('tblTeacherResultsBody');
+                                const pkgSel = document.getElementById('filterTeacherResultPkg');
+                                if (tbody && pkgSel) {
+                                    tbody.innerHTML = this.renderTeacherResultsRows(activeSub, pkgSel.value);
+                                }
+                            } else if (activeTab === 'cheat') {
+                                const cheatTbody = document.getElementById('tblTeacherCheatBody');
+                                if (cheatTbody) {
+                                    cheatTbody.innerHTML = DB.cheatLogs.length === 0 ? `<tr><td colspan="5" class="p-4 text-center text-slate-400">Belum ada catatan pelanggaran siswa.</td></tr>` : DB.cheatLogs.map(l => `
+                                        <tr>
+                                            <td class="p-3">${l.timestamp || '-'}</td>
+                                            <td class="p-3 font-bold">${l.nis}</td>
+                                            <td class="p-3">${l.name}</td>
+                                            <td class="p-3 text-red-600 font-semibold">${l.violationType}</td>
+                                            <td class="p-3 font-bold">${l.count}</td>
+                                        </tr>
+                                    `).join('');
+                                }
+                            }
+                        }
+                    }, 5000);
+                }
             },
 
             selectTeacherPackageOnly(pkg) {
@@ -1648,24 +1674,6 @@
                 this.renderTeacherDashboard();
             },
 
-            insertFormattingTag(tagOpen, tagClose = '') {
-                const textarea = document.getElementById('manualText');
-                if (!textarea) return;
-
-                const start = textarea.selectionStart || 0;
-                const end = textarea.selectionEnd || 0;
-                const text = textarea.value;
-                const selected = text.substring(start, end);
-
-                const replacement = selected ? `${tagOpen}${selected}${tagClose}` : `${tagOpen}${tagClose}`;
-                textarea.value = text.substring(0, start) + replacement + text.substring(end);
-                textarea.focus();
-                
-                const newPos = selected ? start + replacement.length : start + tagOpen.length;
-                textarea.selectionStart = textarea.selectionEnd = newPos;
-                this.updateMathPreviewLive();
-            },
-
             insertMathSymbol(symbol) {
                 const textarea = document.getElementById('manualText');
                 if (!textarea) return;
@@ -1685,8 +1693,73 @@
                 const text = document.getElementById('manualText').value;
                 const previewEl = document.getElementById('manualMathPreview');
                 if (previewEl) {
-                    previewEl.innerHTML = text ? text.replace(/\n/g, '<br>') : '(Pratinjau paragraf soal matematika/IPA akan muncul di sini...)';
+                    previewEl.innerText = text || '(Pratinjau paragraf soal matematika, kimia, fisika akan muncul di sini...)';
                 }
+            },
+
+            addDynamicRow(containerId, maxRows, placeholderPrefix) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                const currentCount = container.children.length;
+                if (currentCount >= maxRows) {
+                    return this.showToast(`Maksimal ${maxRows} opsi diperbolehkan!`, 'warning');
+                }
+
+                const newIdx = currentCount;
+                const div = document.createElement('div');
+                div.className = "flex items-center gap-2";
+                
+                if (containerId.includes('Urutan')) {
+                    div.innerHTML = `
+                        <span class="font-bold text-xs w-16 text-slate-700">Urutan ${newIdx + 1}:</span>
+                        <input type="text" id="manualUrutan_${newIdx}" placeholder="${placeholderPrefix} ${newIdx + 1}" class="flex-1 px-3 py-1.5 border rounded-lg text-xs bg-white">
+                    `;
+                } else if (containerId.includes('Jodoh')) {
+                    div.innerHTML = `
+                        <input type="text" id="manualJodohLeft_${newIdx}" placeholder="Pernyataan Kiri ${newIdx + 1}" class="px-3 py-1.5 border rounded-lg text-xs bg-white flex-1">
+                        <input type="text" id="manualJodohRight_${newIdx}" placeholder="Pasangan Kanan ${newIdx + 1}" class="px-3 py-1.5 border rounded-lg text-xs bg-white flex-1">
+                    `;
+                }
+                container.appendChild(div);
+            },
+
+            renderTeacherReviewQuestionsListHTML(questionsList) {
+                if (questionsList.length === 0) {
+                    return `
+                        <div class="text-center py-8 text-slate-400 text-xs border rounded-2xl bg-white p-6">
+                            <i class="fa-solid fa-folder-open text-3xl mb-2 block text-slate-300"></i>
+                            Belum ada butir soal di Paket ini. Silakan gunakan menu Input Manual atau Import File.
+                        </div>
+                    `;
+                }
+
+                return questionsList.map((q, idx) => {
+                    const formattedQImg = this.formatImageUrl(q.image);
+                    return `
+                        <div class="border rounded-2xl p-4 bg-slate-50 space-y-2">
+                            <div class="flex justify-between items-start">
+                                <div class="flex items-center gap-2">
+                                    <span class="bg-purple-100 text-purple-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">${q.type === 'BS' ? 'BENAR/SALAH [B/S]' : q.type}</span>
+                                    <span class="text-[10px] bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded">Bobot: ${q.weight || 20} Poin</span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="EduGuard.openEditQuestionModal('${q.id}')" class="text-blue-600 hover:text-blue-800 text-xs font-bold">
+                                        <i class="fa-solid fa-pen"></i> Edit
+                                    </button>
+                                    <button onclick="EduGuard.deleteQuestion('${q.id}')" class="text-red-600 hover:text-red-800 text-xs font-bold">
+                                        <i class="fa-solid fa-trash"></i> Hapus
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="text-xs font-bold text-slate-800 leading-relaxed whitespace-pre-line">${idx + 1}. ${q.text}</p>
+                            ${formattedQImg ? `<img src="${formattedQImg}" class="max-h-36 rounded-lg my-1 border bg-white p-1" onerror="this.onerror=null; this.src='https://placehold.co/300x150/e2e8f0/64748b?text=Gambar+Gagal+Muat';">` : ''}
+                            ${q.options ? `<p class="text-[11px] text-slate-600">Opsi/Pernyataan: ${q.options.join(' | ')}</p>` : ''}
+                            ${q.items ? `<p class="text-[11px] text-slate-600">Items Urutan: ${q.items.join(' -> ')}</p>` : ''}
+                            ${q.pairs ? `<p class="text-[11px] text-slate-600">Pasangan: ${q.pairs.map(p=>`${p.left}=>${p.right}`).join(', ')}</p>` : ''}
+                            <p class="text-[11px] text-emerald-700 font-semibold">Kunci Sistem: ${JSON.stringify(q.correctKey !== undefined ? q.correctKey : (q.correctKeys || q.correctOrder || q.pairs))}</p>
+                        </div>
+                    `;
+                }).join('');
             },
 
             renderTeacherTabContent(tab, subjectId, pkg, questionsList, isFinalized) {
@@ -1707,8 +1780,8 @@
                                         <option value="PG">1. Pilihan Ganda A-E (Koreksi Otomatis)</option>
                                         <option value="PGK">2. Pilihan Ganda Kompleks (Koreksi Otomatis)</option>
                                         <option value="BS">3. Benar / Salah [B/S] (Koreksi Otomatis)</option>
-                                        <option value="URUTAN">4. Mengurutkan (Koreksi Otomatis)</option>
-                                        <option value="JODOH">5. Menjodohkan (Koreksi Otomatis)</option>
+                                        <option value="URUTAN">4. Mengurutkan (Dapat Menambah Opsi)</option>
+                                        <option value="JODOH">5. Menjodohkan (Dapat Menambah Opsi)</option>
                                     </select>
                                 </div>
                                 <div>
@@ -1717,66 +1790,40 @@
                                 </div>
                             </div>
 
-                            <!-- TOOLBAR FORMAT PENULISAN TEKS -->
-                            <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm space-y-1.5">
-                                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                                    <i class="fa-solid fa-font text-purple-600 mr-1"></i> Format Penulisan Teks:
-                                </span>
-                                <div class="flex flex-wrap gap-1">
-                                    <button type="button" onclick="EduGuard.insertFormattingTag('<b>', '</b>')" class="format-toolbar-btn font-bold"><i class="fa-solid fa-bold mr-0.5"></i> Tebal</button>
-                                    <button type="button" onclick="EduGuard.insertFormattingTag('<i>', '</i>')" class="format-toolbar-btn italic"><i class="fa-solid fa-italic mr-0.5"></i> Miring</button>
-                                    <button type="button" onclick="EduGuard.insertFormattingTag('<u>', '</u>')" class="format-toolbar-btn underline"><i class="fa-solid fa-underline mr-0.5"></i> Garis Bawah</button>
-                                    <button type="button" onclick="EduGuard.insertFormattingTag('<sup>', '</sup>')" class="format-toolbar-btn"><i class="fa-solid fa-superscript mr-0.5"></i> Pangkat Atas (x²)</button>
-                                    <button type="button" onclick="EduGuard.insertFormattingTag('<sub>', '</sub>')" class="format-toolbar-btn"><i class="fa-solid fa-subscript mr-0.5"></i> Pangkat Bawah (H₂O)</button>
-                                    <button type="button" onclick="EduGuard.insertFormattingTag('<br>')" class="format-toolbar-btn"><i class="fa-solid fa-arrow-down mr-0.5"></i> Ganti Baris Baru</button>
-                                </div>
-                            </div>
-
-                            <!-- PALET SIMBOL MATEMATIKA, FISIKA, & KIMIA LENGKAP -->
                             <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm space-y-2">
                                 <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                                    <i class="fa-solid fa-square-root-variable text-purple-600 mr-1"></i> Simbol Matematika, Fisika, & Kimia Lengkap (Klik untuk Sisipkan):
+                                    <i class="fa-solid fa-flask text-purple-600 mr-1"></i> Toolbar Simbol Lengkap (Matematika, Kimia, Fisika - Klik untuk Sisipkan):
                                 </span>
-                                <div class="space-y-1.5">
-                                    <div class="flex flex-wrap items-center gap-1">
-                                        <span class="text-[10px] font-bold text-purple-800 w-16">Matematika:</span>
-                                        ${['√', '∛', 'π', '²', '³', '⁴', 'ⁿ', '½', '¼', '¾', '±', '×', '÷', '≠', '≈', '≤', '≥', '∞', '∑', '∫', '∆', 'lim', 'log', 'sin', 'cos', 'tan', '∠', '⊥', '△', '∈', '∉', '⊂', '⊃', '∪', '∩', '∅', '→', '↔'].map(sym => `
-                                            <button type="button" onclick="EduGuard.insertMathSymbol('${sym}')" class="symbol-btn">${sym}</button>
-                                        `).join('')}
-                                    </div>
-                                    <div class="flex flex-wrap items-center gap-1 border-t border-slate-100 pt-1.5">
-                                        <span class="text-[10px] font-bold text-indigo-800 w-16">Fisika:</span>
-                                        ${['Ω', 'λ', 'μ', 'ρ', 'σ', 'τ', 'ω', 'Φ', 'ν', 'ε', 'θ', 'α', 'β', 'γ', 'm/s²', 'kg', 'N', 'J', 'W', 'Pa', 'Hz', 'V', 'A', '°C', 'K'].map(sym => `
-                                            <button type="button" onclick="EduGuard.insertMathSymbol('${sym}')" class="symbol-btn">${sym}</button>
-                                        `).join('')}
-                                    </div>
-                                    <div class="flex flex-wrap items-center gap-1 border-t border-slate-100 pt-1.5">
-                                        <span class="text-[10px] font-bold text-emerald-800 w-16">Kimia:</span>
-                                        ${['→', '⇌', '⇄', '↑', '↓', 'H₂O', 'CO₂', 'O₂', 'N₂', 'CH₄', 'H⁺', 'OH⁻', 'SO₄²⁻', 'NO₃⁻', 'Fe²⁺', 'Fe³⁺', 'Cu²⁺'].map(sym => `
-                                            <button type="button" onclick="EduGuard.insertMathSymbol('${sym}')" class="symbol-btn">${sym}</button>
-                                        `).join('')}
-                                    </div>
+                                <div class="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-1 bg-slate-50 border rounded-xl">
+                                    ${[
+                                        '√', '∛', 'π', '²', '³', '⁴', 'ⁿ', '½', '¼', '¾', '±', '×', '÷', '≠', '≈', '≤', '≥', 
+                                        '∞', '∑', '∫', '∆', 'α', 'β', 'γ', 'θ', 'λ', 'μ', 'σ', 'ω', '°', '∠', '⊥', '△', 
+                                        '∈', '∉', '⊂', '⊃', '∪', '∩', '∅', 'lim', 'log', 'sin', 'cos', 'tan', '→', '↔',
+                                        'H₂O', 'CO₂', 'O₂', 'N₂', 'H⁺', 'OH⁻', 'SO₄²⁻', 'NH₃', 'HCl', 'NaCl', 'CH₃COOH',
+                                        '⇄', '⇌', 'aq', 'g', 'l', 's', '°C',
+                                        'λ', 'ν', 'ω', 'v₀', 's(t)', 'F', 'W', 'P', 'E_k', 'E_p', 'Q', 'I', 'V', 'R', 'C',
+                                        'Ω', 'μ₀', 'ε₀', 'B', 'Φ', 'N/C', 'J', 'Wb', 'T', 'Hz'
+                                    ].map(sym => `
+                                        <button type="button" onclick="EduGuard.insertMathSymbol('${sym}')" class="math-symbol-btn">${sym}</button>
+                                    `).join('')}
                                 </div>
                             </div>
 
-                            <!-- KOLOM TEKS SOAL PARAGRAF LENGKAP & LIVE PREVIEW -->
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Pertanyaan / Paragraf Teks Soal</label>
-                                <textarea id="manualText" rows="4" oninput="EduGuard.updateMathPreviewLive()" placeholder="Ketik paragraf pertanyaan soal di sini... Format HTML seperti &lt;b&gt;, &lt;i&gt;, &lt;sup&gt; dan simbol sains akan langsung diformat rapi." class="w-full px-3 py-2.5 border rounded-xl text-xs bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 font-sans leading-relaxed"></textarea>
+                                <textarea id="manualText" rows="4" oninput="EduGuard.updateMathPreviewLive()" placeholder="Ketik paragraf pertanyaan soal di sini... Simbol matematika, kimia, fisika yang disisipkan akan langsung tampil." class="w-full px-3 py-2.5 border rounded-xl text-xs bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 font-sans leading-relaxed"></textarea>
                             </div>
 
-                            <!-- Live Science Paragraph Preview -->
                             <div class="p-3 bg-purple-50/60 border border-purple-200 rounded-xl">
                                 <span class="text-[10px] font-bold text-purple-800 uppercase block mb-1">Pratinjau Teks Paragraf Soal:</span>
-                                <div id="manualMathPreview" class="text-xs text-slate-700 italic leading-relaxed question-render">
-                                    (Pratinjau paragraf soal matematika/IPA akan muncul di sini...)
+                                <div id="manualMathPreview" class="text-xs text-slate-700 italic leading-relaxed whitespace-pre-line">
+                                    (Pratinjau paragraf soal matematika, kimia, fisika akan muncul di sini...)
                                 </div>
                             </div>
 
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">URL Gambar Soal (Opsional / Google Drive Link)</label>
                                 <input type="text" id="manualImage" placeholder="https://drive.google.com/file/d/.../view atau Direct Image URL" class="w-full px-3 py-2 border rounded-xl text-xs bg-white focus:ring-2 focus:ring-purple-500">
-                                <span class="text-[10px] text-slate-400 mt-1 block">* Link Google Drive otomatis dikonversi menjadi gambar visual.</span>
                             </div>
 
                             <div id="manualFormDynamicContainer" class="p-3 bg-white border border-purple-100 rounded-xl space-y-3">
@@ -1794,7 +1841,7 @@
                             <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                 <div>
                                     <h4 class="font-bold text-blue-900 text-xs sm:text-sm">Template Impor Soal (.DOCX / .PDF / .XLSX)</h4>
-                                    <p class="text-xs text-blue-700">Tag Kode: <strong>[PG]</strong>, <strong>[PGK]</strong>, <strong>[B/S]</strong>, <strong>[URUTAN]</strong>, <strong>[JODOH]</strong>. Teks diawali <strong>@</strong>, Opsi diawali <strong>#</strong>, dan <strong>[Kunci: ...]</strong> otomatis disembunyikan saat tampil di murid.</p>
+                                    <p class="text-xs text-blue-700">Dukungan 5 jenis soal objektif (PG, PGK, B/S, Urutan, Jodoh) tanpa essay.</p>
                                 </div>
                                 <div class="flex gap-2">
                                     <button onclick="EduGuard.downloadQuestionExcelTemplate()" class="bg-emerald-600 text-white px-3 py-2 rounded-xl text-xs font-bold hover:bg-emerald-700 shadow-sm flex items-center gap-1.5 transition active:scale-95">
@@ -1818,7 +1865,7 @@
 
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Atau Tempel (Paste) Teks Format Tag di Sini:</label>
-                                <textarea id="textPasteImport" rows="6" placeholder="[PG]&#10;@Hitunglah nilai lim (x → 0) dari (sin 2x) / x = ....&#10;#A. 0&#10;#B. 1&#10;#C. 2&#10;[Kunci: C]&#10;&#10;[B/S]&#10;@Matriks persegi memiliki determinan bernilai nol jika singular.&#10;[Kunci: BENAR]" class="w-full px-3 py-2 border rounded-xl text-xs bg-white font-mono"></textarea>
+                                <textarea id="textPasteImport" rows="6" placeholder="[PG]&#10;@Hitunglah nilai lim (x → 0) dari (sin 2x) / x = ....&#10;#A. 0&#10;#B. 1&#10;#C. 2&#10;[Kunci: C]" class="w-full px-3 py-2 border rounded-xl text-xs bg-white font-mono"></textarea>
                                 <button onclick="EduGuard.parseAndImportText(document.getElementById('textPasteImport').value)" class="mt-2 bg-slate-800 hover:bg-slate-900 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-md transition active:scale-95 flex items-center gap-1.5">
                                     <i class="fa-solid fa-wand-magic-sparkles"></i> Proses Ekstraksi Teks
                                 </button>
@@ -1828,56 +1875,19 @@
                 } else if (tab === 'review') {
                     return `
                         <div class="space-y-3">
-                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-100 p-3 rounded-2xl">
+                            <div class="flex justify-between items-center bg-slate-100 p-3 rounded-2xl">
                                 <div>
-                                    <span class="font-bold text-xs text-slate-700">Bank Soal Paket ${pkg}: <strong class="text-purple-700 text-sm">${questionsList.length} Butir Soal</strong></span>
-                                    <span class="text-[11px] text-slate-500 block">Total Bobot Akumulasi: <strong>${questionsList.reduce((s, q)=>s+Number(q.weight||0), 0)} Poin</strong></span>
+                                    <span class="font-bold text-xs text-slate-700">Total Soal di Paket ${pkg} (Realtime): <strong class="text-purple-700 text-sm">${questionsList.length}</strong></span>
+                                    <span class="text-[11px] text-slate-500 block">Total Bobot: <strong>${questionsList.reduce((s, q)=>s+Number(q.weight||0), 0)} Poin</strong></span>
                                 </div>
-                                <div class="flex items-center gap-2 flex-wrap">
-                                    <button onclick="EduGuard.downloadBankSoalExcel('${subjectId}', '${pkg}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-xs font-bold shadow-md transition active:scale-95 flex items-center gap-1.5" title="Download Bank Soal Format Excel">
-                                        <i class="fa-solid fa-file-excel"></i> Unduh Excel
-                                    </button>
-                                    <button onclick="EduGuard.downloadBankSoalWord('${subjectId}', '${pkg}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-xl text-xs font-bold shadow-md transition active:scale-95 flex items-center gap-1.5" title="Download Bank Soal Format Word">
-                                        <i class="fa-solid fa-file-word"></i> Unduh Word (.doc)
-                                    </button>
-                                    <button onclick="EduGuard.openExamPreviewModal('${subjectId}', '${pkg}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-md transition active:scale-95 flex items-center gap-1.5">
-                                        <i class="fa-solid fa-eye"></i> Simulasi Preview
-                                    </button>
-                                </div>
+                                <button onclick="EduGuard.openExamPreviewModal('${subjectId}', '${pkg}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-md transition active:scale-95 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-eye"></i> Simulasi Preview Soal
+                                </button>
                             </div>
 
-                            ${questionsList.length === 0 ? `
-                                <div class="text-center py-8 text-slate-400 text-xs border rounded-2xl bg-white p-6">
-                                    <i class="fa-solid fa-folder-open text-3xl mb-2 block text-slate-300"></i>
-                                    Belum ada butir soal di Paket ${pkg}. Silakan gunakan menu Input Manual atau Import File.
-                                </div>
-                            ` : questionsList.map((q, idx) => {
-                                const formattedQImg = this.formatImageUrl(q.image);
-                                return `
-                                    <div class="border rounded-2xl p-4 bg-slate-50 space-y-2">
-                                        <div class="flex justify-between items-start">
-                                            <div class="flex items-center gap-2">
-                                                <span class="bg-purple-100 text-purple-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">${q.type === 'BS' ? 'BENAR/SALAH [B/S]' : q.type}</span>
-                                                <span class="text-[10px] bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded">Bobot: ${q.weight || 20} Poin</span>
-                                            </div>
-                                            <div class="flex gap-2">
-                                                <button onclick="EduGuard.openEditQuestionModal('${q.id}')" class="text-blue-600 hover:text-blue-800 text-xs font-bold">
-                                                    <i class="fa-solid fa-pen"></i> Edit
-                                                </button>
-                                                <button onclick="EduGuard.deleteQuestion('${q.id}')" class="text-red-600 hover:text-red-800 text-xs font-bold">
-                                                    <i class="fa-solid fa-trash"></i> Hapus
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="text-xs font-bold text-slate-800 leading-relaxed question-render">${idx + 1}. ${q.text}</div>
-                                        ${formattedQImg ? `<img src="${formattedQImg}" class="max-h-36 rounded-lg my-1 border bg-white p-1" onerror="this.onerror=null; this.src='https://placehold.co/300x150/e2e8f0/64748b?text=Gambar+Gagal+Muat';">` : ''}
-                                        ${q.options ? `<p class="text-[11px] text-slate-600">Opsi/Pernyataan: ${q.options.join(' | ')}</p>` : ''}
-                                        ${q.items ? `<p class="text-[11px] text-slate-600">Items Urutan: ${q.items.join(' -> ')}</p>` : ''}
-                                        ${q.pairs ? `<p class="text-[11px] text-slate-600">Pasangan: ${q.pairs.map(p=>`${p.left}=>${p.right}`).join(', ')}</p>` : ''}
-                                        <p class="text-[11px] text-emerald-700 font-semibold">Kunci Sistem: ${JSON.stringify(q.correctKey !== undefined ? q.correctKey : (q.correctKeys || q.correctOrder || q.pairs))}</p>
-                                    </div>
-                                `;
-                            }).join('')}
+                            <div id="teacherReviewQuestionsContainer" class="space-y-3">
+                                ${this.renderTeacherReviewQuestionsListHTML(questionsList)}
+                            </div>
                         </div>
                     `;
                 } else if (tab === 'finalize') {
@@ -1896,83 +1906,52 @@
                 } else if (tab === 'results') {
                     const activeSubjectObj = DB.subjects.find(s => s.id === subjectId);
                     const subjectName = activeSubjectObj ? activeSubjectObj.name : 'Mata Pelajaran';
-                    
-                    const filteredResults = DB.results.filter(r => !r.subject || r.subject === subjectName || subjectName.includes(r.subject) || r.subject.includes(subjectName));
+                    const uniquePkgs = DB.subjects.find(s => s.id === subjectId)?.packages || ['A', 'B', 'C'];
 
                     return `
                         <div class="space-y-4">
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-purple-50 border border-purple-200 p-4 rounded-2xl">
                                 <div>
                                     <h4 class="font-bold text-purple-900 text-xs sm:text-sm flex items-center gap-2">
-                                        <i class="fa-solid fa-square-poll-vertical text-purple-600"></i> Rekapitulasi Nilai Siswa Selesai
+                                        <i class="fa-solid fa-square-poll-vertical text-purple-600"></i> Rekapitulasi Nilai Siswa (Realtime Sync)
                                     </h4>
-                                    <p class="text-xs text-purple-700">Mapel: <strong>${subjectName}</strong> | Total Siswa Selesai: <strong>${filteredResults.length} Orang</strong></p>
+                                    <p class="text-xs text-purple-700">Mapel: <strong>${subjectName}</strong> | Sortir berdasarkan Paket Soal.</p>
                                 </div>
-                                <button onclick="EduGuard.exportTeacherResultsExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2 active:scale-95 whitespace-nowrap">
-                                    <i class="fa-solid fa-file-excel text-sm"></i> Unduh Rekap Nilai (Excel)
-                                </button>
+                                <div class="flex gap-2 items-center flex-wrap">
+                                    <select id="filterTeacherResultPkg" onchange="EduGuard.filterTeacherResults()" class="px-3 py-2 border rounded-xl text-xs bg-white font-bold text-purple-900 shadow-sm">
+                                        <option value="all">Semua Paket</option>
+                                        ${uniquePkgs.map(p => `<option value="${p}">Paket ${p}</option>`).join('')}
+                                    </select>
+                                    <button onclick="EduGuard.exportTeacherResultsExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2 active:scale-95 whitespace-nowrap">
+                                        <i class="fa-solid fa-file-excel text-sm"></i> Unduh Excel
+                                    </button>
+                                </div>
                             </div>
 
-                            ${filteredResults.length === 0 ? `
-                                <div class="text-center py-8 text-slate-400 text-xs border rounded-2xl bg-white p-6">
-                                    <i class="fa-solid fa-file-circle-xmark text-3xl mb-2 block text-slate-300"></i>
-                                    Belum ada data pengerjaan ujian siswa yang telah selesai untuk mata pelajaran ini.
-                                </div>
-                            ` : `
-                                <div class="overflow-x-auto border rounded-2xl bg-white shadow-sm">
-                                    <table class="w-full text-left border-collapse text-xs">
-                                        <thead class="bg-slate-100 border-b text-slate-700 font-bold">
-                                            <tr>
-                                                <th class="p-3">NIS</th>
-                                                <th class="p-3">Nama Siswa</th>
-                                                <th class="p-3">Kelas</th>
-                                                <th class="p-3">Paket</th>
-                                                <th class="p-3 font-extrabold text-purple-800">Skor Akhir (Max 100)</th>
-                                                <th class="p-3">Status</th>
-                                                <th class="p-3">Waktu Selesai</th>
-                                                <th class="p-3 text-center">Hasil Pekerjaan Siswa</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="divide-y text-slate-600">
-                                            ${filteredResults.map(r => `
-                                                <tr class="hover:bg-slate-50 transition">
-                                                    <td class="p-3 font-bold text-slate-800">${r.nis}</td>
-                                                    <td class="p-3 font-semibold text-slate-700">${r.name}</td>
-                                                    <td class="p-3">${r.class || '-'}</td>
-                                                    <td class="p-3"><span class="bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded text-[10px]">Paket ${r.package || 'A'}</span></td>
-                                                    <td class="p-3 font-black text-purple-700 text-sm">${r.totalScore}</td>
-                                                    <td class="p-3">
-                                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.status && r.status.includes('Dibatalkan') ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${r.status || 'Selesai'}</span>
-                                                    </td>
-                                                    <td class="p-3 text-slate-500 font-mono">${r.submittedAt || '-'}</td>
-                                                    <td class="p-3 text-center">
-                                                        <button onclick="EduGuard.viewTeacherStudentWorkModal('${r.nis}', '${r.name}', '${r.class || '-'}', '${r.subject}', '${r.package || 'A'}', ${r.totalScore})" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm transition active:scale-95 inline-flex items-center gap-1.5">
-                                                            <i class="fa-solid fa-file-signature"></i> Cek Lembar Jawaban
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            `).join('')}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            `}
+                            <div class="overflow-x-auto border rounded-2xl bg-white shadow-sm">
+                                <table class="w-full text-left border-collapse text-xs">
+                                    <thead class="bg-slate-100 border-b text-slate-700 font-bold">
+                                        <tr>
+                                            <th class="p-3">NIS</th>
+                                            <th class="p-3">Nama Siswa</th>
+                                            <th class="p-3">Kelas</th>
+                                            <th class="p-3">Paket</th>
+                                            <th class="p-3 font-extrabold text-purple-800">Skor Akhir (Max 100)</th>
+                                            <th class="p-3">Status</th>
+                                            <th class="p-3">Waktu Selesai</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblTeacherResultsBody" class="divide-y text-slate-600">
+                                        ${this.renderTeacherResultsRows(subjectId, 'all')}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     `;
                 } else if (tab === 'cheat') {
-                    const activeSubjectObj = DB.subjects.find(s => s.id === subjectId);
-                    const subjectName = activeSubjectObj ? activeSubjectObj.name : 'Mata Pelajaran';
-                    const subjectCheatLogs = DB.cheatLogs.filter(l => !l.subject || l.subject === subjectName || subjectName.includes(l.subject) || l.subject.includes(subjectName));
-
                     return `
                         <div class="space-y-3">
-                            <div class="flex justify-between items-center bg-red-50 p-3 rounded-2xl border border-red-200">
-                                <div>
-                                    <h4 class="font-bold text-red-900 text-xs sm:text-sm">Log Pelanggaran Siswa Mapel ${subjectName}</h4>
-                                    <p class="text-[11px] text-red-700">Mencatat upaya screenshot, pindah tab, split screen, dan tombol navigasi.</p>
-                                </div>
-                                <span class="text-xs bg-red-200 text-red-800 font-bold px-2.5 py-1 rounded-full">${subjectCheatLogs.length} Pelanggaran</span>
-                            </div>
-
+                            <h4 class="font-bold text-slate-800 text-sm">Log Pelanggaran Siswa (Realtime Sync)</h4>
                             <div class="overflow-x-auto border rounded-2xl bg-white shadow-sm">
                                 <table class="w-full text-left border-collapse text-xs">
                                     <thead class="bg-red-50 text-red-800 font-bold border-b">
@@ -1981,21 +1960,19 @@
                                             <th class="p-3">NIS</th>
                                             <th class="p-3">Nama Siswa</th>
                                             <th class="p-3">Jenis Pelanggaran</th>
-                                            <th class="p-3">Point</th>
-                                            <th class="p-3">Status</th>
+                                            <th class="p-3">KALI</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y text-slate-600">
-                                        ${subjectCheatLogs.length === 0 ? `
-                                            <tr><td colspan="6" class="p-4 text-center text-slate-400">Belum ada catatan pelanggaran siswa pada mapel ini.</td></tr>
-                                        ` : subjectCheatLogs.map(l => `
+                                    <tbody id="tblTeacherCheatBody" class="divide-y text-slate-600">
+                                        ${DB.cheatLogs.length === 0 ? `
+                                            <tr><td colspan="5" class="p-4 text-center text-slate-400">Belum ada catatan pelanggaran siswa.</td></tr>
+                                        ` : DB.cheatLogs.map(l => `
                                             <tr>
-                                                <td class="p-3">${l.timestamp || '-'}</td>
+                                                <td class="p-3">${l.timestamp}</td>
                                                 <td class="p-3 font-bold">${l.nis}</td>
                                                 <td class="p-3">${l.name}</td>
                                                 <td class="p-3 text-red-600 font-semibold">${l.violationType}</td>
                                                 <td class="p-3 font-bold">${l.count}</td>
-                                                <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">${l.status || 'Teguran'}</span></td>
                                             </tr>
                                         `).join('')}
                                     </tbody>
@@ -2006,291 +1983,40 @@
                 }
             },
 
-            downloadBankSoalExcel(subId, pkg) {
-                const questions = (DB.examPackages[subId] && DB.examPackages[subId][pkg]) || [];
-                const subject = DB.subjects.find(s => s.id === subId);
-                const subName = subject ? subject.name : 'Mata_Pelajaran';
+            renderTeacherResultsRows(subjectId, filterPkg) {
+                const activeSubjectObj = DB.subjects.find(s => s.id === subjectId);
+                const subjectName = activeSubjectObj ? activeSubjectObj.name : 'Mata Pelajaran';
 
-                if (questions.length === 0) {
-                    return this.showToast(`Belum ada soal pada Paket ${pkg} untuk diunduh!`, 'warning');
+                let filtered = DB.results.filter(r => !r.subject || r.subject === subjectName || subjectName.includes(r.subject) || r.subject.includes(subjectName));
+                if (filterPkg !== 'all') {
+                    filtered = filtered.filter(r => String(r.package || 'A') === String(filterPkg));
                 }
 
-                const data = [
-                    [`BANK SOAL ${subName.toUpperCase()} - PAKET ${pkg}`],
-                    [`SMA NEGERI 1 KUTOWINANGUN`, `Tanggal Unduh: ${new Date().toLocaleDateString()}`],
-                    [],
-                    ["NO", "TIPE", "PERTANYAAN SOAL", "BOBOT", "OPSI / ELEMEN", "KUNCI JAWABAN"]
-                ];
+                if (filtered.length === 0) {
+                    return `<tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada data pengerjaan ujian siswa dengan filter tersebut.</td></tr>`;
+                }
 
-                questions.forEach((q, idx) => {
-                    let optStr = "";
-                    let keyStr = "";
-
-                    if (q.type === 'PG' || q.type === 'PGK') {
-                        optStr = (q.options || []).map((o, i) => `${String.fromCharCode(65 + i)}. ${o}`).join(' | ');
-                        if (q.type === 'PG') keyStr = String.fromCharCode(65 + Number(q.correctKey || 0));
-                        else keyStr = (q.correctKeys || []).map(k => String.fromCharCode(65 + k)).join(', ');
-                    } else if (q.type === 'BS') {
-                        optStr = (q.statements || q.options || []).join(' | ');
-                        keyStr = typeof q.correctKey === 'object' ? JSON.stringify(q.correctKey) : String(q.correctKey || 'BENAR');
-                    } else if (q.type === 'URUTAN') {
-                        optStr = (q.items || []).join(' -> ');
-                        keyStr = (q.correctOrder || []).join(' -> ');
-                    } else if (q.type === 'JODOH') {
-                        optStr = (q.pairs || []).map(p => `${p.left} = ${p.right}`).join(' | ');
-                        keyStr = (q.pairs || []).map(p => `${p.left} => ${p.right}`).join(' | ');
-                    }
-
-                    data.push([idx + 1, q.type, q.text.replace(/<[^>]*>/g, ''), q.weight || 20, optStr, keyStr]);
-                });
-
-                const worksheet = XLSX.utils.aoa_to_sheet(data);
-                const workbook = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(workbook, worksheet, `Paket_${pkg}`);
-                XLSX.writeFile(workbook, `Bank_Soal_${subName.replace(/[^a-zA-Z0-9]/g, '_')}_Paket_${pkg}.xlsx`);
-                this.showToast(`Bank Soal Paket ${pkg} berhasil diunduh (Excel)!`, 'success');
+                return filtered.map(r => `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3 font-bold text-slate-800">${r.nis}</td>
+                        <td class="p-3 font-semibold text-slate-700">${r.name}</td>
+                        <td class="p-3">${r.class || '-'}</td>
+                        <td class="p-3"><span class="bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded text-[10px]">Paket ${r.package || 'A'}</span></td>
+                        <td class="p-3 font-black text-purple-700 text-sm">${r.totalScore}</td>
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.status && r.status.includes('Dibatalkan') ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${r.status || 'Selesai'}</span>
+                        </td>
+                        <td class="p-3 text-slate-500 font-mono">${r.submittedAt || '-'}</td>
+                    </tr>
+                `).join('');
             },
 
-            downloadBankSoalWord(subId, pkg) {
-                const questions = (DB.examPackages[subId] && DB.examPackages[subId][pkg]) || [];
-                const subject = DB.subjects.find(s => s.id === subId);
-                const subName = subject ? subject.name : 'Mata_Pelajaran';
-
-                if (questions.length === 0) {
-                    return this.showToast(`Belum ada soal pada Paket ${pkg} untuk diunduh!`, 'warning');
+            filterTeacherResults() {
+                const pkgVal = document.getElementById('filterTeacherResultPkg').value;
+                const tbody = document.getElementById('tblTeacherResultsBody');
+                if (tbody) {
+                    tbody.innerHTML = this.renderTeacherResultsRows(this.teacherSelectedSubject, pkgVal);
                 }
-
-                let htmlContent = `
-                    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-                    <head><meta charset='utf-8'><title>Bank Soal</title>
-                    <style>
-                        body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.4; }
-                        h2, h3 { text-align: center; margin: 4px 0; }
-                        .soal-item { margin-bottom: 16px; border-bottom: 1px solid #ccc; padding-bottom: 8px; }
-                        .kunci { color: #166534; font-weight: bold; margin-top: 4px; }
-                    </style>
-                    </head>
-                    <body>
-                        <h2>CBT SMA NEGERI 1 KUTOWINANGUN</h2>
-                        <h3>BANK SOAL: ${subName.toUpperCase()} (PAKET ${pkg})</h3>
-                        <hr/>
-                `;
-
-                questions.forEach((q, idx) => {
-                    htmlContent += `<div class="soal-item">`;
-                    htmlContent += `<p><strong>${idx + 1}. [${q.type}] (Bobot: ${q.weight || 20} Poin)</strong><br/>${q.text}</p>`;
-                    
-                    if (q.type === 'PG' && q.options) {
-                        q.options.forEach((opt, oIdx) => {
-                            htmlContent += `<div>${String.fromCharCode(65 + oIdx)}. ${opt}</div>`;
-                        });
-                        htmlContent += `<div class="kunci">Kunci: ${String.fromCharCode(65 + Number(q.correctKey || 0))}</div>`;
-                    } else if (q.type === 'PGK' && q.options) {
-                        q.options.forEach((opt, oIdx) => {
-                            htmlContent += `<div>[ ] ${String.fromCharCode(65 + oIdx)}. ${opt}</div>`;
-                        });
-                        htmlContent += `<div class="kunci">Kunci: ${(q.correctKeys || []).map(k => String.fromCharCode(65 + k)).join(', ')}</div>`;
-                    } else if (q.type === 'BS') {
-                        htmlContent += `<div>Pernyataan: ${(q.statements || q.options || []).join(' | ')}</div>`;
-                        htmlContent += `<div class="kunci">Kunci: ${JSON.stringify(q.correctKey)}</div>`;
-                    } else if (q.type === 'URUTAN') {
-                        htmlContent += `<div>Items: ${(q.items || []).join(' -> ')}</div>`;
-                        htmlContent += `<div class="kunci">Kunci Urutan: ${(q.correctOrder || []).join(' -> ')}</div>`;
-                    } else if (q.type === 'JODOH') {
-                        htmlContent += `<div>Pasangan: ${(q.pairs || []).map(p => `${p.left} = ${p.right}`).join(' | ')}</div>`;
-                    }
-                    htmlContent += `</div>`;
-                });
-
-                htmlContent += `</body></html>`;
-
-                const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `Bank_Soal_${subName.replace(/[^a-zA-Z0-9]/g, '_')}_Paket_${pkg}.doc`;
-                a.click();
-                this.showToast(`Bank Soal Paket ${pkg} berhasil diunduh (Word .doc)!`, 'success');
-            },
-
-            async viewTeacherStudentWorkModal(nis, name, className, subjectName, pkg, totalScore) {
-                this.showToast('Memuat lembar pengerjaan siswa...', 'info');
-
-                let answersMap = {};
-                const remoteAnswers = await apiCall('getStudentAnswers', { nis: nis, subject: subjectName });
-                if (remoteAnswers && remoteAnswers.status === 'success' && Array.isArray(remoteAnswers.data)) {
-                    const found = remoteAnswers.data.find(a => String(a.nis) === String(nis) && String(a.package || 'A') === String(pkg));
-                    if (found && found.userAnswers) answersMap = found.userAnswers;
-                }
-
-                if (Object.keys(answersMap).length === 0 && DB.studentAnswersMap) {
-                    const localKey = `${nis}_${subjectName}_${pkg}`;
-                    if (DB.studentAnswersMap[localKey]) {
-                        answersMap = DB.studentAnswersMap[localKey];
-                    }
-                }
-
-                const subObj = DB.subjects.find(s => s.name === subjectName || s.id === this.teacherSelectedSubject);
-                const subId = subObj ? subObj.id : this.teacherSelectedSubject;
-
-                let questions = (DB.examPackages[subId] && DB.examPackages[subId][pkg]) || [];
-                if (questions.length === 0) {
-                    const remoteQ = await apiCall('getQuestions', { subjectId: subId, package: pkg });
-                    if (remoteQ && remoteQ.status === 'success' && remoteQ.data.length > 0) questions = remoteQ.data;
-                }
-
-                const body = `
-                    <div class="space-y-4">
-                        <div class="bg-purple-50 p-4 rounded-2xl border border-purple-200 text-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                            <div>
-                                <span class="text-[10px] bg-purple-200 text-purple-900 px-2 py-0.5 rounded-full font-bold uppercase">Lembar Hasil Pengerjaan Siswa</span>
-                                <h4 class="font-black text-sm text-purple-950 mt-1 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-user-graduate text-purple-600"></i> ${name} (NIS: ${nis})
-                                </h4>
-                                <p class="text-xs text-slate-600">Kelas: <strong>${className}</strong> | Mapel: <strong>${subjectName}</strong> | Paket: <strong>${pkg}</strong></p>
-                            </div>
-                            <div class="text-right sm:border-l sm:border-purple-200 sm:pl-4">
-                                <span class="text-[10px] text-slate-500 font-bold block">Skor Akhir (Otomatis):</span>
-                                <span class="text-2xl font-black text-purple-700">${totalScore} <span class="text-xs font-normal text-slate-500">/ 100</span></span>
-                            </div>
-                        </div>
-
-                        <div class="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
-                            ${questions.length === 0 ? `
-                                <div class="text-center py-6 text-slate-400 text-xs bg-slate-50 border rounded-2xl">
-                                    <i class="fa-solid fa-folder-open text-2xl mb-1 text-slate-300 block"></i>
-                                    Belum ada data butir soal yang terbaca untuk paket ini.
-                                </div>
-                            ` : questions.map((q, qIdx) => {
-                                const userAns = answersMap[qIdx];
-                                const formattedQImg = this.formatImageUrl(q.image);
-                                const weight = Number(q.weight || 20);
-
-                                let isCorrect = false;
-                                if (q.type === 'PG' && userAns === q.correctKey) isCorrect = true;
-                                else if (q.type === 'PGK' && Array.isArray(userAns) && Array.isArray(q.correctKeys)) {
-                                    isCorrect = [...userAns].sort().join(',') === [...q.correctKeys].sort().join(',');
-                                } else if (q.type === 'BS') {
-                                    if (typeof userAns === 'object' && userAns !== null && q.statements) {
-                                        let correctCount = 0;
-                                        const keysObj = typeof q.correctKey === 'object' ? q.correctKey : {};
-                                        q.statements.forEach((st, sIdx) => {
-                                            if (String(userAns[sIdx] || '').toUpperCase() === String(keysObj[sIdx] || 'BENAR').toUpperCase()) correctCount++;
-                                        });
-                                        isCorrect = correctCount === q.statements.length;
-                                    } else {
-                                        isCorrect = String(userAns || '').toUpperCase() === String(q.correctKey || 'BENAR').toUpperCase();
-                                    }
-                                } else if (q.type === 'URUTAN' && Array.isArray(userAns)) {
-                                    isCorrect = JSON.stringify(userAns) === JSON.stringify(q.correctOrder);
-                                } else if (q.type === 'JODOH' && Array.isArray(userAns)) {
-                                    let matchCount = 0;
-                                    (q.pairs || []).forEach((pair, pIdx) => {
-                                        if (userAns[pIdx] && userAns[pIdx].userRight === pair.right) matchCount++;
-                                    });
-                                    isCorrect = matchCount === (q.pairs || []).length;
-                                }
-
-                                return `
-                                    <div class="border rounded-2xl p-4 bg-slate-50 space-y-3">
-                                        <div class="flex justify-between items-center">
-                                            <div class="flex items-center gap-2">
-                                                <span class="bg-purple-100 text-purple-900 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase">Soal ${qIdx + 1} (${q.type === 'BS' ? 'B/S' : q.type})</span>
-                                                <span class="text-[10px] bg-slate-200 text-slate-700 font-bold px-2 py-0.5 rounded">Bobot: ${weight} Poin</span>
-                                            </div>
-                                            <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full ${isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}">
-                                                ${isCorrect ? `✓ Benar (+${weight} Poin)` : '✗ Salah (0 Poin)'}
-                                            </span>
-                                        </div>
-
-                                        <div class="text-xs font-bold text-slate-800 leading-relaxed question-render">${q.text}</div>
-                                        ${formattedQImg ? `<img src="${formattedQImg}" class="max-h-36 rounded-xl my-1 border bg-white p-1">` : ''}
-
-                                        <!-- Jawaban yang Dipilih Siswa -->
-                                        <div class="p-3 bg-white border border-slate-200 rounded-xl space-y-1">
-                                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Jawaban yang Dipilih Siswa:</span>
-                                            ${this.renderStudentWorkDetailValue(q, userAns)}
-                                        </div>
-
-                                        <!-- Kunci Jawaban Resmi Guru / Sistem -->
-                                        <div class="p-2.5 bg-emerald-50/70 border border-emerald-200 rounded-xl text-[11px] text-emerald-950">
-                                            <span class="font-extrabold text-emerald-800 block text-[10px] uppercase">Kunci Jawaban Tepat Sistem:</span>
-                                            ${this.renderQuestionKeySummary(q)}
-                                        </div>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                    </div>
-                `;
-
-                this.showModal(`Lembar Jawaban Siswa - ${name}`, body, `<button onclick="EduGuard.closeModal()" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold">Tutup Lembar Jawaban</button>`);
-            },
-
-            renderStudentWorkDetailValue(q, userAns) {
-                if (userAns === undefined || userAns === null || userAns === '') {
-                    return `<span class="text-xs text-red-600 font-bold italic"><i class="fa-solid fa-circle-exclamation mr-1"></i>Siswa tidak menjawab butir soal ini.</span>`;
-                }
-
-                if (q.type === 'PG') {
-                    const optIdx = Number(userAns);
-                    const optText = q.options && q.options[optIdx] ? q.options[optIdx] : `Opsi ${String.fromCharCode(65 + optIdx)}`;
-                    return `<p class="text-xs font-bold text-slate-800"><span class="w-5 h-5 rounded-full bg-slate-100 text-slate-700 border inline-flex items-center justify-center text-[10px] mr-1.5 font-black">${String.fromCharCode(65 + optIdx)}</span> ${optText}</p>`;
-                } else if (q.type === 'PGK') {
-                    if (!Array.isArray(userAns) || userAns.length === 0) return `<span class="text-xs text-red-600 italic">Tidak ada opsi yang dipilih.</span>`;
-                    return `
-                        <div class="flex flex-wrap gap-1.5 pt-1">
-                            ${userAns.map(k => `
-                                <span class="text-xs bg-purple-100 text-purple-900 font-bold px-2 py-0.5 rounded-lg border border-purple-200">
-                                    ${String.fromCharCode(65 + k)}. ${q.options ? q.options[k] : ''}
-                                </span>
-                            `).join('')}
-                        </div>
-                    `;
-                } else if (q.type === 'BS') {
-                    if (typeof userAns === 'object' && userAns !== null && q.statements) {
-                        return `
-                            <ul class="text-xs font-semibold text-slate-700 space-y-1">
-                                ${q.statements.map((st, idx) => `
-                                    <li class="flex items-center justify-between border-b pb-1">
-                                        <span>${idx + 1}. ${st}</span>
-                                        <span class="font-bold ${userAns[idx] === 'BENAR' ? 'text-emerald-700' : 'text-red-700'}">${userAns[idx] || 'Kosong'}</span>
-                                    </li>
-                                `).join('')}
-                            </ul>
-                        `;
-                    }
-                    const isVal = String(userAns).toUpperCase();
-                    return `<span class="text-xs font-black ${isVal === 'BENAR' ? 'text-emerald-700' : 'text-red-700'}">${isVal}</span>`;
-                } else if (q.type === 'URUTAN') {
-                    if (!Array.isArray(userAns)) return `<p class="text-xs text-slate-700">${userAns}</p>`;
-                    return `<ol class="list-decimal list-inside text-xs font-semibold text-slate-800 space-y-0.5">${userAns.map(it => `<li>${it}</li>`).join('')}</ol>`;
-                } else if (q.type === 'JODOH') {
-                    if (!Array.isArray(userAns)) return `<p class="text-xs text-slate-700">${userAns}</p>`;
-                    return `
-                        <ul class="text-xs font-semibold text-slate-800 space-y-1">
-                            ${userAns.map((p, idx) => `
-                                <li><strong>${idx + 1}. ${p.left}:</strong> ➔ <span class="text-purple-700 font-bold">${p.userRight || 'Tidak Diisi'}</span></li>
-                            `).join('')}
-                        </ul>
-                    `;
-                }
-                return `<p class="text-xs text-slate-700">${JSON.stringify(userAns)}</p>`;
-            },
-
-            renderQuestionKeySummary(q) {
-                if (q.type === 'PG' && q.options) {
-                    return `Kunci: <strong>${String.fromCharCode(65 + q.correctKey)}. ${q.options[q.correctKey] || ''}</strong>`;
-                } else if (q.type === 'PGK' && q.options) {
-                    return `Kunci: <strong>${(q.correctKeys || []).map(k => `${String.fromCharCode(65 + k)}. ${q.options[k] || ''}`).join(' | ')}</strong>`;
-                } else if (q.type === 'BS') {
-                    return `Kunci: <strong>${typeof q.correctKey === 'object' ? JSON.stringify(q.correctKey) : (q.correctKey || 'BENAR')}</strong>`;
-                } else if (q.type === 'URUTAN') {
-                    return `Urutan: <strong>${(q.correctOrder || []).join(' ➔ ')}</strong>`;
-                } else if (q.type === 'JODOH') {
-                    return `Pasangan: <strong>${(q.pairs || []).map(p => `${p.left} ➔ ${p.right}`).join(' | ')}</strong>`;
-                }
-                return `Kunci: ${JSON.stringify(q.correctKey)}`;
             },
 
             openExamPreviewModal(subId, pkg) {
@@ -2321,7 +2047,7 @@
                                             <span class="bg-indigo-100 text-indigo-800 text-[10px] font-extrabold px-2 py-0.5 rounded uppercase">Soal ${idx + 1} (${q.type})</span>
                                             <span class="text-[10px] text-slate-500 font-bold">Bobot: ${q.weight || 20} Poin</span>
                                         </div>
-                                        <div class="text-xs font-bold text-slate-800 leading-relaxed question-render">${q.text}</div>
+                                        <p class="text-xs font-bold text-slate-800 whitespace-pre-line leading-relaxed">${q.text}</p>
                                         ${formattedQImg ? `<img src="${formattedQImg}" class="max-h-40 rounded-xl my-2 mx-auto border bg-white p-1">` : ''}
 
                                         <div class="pt-2 border-t space-y-1">
@@ -2374,46 +2100,6 @@
                 this.showModal('Pratinjau (Preview) Soal Guru', body, `<button onclick="EduGuard.closeModal()" class="bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold">Tutup Pratinjau</button>`);
             },
 
-            exportTeacherResultsExcel() {
-                const subId = this.teacherSelectedSubject;
-                const subjectObj = DB.subjects.find(s => s.id === subId);
-                const subjectName = subjectObj ? subjectObj.name : 'Mata_Pelajaran';
-
-                const filteredResults = DB.results.filter(r => !r.subject || r.subject === subjectName || subjectName.includes(r.subject) || r.subject.includes(subjectName));
-
-                if (filteredResults.length === 0) {
-                    return this.showToast('Belum ada data hasil ujian untuk diunduh!', 'warning');
-                }
-
-                const excelData = [
-                    ["REKAPITULASI HASIL UJIAN - CBT SMA NEGERI 1 KUTOWINANGUN"],
-                    [`Mata Pelajaran: ${subjectName}`, `Tanggal Unduh: ${new Date().toLocaleDateString()}`],
-                    [],
-                    ["NO", "NIS", "NAMA SISWA", "KELAS", "PAKET", "SKOR AKHIR (100)", "STATUS", "WAKTU SUBMIT"]
-                ];
-
-                filteredResults.forEach((r, idx) => {
-                    excelData.push([
-                        idx + 1,
-                        r.nis,
-                        r.name,
-                        r.class || '-',
-                        r.package || 'A',
-                        r.totalScore,
-                        r.status || 'Selesai',
-                        r.submittedAt || '-'
-                    ]);
-                });
-
-                const worksheet = XLSX.utils.aoa_to_sheet(excelData);
-                const workbook = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(workbook, worksheet, "Hasil Ujian");
-                
-                const filename = `Hasil_Ujian_${subjectName.replace(/[^a-zA-Z0-9]/g, '_')}_SMAN1Kutowinangun.xlsx`;
-                XLSX.writeFile(workbook, filename);
-                this.showToast('File Rekap Nilai berhasil diunduh!', 'success');
-            },
-
             getManualFormFieldsHTML(type) {
                 if (type === 'PG') {
                     return `
@@ -2455,7 +2141,7 @@
                     return `
                         <p class="text-xs font-bold text-slate-700 mb-1">Soal Benar / Salah [B/S]:</p>
                         <div class="space-y-2">
-                            <p class="text-[11px] text-slate-500">Isi Kasus / Pernyataan di bawah ini (Kosongkan jika hanya 1 Pernyataan Tunggal):</p>
+                            <p class="text-[11px] text-slate-500">Isi Kasus / Pernyataan di bawah ini:</p>
                             ${[1, 2, 3, 4, 5].map(idx => `
                                 <div class="flex items-center gap-2">
                                     <span class="font-bold text-xs w-16 text-slate-700">Kasus ${idx}:</span>
@@ -2470,23 +2156,37 @@
                     `;
                 } else if (type === 'URUTAN') {
                     return `
-                        <p class="text-xs font-bold text-slate-700">Masukkan Butir-Butir dalam URUTAN TEPAT (Awal ke Akhir):</p>
-                        ${[1, 2, 3, 4].map(idx => `
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold text-xs w-16 text-slate-700">Urutan ${idx}:</span>
-                                <input type="text" id="manualUrutan_${idx-1}" placeholder="Langkah/Tahap ke-${idx}" class="flex-1 px-3 py-1.5 border rounded-lg text-xs bg-white">
-                            </div>
-                        `).join('')}
+                        <div class="flex justify-between items-center mb-1">
+                            <p class="text-xs font-bold text-slate-700">Masukkan Butir-Butir dalam URUTAN TEPAT (Dapat Tambah Opsi):</p>
+                            <button type="button" onclick="EduGuard.addDynamicRow('manualUrutanContainer', 8, 'Langkah')" class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-[10px] font-bold">
+                                <i class="fa-solid fa-plus mr-1"></i> Tambah Opsi Urutan
+                            </button>
+                        </div>
+                        <div id="manualUrutanContainer" class="space-y-2">
+                            ${[1, 2, 3, 4].map(idx => `
+                                <div class="flex items-center gap-2">
+                                    <span class="font-bold text-xs w-16 text-slate-700">Urutan ${idx}:</span>
+                                    <input type="text" id="manualUrutan_${idx-1}" placeholder="Langkah/Tahap ke-${idx}" class="flex-1 px-3 py-1.5 border rounded-lg text-xs bg-white">
+                                </div>
+                            `).join('')}
+                        </div>
                     `;
                 } else if (type === 'JODOH') {
                     return `
-                        <p class="text-xs font-bold text-slate-700">Pasangkan Pernyataan (Sisi Kiri) dengan Pasangannya (Sisi Kanan):</p>
-                        ${[1, 2, 3].map(idx => `
-                            <div class="grid grid-cols-2 gap-2">
-                                <input type="text" id="manualJodohLeft_${idx-1}" placeholder="Pernyataan Kiri ${idx}" class="px-3 py-1.5 border rounded-lg text-xs bg-white">
-                                <input type="text" id="manualJodohRight_${idx-1}" placeholder="Pasangan Kanan ${idx}" class="px-3 py-1.5 border rounded-lg text-xs bg-white">
-                            </div>
-                        `).join('')}
+                        <div class="flex justify-between items-center mb-1">
+                            <p class="text-xs font-bold text-slate-700">Pasangkan Pernyataan dengan Pasangannya (Dapat Tambah Opsi):</p>
+                            <button type="button" onclick="EduGuard.addDynamicRow('manualJodohContainer', 6, 'Pasangan')" class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-[10px] font-bold">
+                                <i class="fa-solid fa-plus mr-1"></i> Tambah Pasangan
+                            </button>
+                        </div>
+                        <div id="manualJodohContainer" class="space-y-2">
+                            ${[1, 2, 3].map(idx => `
+                                <div class="flex items-center gap-2">
+                                    <input type="text" id="manualJodohLeft_${idx-1}" placeholder="Pernyataan Kiri ${idx}" class="px-3 py-1.5 border rounded-lg text-xs bg-white flex-1">
+                                    <input type="text" id="manualJodohRight_${idx-1}" placeholder="Pasangan Kanan ${idx}" class="px-3 py-1.5 border rounded-lg text-xs bg-white flex-1">
+                                </div>
+                            `).join('')}
+                        </div>
                     `;
                 }
             },
@@ -2556,11 +2256,11 @@
                     const stList = [];
                     const keyMap = {};
                     for (let i = 0; i < 5; i++) {
-                        const kText = document.getElementById(`manualBsKasus_${i}`).value.trim();
-                        const kVal = document.getElementById(`manualBsKasusKey_${i}`).value;
-                        if (kText) {
-                            stList.push(kText);
-                            keyMap[stList.length - 1] = kVal;
+                        const kEl = document.getElementById(`manualBsKasus_${i}`);
+                        const vEl = document.getElementById(`manualBsKasusKey_${i}`);
+                        if (kEl && kEl.value.trim()) {
+                            stList.push(kEl.value.trim());
+                            keyMap[stList.length - 1] = vEl.value;
                         }
                     }
                     if (stList.length > 0) {
@@ -2573,19 +2273,21 @@
                     }
                 } else if (type === 'URUTAN') {
                     const items = [];
-                    for (let i = 0; i < 4; i++) {
-                        const val = document.getElementById(`manualUrutan_${i}`).value.trim();
-                        if (val) items.push(val);
+                    for (let i = 0; i < 8; i++) {
+                        const el = document.getElementById(`manualUrutan_${i}`);
+                        if (el && el.value.trim()) items.push(el.value.trim());
                     }
                     if (items.length < 2) return this.showToast('Isi minimal 2 urutan!', 'warning');
                     newQ.items = items;
                     newQ.correctOrder = [...items];
                 } else if (type === 'JODOH') {
                     const pairs = [];
-                    for (let i = 0; i < 3; i++) {
-                        const l = document.getElementById(`manualJodohLeft_${i}`).value.trim();
-                        const r = document.getElementById(`manualJodohRight_${i}`).value.trim();
-                        if (l && r) pairs.push({ left: l, right: r });
+                    for (let i = 0; i < 6; i++) {
+                        const lEl = document.getElementById(`manualJodohLeft_${i}`);
+                        const rEl = document.getElementById(`manualJodohRight_${i}`);
+                        if (lEl && rEl && lEl.value.trim() && rEl.value.trim()) {
+                            pairs.push({ left: lEl.value.trim(), right: rEl.value.trim() });
+                        }
                     }
                     if (pairs.length < 1) return this.showToast('Isi minimal 1 pasangan terikat!', 'warning');
                     newQ.pairs = pairs;
@@ -2601,425 +2303,6 @@
                 this.switchTeacherTab('review');
             },
 
-            openEditQuestionModal(qId) {
-                const subId = this.teacherSelectedSubject;
-                const pkg = this.teacherSelectedPkg;
-                const questions = (DB.examPackages[subId] && DB.examPackages[subId][pkg]) || [];
-                const q = questions.find(item => item.id === qId);
-
-                if (!q) return;
-
-                const body = `
-                    <div class="space-y-3">
-                        <div>
-                            <label class="block text-xs font-bold mb-1">Pertanyaan Soal</label>
-                            <textarea id="editModalText" rows="3" class="w-full p-2 border rounded-xl text-xs">${q.text}</textarea>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold mb-1">Bobot Poin</label>
-                            <input type="number" id="editModalWeight" value="${q.weight || 20}" class="w-full p-2 border rounded-xl text-xs">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold mb-1">URL Gambar Soal</label>
-                            <input type="text" id="editModalImage" value="${q.image || ''}" class="w-full p-2 border rounded-xl text-xs" placeholder="https://...">
-                        </div>
-                    </div>
-                `;
-                const footer = `
-                    <button onclick="EduGuard.updateQuestion('${qId}')" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md">Simpan Perubahan</button>
-                `;
-                this.showModal('Edit Butir Soal', body, footer);
-            },
-
-            updateQuestion(qId) {
-                const subId = this.teacherSelectedSubject;
-                const pkg = this.teacherSelectedPkg;
-                const newText = document.getElementById('editModalText').value.trim();
-                const newImg = document.getElementById('editModalImage').value.trim();
-                const newWeight = Number(document.getElementById('editModalWeight').value || 20);
-
-                const q = DB.examPackages[subId][pkg].find(item => item.id === qId);
-                if (q) {
-                    q.text = newText;
-                    q.image = newImg || null;
-                    q.weight = newWeight;
-                }
-                this.closeModal();
-                this.renderTeacherDashboard();
-                this.showToast('Soal berhasil diperbarui!', 'success');
-            },
-
-            deleteQuestion(qId) {
-                const subId = this.teacherSelectedSubject;
-                const pkg = this.teacherSelectedPkg;
-                DB.examPackages[subId][pkg] = DB.examPackages[subId][pkg].filter(item => item.id !== qId);
-                apiCall('deleteQuestion', { questionId: qId });
-                this.renderTeacherDashboard();
-                this.showToast('Soal berhasil dihapus.', 'info');
-            },
-
-            async toggleTeacherFinalize(pkg) {
-                const subId = this.teacherSelectedSubject;
-                const subject = DB.subjects.find(s => s.id === subId);
-                if (!subject) return;
-
-                if (!subject.finalizedPackages) subject.finalizedPackages = [];
-                const idx = subject.finalizedPackages.indexOf(pkg);
-                if (idx >= 0) subject.finalizedPackages.splice(idx, 1);
-                else subject.finalizedPackages.push(pkg);
-
-                await apiCall('toggleFinalize', { subjectId: subId, package: pkg });
-                this.showToast('Status finalisasi diperbarui!', 'success');
-                this.renderTeacherDashboard();
-            },
-
-            handleFileUpload(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                if (file.name.endsWith('.docx')) {
-                    reader.onload = async (evt) => {
-                        const result = await mammoth.extractRawText({ arrayBuffer: evt.target.result });
-                        this.parseAndImportText(result.value);
-                    };
-                    reader.readAsArrayBuffer(file);
-                } else if (file.name.endsWith('.pdf')) {
-                    reader.onload = async (evt) => {
-                        const typedarray = new Uint8Array(evt.target.result);
-                        const pdf = await pdfjsLib.getDocument(typedarray).promise;
-                        let fullText = '';
-                        for (let i = 1; i <= pdf.numPages; i++) {
-                            const page = await pdf.getPage(i);
-                            const textContent = await page.getTextContent();
-                            fullText += textContent.items.map(s => s.str).join(' ') + '\n';
-                        }
-                        this.parseAndImportText(fullText);
-                    };
-                    reader.readAsArrayBuffer(file);
-                } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-                    reader.onload = (evt) => {
-                        const data = new Uint8Array(evt.target.result);
-                        const workbook = XLSX.read(data, { type: 'array' });
-                        const firstSheetName = workbook.SheetNames[0];
-                        const worksheet = workbook.Sheets[firstSheetName];
-                        const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-                        this.parseAndImportExcelQuestions(rows);
-                    };
-                    reader.readAsArrayBuffer(file);
-                } else {
-                    reader.onload = (evt) => this.parseAndImportText(evt.target.result);
-                    reader.readAsText(file);
-                }
-            },
-
-            downloadQuestionExcelTemplate() {
-                const data = [
-                    ["TIPE", "SOAL", "BOBOT", "OPSI_A", "OPSI_B", "OPSI_C", "OPSI_D", "OPSI_E", "KUNCI"],
-                    ["PG", "Hitunglah nilai lim (x → 0) dari (sin 4x) / (2x) = ....", 25, "0", "1", "2", "4", "8", "C"],
-                    ["PGK", "Pilihlah perangkat input komputer di bawah ini:", 25, "Keyboard", "Monitor", "Mouse", "Printer", "", "A,C"],
-                    ["BS", "RAM adalah memori penyimpanan bersifat volatile.", 25, "", "", "", "", "", "BENAR"],
-                    ["URUTAN", "Urutkan pemrosesan data komputer dari awal hingga akhir:", 25, "Input", "Process", "Storage", "Output", "", "Input,Process,Storage,Output"]
-                ];
-
-                const worksheet = XLSX.utils.aoa_to_sheet(data);
-                const workbook = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(workbook, worksheet, "TemplateSoal");
-                XLSX.writeFile(workbook, "Template_Import_Soal_Objektif_CBT.xlsx");
-            },
-
-            parseAndImportExcelQuestions(rows) {
-                if (!rows || rows.length <= 1) {
-                    return this.showToast('File Excel kosong atau tidak memiliki baris data!', 'error');
-                }
-
-                const subId = this.teacherSelectedSubject;
-                const pkg = this.teacherSelectedPkg;
-                const parsed = [];
-
-                for (let i = 1; i < rows.length; i++) {
-                    const row = rows[i];
-                    if (!row || row.length === 0) continue;
-
-                    const typeRaw = String(row[0] || 'PG').trim().toUpperCase();
-                    const text = String(row[1] || '').trim();
-                    if (!text) continue;
-
-                    let type = 'PG';
-                    if (['PG', 'PGK', 'BS', 'B/S', 'URUTAN', 'JODOH'].includes(typeRaw)) {
-                        type = (typeRaw === 'B/S') ? 'BS' : typeRaw;
-                    } else if (typeRaw.includes('BENAR') || typeRaw.includes('SALAH')) type = 'BS';
-                    else if (typeRaw.includes('KOMPLEKS')) type = 'PGK';
-                    else if (typeRaw.includes('URUT') || typeRaw.includes('SORTING')) type = 'URUTAN';
-                    else if (typeRaw.includes('JODOH') || typeRaw.includes('MATCH')) type = 'JODOH';
-
-                    const weight = Number(row[2] || 20);
-
-                    const qObj = {
-                        id: 'Q_' + Date.now() + '_' + i + '_' + Math.floor(Math.random() * 100),
-                        type: type,
-                        text: text,
-                        weight: weight
-                    };
-
-                    const colD = row[3] !== undefined ? String(row[3]).trim() : '';
-                    const colE = row[4] !== undefined ? String(row[4]).trim() : '';
-                    const colF = row[5] !== undefined ? String(row[5]).trim() : '';
-                    const colG = row[6] !== undefined ? String(row[6]).trim() : '';
-                    const colH = row[7] !== undefined ? String(row[7]).trim() : '';
-                    const colI = row[8] !== undefined ? String(row[8]).trim() : '';
-
-                    if (type === 'PG' || type === 'PGK') {
-                        const options = [colD, colE, colF, colG, colH].filter(o => o !== '');
-                        qObj.options = options;
-
-                        if (type === 'PG') {
-                            let keyIdx = 0;
-                            if (/^[A-E]$/i.test(colI)) {
-                                keyIdx = colI.toUpperCase().charCodeAt(0) - 65;
-                            } else if (!isNaN(parseInt(colI))) {
-                                keyIdx = parseInt(colI);
-                            }
-                            qObj.correctKey = keyIdx;
-                        } else {
-                            let keyIndices = [];
-                            if (colI.includes(',') || colI.includes(';') || colI.includes('|')) {
-                                const parts = colI.split(/[,;|]/);
-                                parts.forEach(p => {
-                                    const pt = p.trim().toUpperCase();
-                                    if (/^[A-E]$/.test(pt)) keyIndices.push(pt.charCodeAt(0) - 65);
-                                    else if (!isNaN(parseInt(pt))) keyIndices.push(parseInt(pt));
-                                });
-                            } else if (/^[A-E]+$/i.test(colI)) {
-                                for (let c of colI.toUpperCase()) keyIndices.push(c.charCodeAt(0) - 65);
-                            } else {
-                                keyIndices = [0, 2];
-                            }
-                            qObj.correctKeys = keyIndices;
-                        }
-                    } else if (type === 'BS') {
-                        qObj.options = ['BENAR', 'SALAH'];
-                        qObj.correctKey = colI.toUpperCase().includes('SALAH') || colI.toUpperCase() === 'S' ? 'SALAH' : 'BENAR';
-                    } else if (type === 'URUTAN') {
-                        const items = [colD, colE, colF, colG, colH].filter(o => o !== '');
-                        qObj.items = items;
-                        qObj.correctOrder = [...items];
-                    } else if (type === 'JODOH') {
-                        const pairs = [];
-                        if (colD && colE) pairs.push({ left: colD, right: colE });
-                        if (colF && colG) pairs.push({ left: colF, right: colG });
-                        qObj.pairs = pairs;
-                    }
-
-                    parsed.push(qObj);
-                }
-
-                if (parsed.length === 0) {
-                    return this.showToast('Tidak ada butir soal objektif valid yang terbaca!', 'warning');
-                }
-
-                if (!DB.examPackages[subId]) DB.examPackages[subId] = {};
-                if (!DB.examPackages[subId][pkg]) DB.examPackages[subId][pkg] = [];
-                DB.examPackages[subId][pkg].push(...parsed);
-
-                apiCall('saveQuestionsBatch', { subjectId: subId, package: pkg, questions: parsed });
-                this.showToast(`Berhasil mengekstrak ${parsed.length} soal ke Paket ${pkg}!`, 'success');
-                this.switchTeacherTab('review');
-            },
-
-            parseAndImportText(rawText) {
-                if (!rawText || !rawText.trim()) return this.showToast('Teks kosong atau file gagal dibaca!', 'error');
-
-                const subId = this.teacherSelectedSubject;
-                const pkg = this.teacherSelectedPkg;
-                const parsed = [];
-
-                const tagRegex = /\[(PG|PGK|BS|B\/S|SORTING|URUTAN|MATCHING|JODOH)\]/gi;
-                const matches = [...rawText.matchAll(tagRegex)];
-
-                if (matches.length === 0) {
-                    return this.showToast('Format tag tidak ditemukan! Gunakan [PG], [PGK], [B/S], [URUTAN], atau [JODOH]', 'warning');
-                }
-
-                for (let i = 0; i < matches.length; i++) {
-                    const currentMatch = matches[i];
-                    const rawTag = currentMatch[1].toUpperCase();
-                    const startIdx = currentMatch.index + currentMatch[0].length;
-                    const endIdx = (i + 1 < matches.length) ? matches[i + 1].index : rawText.length;
-                    const blockText = rawText.substring(startIdx, endIdx).trim();
-
-                    let type = 'PG';
-                    if (rawTag === 'PGK') type = 'PGK';
-                    else if (rawTag === 'BS' || rawTag === 'B/S') type = 'BS';
-                    else if (rawTag === 'SORTING' || rawTag === 'URUTAN') type = 'URUTAN';
-                    else if (rawTag === 'MATCHING' || rawTag === 'JODOH') type = 'JODOH';
-
-                    let questionText = '';
-                    const qMatch = blockText.match(/@\s*([\s\S]*?)(?=#|\[Kunci:|$)/i);
-                    if (qMatch) {
-                        questionText = qMatch[1].replace(/\|.*\|/g, '').trim();
-                    } else {
-                        const firstPart = blockText.split(/#|\[Kunci:/i)[0];
-                        questionText = firstPart.replace(/^@\s*/, '').replace(/\|.*\|/g, '').trim();
-                    }
-
-                    questionText = questionText.replace(/^[\s\r\n]+|[\s\r\n]+$/g, '').trim();
-
-                    let keyStr = '';
-                    const keyMatch = blockText.match(/\[Kunci\s*:\s*([^\]]+)\]/i);
-                    if (keyMatch) keyStr = keyMatch[1].trim();
-
-                    const rawHashItems = [];
-                    const hashSplit = blockText.split(/#/g);
-                    for (let j = 1; j < hashSplit.length; j++) {
-                        let itemStr = hashSplit[j];
-                        if (itemStr.includes('[Kunci:')) {
-                            itemStr = itemStr.split('[Kunci:')[0];
-                        }
-                        itemStr = itemStr.replace(/\|/g, '').trim();
-                        if (itemStr) rawHashItems.push('#' + itemStr);
-                    }
-
-                    const qObj = {
-                        id: 'Q_' + Date.now() + '_' + i + '_' + Math.floor(Math.random() * 1000),
-                        type: type,
-                        text: questionText || 'Pertanyaan Soal',
-                        weight: 20
-                    };
-
-                    if (type === 'PG' || type === 'PGK') {
-                        const options = [];
-                        const optLetterMap = {};
-
-                        rawHashItems.forEach(itemStr => {
-                            const subItems = itemStr.split(/(?=#\s*[A-E]\.)/gi);
-                            subItems.forEach(s => {
-                                const m = s.match(/#\s*([A-E])\.\s*([\s\S]*)/i);
-                                if (m) {
-                                    const letter = m[1].toUpperCase();
-                                    const val = m[2].trim();
-                                    optLetterMap[letter] = val;
-                                }
-                            });
-                        });
-
-                        const letters = ['A', 'B', 'C', 'D', 'E'];
-                        letters.forEach(l => {
-                            if (optLetterMap[l] !== undefined) options.push(optLetterMap[l]);
-                        });
-
-                        if (options.length === 0) {
-                            rawHashItems.forEach(itemStr => {
-                                const cleanVal = itemStr.replace(/^#\s*([A-E]\.|\d+[\.\)]?)?\s*/i, '').trim();
-                                if (cleanVal) options.push(cleanVal);
-                            });
-                        }
-
-                        qObj.options = options;
-
-                        if (type === 'PG') {
-                            const kLetter = keyStr.toUpperCase().replace(/[^A-E]/g, '');
-                            qObj.correctKey = (kLetter && letters.includes(kLetter)) ? kLetter.charCodeAt(0) - 65 : 0;
-                        } else {
-                            const selectedKeys = [];
-                            const kLetters = keyStr.toUpperCase().split(/[^A-E]+/);
-                            kLetters.forEach(kl => {
-                                if (kl && letters.includes(kl)) {
-                                    const idx = kl.charCodeAt(0) - 65;
-                                    if (!selectedKeys.includes(idx)) selectedKeys.push(idx);
-                                }
-                            });
-                            qObj.correctKeys = selectedKeys;
-                        }
-
-                    } else if (type === 'BS') {
-                        const stMap = {};
-                        rawHashItems.forEach(itemStr => {
-                            const m = itemStr.match(/#\s*(\d+|[A-E])\.\s*([\s\S]*)/i);
-                            if (m) stMap[m[1]] = m[2].trim();
-                        });
-
-                        const stKeys = Object.keys(stMap);
-                        if (stKeys.length > 0) {
-                            qObj.statements = stKeys.map(k => stMap[k]);
-                            qObj.options = qObj.statements;
-                            const keyMap = {};
-                            const parts = keyStr.split(/[,;\s]+/);
-                            parts.forEach((pt, pIdx) => {
-                                const norm = pt.toUpperCase();
-                                if (norm.includes('B') || norm.includes('BENAR')) keyMap[pIdx] = 'BENAR';
-                                else if (norm.includes('S') || norm.includes('SALAH')) keyMap[pIdx] = 'SALAH';
-                            });
-                            qObj.correctKey = keyMap;
-                        } else {
-                            qObj.options = ['BENAR', 'SALAH'];
-                            const kUpper = keyStr.toUpperCase();
-                            qObj.correctKey = (kUpper.includes('SALAH') || kUpper === 'S') ? 'SALAH' : 'BENAR';
-                        }
-                    } else if (type === 'URUTAN') {
-                        const rawItemsList = rawHashItems.map(it => it.replace(/^#\s*([A-E]\.|\d+[\.\)]?)?\s*/i, '').trim());
-                        qObj.items = rawItemsList;
-                        qObj.correctOrder = [...rawItemsList];
-                    } else if (type === 'JODOH') {
-                        const pairs = [];
-                        rawHashItems.forEach(it => {
-                            const clean = it.replace(/^#\s*/, '');
-                            const parts = clean.split(/[-–—→=>]+/);
-                            if (parts.length === 2) {
-                                pairs.push({ left: parts[0].trim(), right: parts[1].trim() });
-                            }
-                        });
-                        qObj.pairs = pairs;
-                    }
-
-                    parsed.push(qObj);
-                }
-
-                if (parsed.length === 0) {
-                    return this.showToast('Tidak dapat mengenali format soal objektif!', 'warning');
-                }
-
-                if (!DB.examPackages[subId]) DB.examPackages[subId] = {};
-                if (!DB.examPackages[subId][pkg]) DB.examPackages[subId][pkg] = [];
-                DB.examPackages[subId][pkg].push(...parsed);
-
-                apiCall('saveQuestionsBatch', { subjectId: subId, package: pkg, questions: parsed });
-                this.showToast(`Berhasil mengekstrak ${parsed.length} butir soal ke Paket ${pkg}!`, 'success');
-                this.switchTeacherTab('review');
-            },
-
-            showTemplateModal() {
-                const body = `
-                    <div class="space-y-3">
-                        <p class="font-bold text-slate-800 text-xs">1. Impor dari Word / PDF (Format Tag Resmi Tanpa Essay):</p>
-                        <div class="bg-slate-900 text-emerald-400 p-3 rounded-xl font-mono text-[11px] overflow-x-auto leading-relaxed">
-                            [PG]<br>
-                            @Hitunglah nilai lim (x → 0) dari (sin 4x) / (2x) = ....<br>
-                            #A. 0<br>
-                            #B. 1<br>
-                            #C. 2<br>
-                            [Kunci: C]<br><br>
-                            [B/S]<br>
-                            @RAM adalah memori penyimpanan bersifat volatile.<br>
-                            [Kunci: BENAR]<br><br>
-                            [PGK]<br>
-                            @Berikut yang termasuk perangkat keras input adalah:<br>
-                            #A. Keyboard #B. Mouse #C. Scanner<br>
-                            [Kunci: A, B, C]
-                        </div>
-
-                        <div class="border-t pt-2">
-                            <p class="font-bold text-slate-800 text-xs mb-1">2. Impor dari Excel (.xlsx):</p>
-                            <p class="text-[11px] text-slate-600 mb-2">Gunakan kolom: <strong>TIPE</strong>, <strong>SOAL</strong>, <strong>BOBOT</strong>, <strong>OPSI_A s/d OPSI_E</strong>, dan <strong>KUNCI</strong>.</p>
-                            <button onclick="EduGuard.downloadQuestionExcelTemplate()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-sm flex items-center justify-center gap-1.5 transition active:scale-95">
-                                <i class="fa-solid fa-download"></i> Unduh File Template Excel (.xlsx)
-                            </button>
-                        </div>
-                    </div>
-                `;
-                this.showModal('Template Import Soal Objektif', body, `<button onclick="EduGuard.closeModal()" class="bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold">Tutup</button>`);
-            },
-
             renderAdminDashboard() {
                 const body = document.getElementById('appBody');
                 this.ensureSubjectsUpToDate();
@@ -3032,13 +2315,11 @@
                                 <h2 class="text-lg sm:text-xl font-extrabold text-slate-800 flex items-center gap-2">
                                     <i class="fa-solid fa-user-shield text-emerald-600"></i> Panel Administrator
                                 </h2>
-                                <p class="text-xs text-slate-500">Kontrol Publikasi Multi-Paket, Data User (1 Guru = 1 Mapel), & Monitoring Pelanggaran</p>
+                                <p class="text-xs text-slate-500">Kontrol Publikasi Multi-Paket, Data User (1 Guru = 1 Mapel), & Monitoring Realtime</p>
                             </div>
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <button onclick="EduGuard.promptDatabaseSetupSecurityModal()" class="bg-red-600 hover:bg-red-700 text-white px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95">
-                                    <i class="fa-solid fa-database"></i> Inisialisasi Database Google Sheets
-                                </button>
-                            </div>
+                            <button onclick="EduGuard.triggerAutoSetupDatabase()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95">
+                                <i class="fa-solid fa-database"></i> Inisialisasi Database Google Sheets
+                            </button>
                         </div>
 
                         <div class="flex overflow-x-auto gap-2 border-b border-slate-100 pb-2 text-xs font-bold">
@@ -3046,10 +2327,10 @@
                                 <i class="fa-solid fa-bullhorn"></i> 1. Publikasi Paket Soal
                             </button>
                             <button onclick="EduGuard.switchAdminTab('cheat')" class="px-3.5 py-2 rounded-xl flex items-center gap-1.5 whitespace-nowrap transition ${activeTab === 'cheat' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'text-slate-500 hover:bg-slate-50'}">
-                                <i class="fa-solid fa-shield-virus"></i> 2. Kontrol Kecurangan
+                                <i class="fa-solid fa-shield-virus"></i> 2. Kontrol Kecurangan (Realtime)
                             </button>
                             <button onclick="EduGuard.switchAdminTab('results')" class="px-3.5 py-2 rounded-xl flex items-center gap-1.5 whitespace-nowrap transition ${activeTab === 'results' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'text-slate-500 hover:bg-slate-50'}">
-                                <i class="fa-solid fa-file-invoice"></i> 3. Hasil Akhir & Laporan
+                                <i class="fa-solid fa-file-invoice"></i> 3. Hasil Akhir & Laporan (Realtime)
                             </button>
                             <button onclick="EduGuard.switchAdminTab('users_data')" class="px-3.5 py-2 rounded-xl flex items-center gap-1.5 whitespace-nowrap transition ${activeTab === 'users_data' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'text-slate-500 hover:bg-slate-50'}">
                                 <i class="fa-solid fa-users"></i> 4. Data Guru & Murid
@@ -3064,43 +2345,61 @@
                         </div>
                     </div>
                 `;
-            },
 
-            promptDatabaseSetupSecurityModal() {
-                const body = `
-                    <div class="space-y-3">
-                        <div class="bg-red-50 border border-red-200 p-3.5 rounded-xl text-red-800 text-xs">
-                            <p class="font-bold flex items-center gap-1.5 mb-1"><i class="fa-solid fa-triangle-exclamation text-red-600"></i> PERINGATAN TINDAKAN KRUSIAL:</p>
-                            <p>Inisialisasi akan membuat ulang seluruh tabel database spreadsheet sekolah. Untuk melanjutkan, ketik kata kunci konfirmasi keamanan di bawah ini:</p>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">Ketik Kata Kunci: <code class="bg-slate-100 text-red-700 px-1.5 py-0.5 rounded font-bold">SAYARESET</code></label>
-                            <input type="text" id="dbResetSecurityInput" placeholder="Ketik ..." class="w-full p-2.5 border rounded-xl text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-red-500 bg-white">
-                        </div>
-                    </div>
-                `;
-                const footer = `
-                    <button onclick="EduGuard.closeModal()" class="bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl text-xs font-bold">Batal</button>
-                    <button onclick="EduGuard.executeDatabaseSetupWithSecurity()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-xl text-xs font-bold shadow-md">Lanjutkan Inisialisasi</button>
-                `;
-                this.showModal('Konfirmasi Keamanan Database', body, footer);
-            },
+                if (this.adminRealtimeSyncInterval) clearInterval(this.adminRealtimeSyncInterval);
+                if (activeTab === 'results' || activeTab === 'cheat') {
+                    this.adminRealtimeSyncInterval = setInterval(async () => {
+                        if (this.currentUser && this.currentUser.role === 'admin') {
+                            const remoteRes = await apiCall('getResults');
+                            if (remoteRes && remoteRes.status === 'success' && Array.isArray(remoteRes.data)) {
+                                DB.results = remoteRes.data;
+                            }
+                            const remoteCheat = await apiCall('getCheatLogs');
+                            if (remoteCheat && remoteCheat.status === 'success' && Array.isArray(remoteCheat.data)) {
+                                DB.cheatLogs = remoteCheat.data;
+                            }
 
-            async executeDatabaseSetupWithSecurity() {
-                const inputVal = document.getElementById('dbResetSecurityInput').value.trim().toUpperCase();
-                if (inputVal !== 'SAYARESET') {
-                    return this.showToast('Kata sandi keamanan salah! Ketik SAYARESET dengan benar.', 'error');
+                            if (activeTab === 'results') {
+                                const tbody = document.getElementById('tblAdminResultsBody');
+                                const subSel = document.getElementById('filterResultSubject');
+                                const pkgSel = document.getElementById('filterResultPackage');
+                                if (tbody && subSel && pkgSel) {
+                                    tbody.innerHTML = this.renderAdminResultsRows(subSel.value, pkgSel.value);
+                                }
+                            } else if (activeTab === 'cheat') {
+                                const cheatTbody = document.getElementById('tblAdminCheatBody');
+                                if (cheatTbody) {
+                                    cheatTbody.innerHTML = DB.cheatLogs.length === 0 ? `<tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada catatan kecurangan.</td></tr>` : DB.cheatLogs.map(l => `
+                                        <tr>
+                                            <td class="p-3">${l.timestamp || '-'}</td>
+                                            <td class="p-3 font-bold">${l.nis}</td>
+                                            <td class="p-3">${l.name}</td>
+                                            <td class="p-3">${l.subject}</td>
+                                            <td class="p-3 text-red-600 font-semibold">${l.violationType}</td>
+                                            <td class="p-3 font-bold">${l.count}</td>
+                                            <td class="p-3">
+                                                <button onclick="EduGuard.resetStudentViolation('${l.nis}')" class="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold shadow-sm transition active:scale-95">
+                                                    Reset Point
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `).join('');
+                                }
+                            }
+                        }
+                    }, 5000);
                 }
+            },
 
-                this.closeModal();
-                this.showToast('Memulai inisialisasi database di Google Sheets...', 'info');
-                const res = await apiCall('setupDatabase', { securityKey: 'SAYARESET' });
+            async triggerAutoSetupDatabase() {
+                this.showToast('Memulai pembuatan database di Google Sheets...', 'info');
+                const res = await apiCall('setupDatabase');
                 if (res && res.status === 'success') {
                     this.showToast('✅ ' + res.message, 'success');
                 } else if (res) {
                     this.showToast('❌ Gagal: ' + res.message, 'error');
                 } else {
-                    this.showToast('Database mode offline/demo telah di-reset.', 'info');
+                    this.showToast('Tersambung ke Mode Offline / Demo.', 'info');
                 }
             },
 
@@ -3168,18 +2467,17 @@
                         <div class="space-y-4">
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-red-50 p-3.5 rounded-2xl border border-red-200">
                                 <div>
-                                    <h4 class="font-bold text-red-900 text-xs sm:text-sm">Kontrol Kecurangan & Batas Toleransi Pelanggaran</h4>
-                                    <p class="text-xs text-red-700">Mencatat otomatis pelanggaran screenshot, split screen, tab blur, dan tombol navigasi.</p>
+                                    <h4 class="font-bold text-red-900 text-xs sm:text-sm flex items-center gap-1.5">
+                                        <i class="fa-solid fa-tower-broadcast text-red-600 animate-pulse"></i> Kontrol Kecurangan (Live Realtime Sync)
+                                    </h4>
+                                    <p class="text-xs text-red-700">Jika siswa melanggar melebihi batas ini, ujian dipaksa simpan dan dikirim.</p>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-xs font-bold text-red-900">Max Strikes:</span>
-                                    <select onchange="EduGuard.setAdminMaxStrikes(this.value)" class="px-3 py-1.5 border rounded-xl text-xs font-bold text-red-800 bg-white shadow-sm">
-                                        <option value="1" ${this.maxViolations === 1 ? 'selected' : ''}>1x Strike (Sangat Ketat)</option>
-                                        <option value="2" ${this.maxViolations === 2 ? 'selected' : ''}>2x Strikes</option>
-                                        <option value="3" ${this.maxViolations === 3 ? 'selected' : ''}>3x Strikes (Standar)</option>
-                                        <option value="5" ${this.maxViolations === 5 ? 'selected' : ''}>5x Strikes</option>
-                                    </select>
-                                </div>
+                                <select onchange="EduGuard.setAdminMaxStrikes(this.value)" class="px-3 py-2 border rounded-xl text-xs font-bold text-red-800 bg-white shadow-sm">
+                                    <option value="1" ${this.maxViolations === 1 ? 'selected' : ''}>1x Strike (Sangat Ketat)</option>
+                                    <option value="2" ${this.maxViolations === 2 ? 'selected' : ''}>2x Strikes</option>
+                                    <option value="3" ${this.maxViolations === 3 ? 'selected' : ''}>3x Strikes (Standar)</option>
+                                    <option value="5" ${this.maxViolations === 5 ? 'selected' : ''}>5x Strikes</option>
+                                </select>
                             </div>
 
                             <div class="overflow-x-auto border rounded-2xl bg-white shadow-sm">
@@ -3188,21 +2486,21 @@
                                         <tr>
                                             <th class="p-3">Waktu</th>
                                             <th class="p-3">NIS</th>
-                                            <th class="p-3">Nama Siswa</th>
-                                            <th class="p-3">Mata Pelajaran</th>
+                                            <th class="p-3">Nama</th>
+                                            <th class="p-3">Mapel</th>
                                             <th class="p-3">Jenis Pelanggaran</th>
                                             <th class="p-3">Point</th>
                                             <th class="p-3">Aksi Reset</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y text-slate-600">
+                                    <tbody id="tblAdminCheatBody" class="divide-y text-slate-600">
                                         ${DB.cheatLogs.length === 0 ? `
-                                            <tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada catatan kecurangan siswa.</td></tr>
+                                            <tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada catatan kecurangan.</td></tr>
                                         ` : DB.cheatLogs.map(l => `
                                             <tr>
                                                 <td class="p-3">${l.timestamp || '-'}</td>
                                                 <td class="p-3 font-bold">${l.nis}</td>
-                                                <td class="p-3 font-semibold">${l.name}</td>
+                                                <td class="p-3">${l.name}</td>
                                                 <td class="p-3">${l.subject}</td>
                                                 <td class="p-3 text-red-600 font-semibold">${l.violationType}</td>
                                                 <td class="p-3 font-bold">${l.count}</td>
@@ -3219,27 +2517,32 @@
                         </div>
                     `;
                 } else if (tab === 'results') {
-                    const filterPkg = this.adminResultFilterPkg;
-                    const displayedResults = DB.results.filter(r => filterPkg === 'all' || String(r.package || 'A') === String(filterPkg));
+                    const uniqueSubjects = Array.from(new Set(DB.results.map(r => r.subject)));
+                    const uniquePackages = Array.from(new Set(DB.results.map(r => r.package || 'A')));
 
                     return `
                         <div class="space-y-4">
-                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-xs font-bold text-slate-700">Tampilkan Paket:</span>
-                                    <select onchange="EduGuard.filterAdminResultPackage(this.value)" class="px-3 py-1.5 border rounded-xl text-xs bg-white font-bold text-purple-900 shadow-sm">
-                                        <option value="all" ${filterPkg === 'all' ? 'selected' : ''}>Semua Paket Soal</option>
-                                        <option value="A" ${filterPkg === 'A' ? 'selected' : ''}>Hanya Paket A</option>
-                                        <option value="B" ${filterPkg === 'B' ? 'selected' : ''}>Hanya Paket B</option>
-                                        <option value="C" ${filterPkg === 'C' ? 'selected' : ''}>Hanya Paket C</option>
-                                    </select>
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 border p-4 rounded-2xl shadow-sm">
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-xs sm:text-sm flex items-center gap-1.5">
+                                        <i class="fa-solid fa-tower-broadcast text-emerald-600 animate-pulse"></i> Hasil Akhir & Laporan (Live Realtime Sync)
+                                    </h4>
+                                    <p class="text-xs text-slate-500">Filter rekap nilai berdasarkan Mata Pelajaran dan Paket Soal.</p>
                                 </div>
                                 <div class="flex gap-2 flex-wrap">
+                                    <select id="filterResultSubject" onchange="EduGuard.filterAdminResults()" class="px-3 py-1.5 border rounded-xl text-xs bg-white font-medium shadow-sm">
+                                        <option value="all">Semua Mapel</option>
+                                        ${uniqueSubjects.map(sub => `<option value="${sub}">${sub}</option>`).join('')}
+                                    </select>
+                                    <select id="filterResultPackage" onchange="EduGuard.filterAdminResults()" class="px-3 py-1.5 border rounded-xl text-xs bg-white font-medium shadow-sm">
+                                        <option value="all">Semua Paket</option>
+                                        ${uniquePackages.map(pkg => `<option value="${pkg}">Paket ${pkg}</option>`).join('')}
+                                    </select>
                                     <button onclick="EduGuard.exportToPDF()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm flex items-center gap-1 transition active:scale-95">
                                         <i class="fa-solid fa-file-pdf"></i> Cetak PDF
                                     </button>
-                                    <button onclick="EduGuard.exportAdminResultsExcel('${filterPkg}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold shadow-sm flex items-center gap-1 transition active:scale-95">
-                                        <i class="fa-solid fa-file-excel"></i> Unduh Excel (Paket ${filterPkg === 'all' ? 'Semua' : filterPkg})
+                                    <button onclick="EduGuard.exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm flex items-center gap-1 transition active:scale-95">
+                                        <i class="fa-solid fa-file-excel"></i> Export Excel
                                     </button>
                                 </div>
                             </div>
@@ -3257,20 +2560,8 @@
                                             <th class="p-3">Status</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y text-slate-600">
-                                        ${displayedResults.length === 0 ? `
-                                            <tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada data pengerjaan ujian untuk filter ini.</td></tr>
-                                        ` : displayedResults.map(r => `
-                                            <tr>
-                                                <td class="p-3 font-bold">${r.nis}</td>
-                                                <td class="p-3 font-semibold">${r.name}</td>
-                                                <td class="p-3">${r.class || '-'}</td>
-                                                <td class="p-3">${r.subject}</td>
-                                                <td class="p-3 font-bold text-purple-700"><span class="bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-[10px]">Paket ${r.package || 'A'}</span></td>
-                                                <td class="p-3 font-black text-brand-600">${r.totalScore}</td>
-                                                <td class="p-3 font-bold ${r.status && r.status.includes('Dibatalkan') ? 'text-red-600' : 'text-emerald-600'}">${r.status || 'Selesai'}</td>
-                                            </tr>
-                                        `).join('')}
+                                    <tbody id="tblAdminResultsBody" class="divide-y text-slate-600">
+                                        ${this.renderAdminResultsRows('all', 'all')}
                                     </tbody>
                                 </table>
                             </div>
@@ -3377,13 +2668,13 @@
                 } else if (tab === 'users') {
                     return `
                         <div class="space-y-4">
-                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 border border-slate-200 p-4 rounded-2xl">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 border p-4 rounded-2xl shadow-sm">
                                 <div>
-                                    <h4 class="font-bold text-slate-800 text-xs sm:text-sm">Manajemen Perangkat HP Siswa (Device Lock & Unbind)</h4>
-                                    <p class="text-xs text-slate-500">Mencegah satu akun murid dibuka bersamaan di handphone berbeda.</p>
+                                    <h4 class="font-bold text-slate-800 text-xs sm:text-sm">Manajemen Perangkat HP Siswa (Unbind Device Lock)</h4>
+                                    <p class="text-xs text-slate-500">Pengecekan dan pelepasan keterikatan perangkat HP siswa yang terkunci ujian.</p>
                                 </div>
-                                <button onclick="EduGuard.confirmUnbindAllDevicesModal()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md transition active:scale-95 flex items-center gap-1.5 whitespace-nowrap">
-                                    <i class="fa-solid fa-mobile-screen-button"></i> Unbind All Device HP
+                                <button onclick="EduGuard.unbindAllDevices()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md transition active:scale-95 flex items-center gap-1.5 whitespace-nowrap">
+                                    <i class="fa-solid fa-unlock-keyhole"></i> UNBIND ALL (Lepas Semua HP)
                                 </button>
                             </div>
 
@@ -3420,66 +2711,47 @@
                 }
             },
 
-            filterAdminResultPackage(pkg) {
-                this.adminResultFilterPkg = pkg;
-                this.renderAdminDashboard();
-            },
-
-            exportAdminResultsExcel(filterPkg = 'all') {
-                const displayedResults = DB.results.filter(r => filterPkg === 'all' || String(r.package || 'A') === String(filterPkg));
-
-                if (displayedResults.length === 0) {
-                    return this.showToast('Belum ada data nilai pada paket ini untuk diunduh!', 'warning');
+            renderAdminResultsRows(filterSub = 'all', filterPkg = 'all') {
+                let filtered = DB.results;
+                if (filterSub !== 'all') {
+                    filtered = filtered.filter(r => r.subject === filterSub);
+                }
+                if (filterPkg !== 'all') {
+                    filtered = filtered.filter(r => String(r.package || 'A') === String(filterPkg));
                 }
 
-                const excelData = [
-                    ["REKAPITULASI HASIL UJIAN SISWA - CBT SMA NEGERI 1 KUTOWINANGUN"],
-                    [`Paket Soal: ${filterPkg === 'all' ? 'Semua Paket' : 'Paket ' + filterPkg}`, `Tanggal Unduh: ${new Date().toLocaleDateString()}`],
-                    [],
-                    ["NO", "NIS", "NAMA SISWA", "KELAS", "MATA PELAJARAN", "PAKET", "SKOR AKHIR (100)", "STATUS", "WAKTU SUBMIT"]
-                ];
+                if (filtered.length === 0) {
+                    return `<tr><td colspan="7" class="p-4 text-center text-slate-400">Tidak ada data hasil ujian dengan filter tersebut.</td></tr>`;
+                }
 
-                displayedResults.forEach((r, idx) => {
-                    excelData.push([
-                        idx + 1,
-                        r.nis,
-                        r.name,
-                        r.class || '-',
-                        r.subject,
-                        r.package || 'A',
-                        r.totalScore,
-                        r.status || 'Selesai',
-                        r.submittedAt || '-'
-                    ]);
+                return filtered.map(r => `
+                    <tr>
+                        <td class="p-3 font-bold">${r.nis}</td>
+                        <td class="p-3">${r.name}</td>
+                        <td class="p-3">${r.class || '-'}</td>
+                        <td class="p-3">${r.subject}</td>
+                        <td class="p-3 font-bold text-purple-700">Paket ${r.package || 'A'}</td>
+                        <td class="p-3 font-black text-brand-600">${r.totalScore}</td>
+                        <td class="p-3 font-bold ${r.status && r.status.includes('Dibatalkan') ? 'text-red-600' : 'text-emerald-600'}">${r.status || 'Selesai'}</td>
+                    </tr>
+                `).join('');
+            },
+
+            filterAdminResults() {
+                const subVal = document.getElementById('filterResultSubject').value;
+                const pkgVal = document.getElementById('filterResultPackage').value;
+                const tbody = document.getElementById('tblAdminResultsBody');
+                if (tbody) {
+                    tbody.innerHTML = this.renderAdminResultsRows(subVal, pkgVal);
+                }
+            },
+
+            async unbindAllDevices() {
+                DB.students.forEach(st => {
+                    st.deviceId = null;
+                    apiCall('unbindDevice', { nis: st.nis });
                 });
-
-                const worksheet = XLSX.utils.aoa_to_sheet(excelData);
-                const workbook = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(workbook, worksheet, `Hasil_Paket_${filterPkg}`);
-                XLSX.writeFile(workbook, `Rekap_Nilai_CBT_Paket_${filterPkg}_SMAN1Kutowinangun.xlsx`);
-                this.showToast('File Rekap Nilai Admin berhasil diunduh!', 'success');
-            },
-
-            confirmUnbindAllDevicesModal() {
-                const body = `
-                    <div class="text-center py-2 space-y-3">
-                        <i class="fa-solid fa-mobile-screen-button text-4xl text-red-600"></i>
-                        <h4 class="font-bold text-sm text-slate-800">Lepas Kunci Perangkat (Unbind All)?</h4>
-                        <p class="text-xs text-slate-600">Tindakan ini akan mengosongkan pengikatan perangkat (Device ID) untuk <strong>seluruh siswa</strong>, sehingga semua siswa dapat login kembali di HP masing-masing.</p>
-                    </div>
-                `;
-                const footer = `
-                    <button onclick="EduGuard.closeModal()" class="bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl text-xs font-bold">Batal</button>
-                    <button onclick="EduGuard.executeUnbindAllDevices()" class="bg-red-600 text-white px-4 py-1.5 rounded-xl text-xs font-bold shadow-md">Ya, Unbind Semua HP</button>
-                `;
-                this.showModal('Konfirmasi Unbind All Devices', body, footer);
-            },
-
-            async executeUnbindAllDevices() {
-                this.closeModal();
-                DB.students.forEach(s => { s.deviceId = null; });
-                await apiCall('unbindAllDevices');
-                this.showToast('Seluruh ikatan perangkat HP siswa berhasil dilepas!', 'success');
+                this.showToast('Semua keterikatan perangkat (ALL Unbind) berhasil dilepas!', 'success');
                 this.renderAdminDashboard();
             },
 
@@ -3747,6 +3019,19 @@
                 if (st) st.deviceId = null;
                 this.showToast(`Device binding NIS ${nis} dilepas. Siswa bisa login di HP baru.`, 'success');
                 this.renderAdminDashboard();
+            },
+
+            exportToExcel() {
+                let csv = 'NIS,Nama,Kelas,Mata Pelajaran,Paket,Skor Total,Status\n';
+                DB.results.forEach(r => {
+                    csv += `"${r.nis}","${r.name}","${r.class || '-'}","${r.subject}","Paket ${r.package || 'A'}",${r.totalScore},"${r.status || 'Selesai'}"\n`;
+                });
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Rekap_Hasil_Ujian_CBT_SMAN1Kutowinangun.csv';
+                a.click();
             },
 
             exportToPDF() {
