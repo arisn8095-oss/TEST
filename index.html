@@ -9,25 +9,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    
     <script>
-        if (typeof pdfjsLib !== 'undefined') {
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-        }
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         brand: {
-                            50: '#f0f7ff', 100: '#e0effe', 500: '#2563eb', 
-                            600: '#1d4ed8', 700: '#1e40af', 800: '#1e3a8a', 900: '#172554'
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#2563eb',
+                            600: '#1d4ed8',
+                            700: '#1e40af',
+                            800: '#1e3a8a',
+                            900: '#172554'
                         }
                     }
                 }
             }
         }
     </script>
-
     <style>
         .no-select { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -50,15 +51,10 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans antialiased no-select min-h-screen flex flex-col justify-between">
 
-    <div id="globalErrorBox" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 hidden bg-red-600 text-white px-4 py-3 rounded-xl shadow-2xl text-xs font-bold max-w-lg w-11/12 flex items-center justify-between">
-        <span id="globalErrorText">Terjadi kesalahan sistem.</span>
-        <button onclick="document.getElementById('globalErrorBox').classList.add('hidden')" class="ml-2 font-black">X</button>
-    </div>
-
     <div id="cheatOverlay" class="fixed inset-0 bg-red-600 bg-opacity-95 z-50 hidden flex-col items-center justify-center p-6 text-white text-center backdrop-blur-md">
         <i class="fa-solid fa-triangle-exclamation text-6xl mb-4 animate-bounce"></i>
         <h2 class="text-2xl font-bold mb-2">PELANGGARAN TERDETEKSI!</h2>
-        <p class="text-sm sm:text-base mb-6 max-w-md">Anda terdeteksi keluar dari layar penuh, berpindah tab, mencoba split-screen, tangkapan layar, atau menekan tombol navigasi HP.</p>
+        <p id="cheatOverlayMsg" class="text-sm sm:text-base mb-6 max-w-md">Anda terdeteksi keluar dari layar penuh, berpindah tab, mencoba split-screen, tangkapan layar, atau menekan tombol navigasi HP. Pelanggaran ini dicatat server!</p>
         <div class="bg-white text-red-700 px-4 py-2 rounded-lg font-bold mb-6 text-sm shadow-md">
             Sisa Kesempatan: <span id="overlayStrikeCount">1</span> / <span id="overlayMaxStrike">3</span>
         </div>
@@ -72,7 +68,7 @@
             <i class="fa-solid fa-ban"></i>
         </div>
         <h2 class="text-2xl font-bold mb-2 text-red-500">UJIAN DIBATALKAN (BATAS PELANGGARAN HABIS)</h2>
-        <p class="text-slate-300 text-xs sm:text-sm mb-6 max-w-md">Anda telah melebihi batas toleransi keamanan ujian. Jawaban Anda telah disimpan otomatis.</p>
+        <p class="text-slate-300 text-xs sm:text-sm mb-6 max-w-md">Anda telah melebihi batas toleransi keamanan ujian. Jawaban yang sempat diisi telah disimpan otomatis ke server sekolah.</p>
         <button onclick="EduGuard.logout()" class="bg-brand-600 text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-brand-700 transition">
             Kembali ke Halaman Login
         </button>
@@ -89,7 +85,7 @@
                     <div>
                         <h1 class="font-extrabold text-slate-800 text-xs sm:text-sm md:text-base leading-tight">CBT SMA NEGERI 1 KUTOWINANGUN</h1>
                         <span class="text-[11px] text-brand-600 font-bold flex items-center gap-1">
-                            <i class="fa-solid fa-bolt text-[10px] text-amber-500"></i> Zero-Delay Accelerated Engine v5.2
+                            <i class="fa-solid fa-shield-halved text-[10px]"></i> High Security Mobile CBT v8.5 (Multi-Paket & 1 Guru = 1 Mapel)
                         </span>
                     </div>
                 </div>
@@ -107,48 +103,90 @@
         </header>
 
         <main id="appBody" class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5">
-            <div class="flex flex-col items-center justify-center py-16">
-                <i class="fa-solid fa-spinner fa-spin text-4xl text-brand-600 mb-3"></i>
-                <p class="text-xs font-bold text-slate-600">Memuat Sistem SMAN 1 Kutowinangun secara instan...</p>
-            </div>
+            <!-- Dynamic views injected via JavaScript -->
         </main>
 
         <footer class="bg-white border-t border-slate-200 py-3 text-center text-xs text-slate-500 no-print">
-            &copy; 2026 CBT SMA NEGERI 1 KUTOWINANGUN &bull; Sistem Ujian Terintegrasi.
+            &copy; 2026 CBT SMA NEGERI 1 KUTOWINANGUN &bull; Sistem Ujian Terintegrasi Google Cloud & Spreadsheet.
         </footer>
     </div>
 
     <script>
-        window.onerror = function(msg, url, line) {
-            try {
-                const box = document.getElementById('globalErrorBox');
-                const txt = document.getElementById('globalErrorText');
-                if (box && txt) {
-                    txt.innerText = "Error: " + msg + " (Line " + line + ")";
-                    box.classList.remove('hidden');
-                }
-            } catch(e){}
-        };
-
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyhXTqRqXZ76_He5CwhkuEV1_flMAQPR2_x_NKUjHboLmfq45Y2bMHyOnzaoOFqf3so/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOZdtp3OEJcRFDN-RFGGaTYExY9AU5BKf7ubVOxgw83zPipeZyZ-CKhzjAKv6BzHuR/exec";
 
         const DB = {
-            admin: { id: "admin", name: "Administrator Utama", role: "admin" },
-            teachers: [],
-            students: [],
-            subjects: [],
+            admin: { id: "ADMIN01", name: "Administrator Utama", role: "admin" },
+            teachers: [
+                { nip: "19850715", name: "Budi Santoso, M.Kom", subject: "Informatika", subjectId: "SUB-19850715" },
+                { nip: "19900210", name: "Siti Nurhaliza, S.Pd", subject: "Matematika Peminatan", subjectId: "SUB-19900210" }
+            ],
+            students: [
+                { nis: "1001", name: "Ahmad Zaky", class: "XII MIPA 1", deviceId: null },
+                { nis: "1002", name: "Bunga Citra", class: "XII MIPA 2", deviceId: null },
+                { nis: "1003", name: "Candra Wijaya", class: "XII IPS 1", deviceId: null }
+            ],
+            subjects: [
+                {
+                    id: "SUB-19850715",
+                    name: "Informatika",
+                    teacherNip: "19850715",
+                    packages: ["A", "B", "C"],
+                    packageTokens: { "A": "TOK123", "B": "PBK123", "C": "PCK123" },
+                    packageDurations: { "A": 60, "B": 60, "C": 60 },
+                    durationMin: 60,
+                    finalizedPackages: ["A", "B"],
+                    publishedPackages: ["A", "B"],
+                    randomizeQuestions: { "A": false, "B": false, "C": false },
+                    randomizeOptions: { "A": false, "B": false, "C": false }
+                },
+                {
+                    id: "SUB-19900210",
+                    name: "Matematika Peminatan",
+                    teacherNip: "19900210",
+                    packages: ["A", "B"],
+                    packageTokens: { "A": "MAT123", "B": "MTK123" },
+                    packageDurations: { "A": 90, "B": 90 },
+                    durationMin: 90,
+                    finalizedPackages: ["A"],
+                    publishedPackages: ["A"],
+                    randomizeQuestions: { "A": false, "B": false },
+                    randomizeOptions: { "A": false, "B": false }
+                }
+            ],
+            examPackages: {
+                "SUB-19850715": {
+                    "A": [
+                        {
+                            id: "Q_INF_A1",
+                            type: "PG",
+                            text: "Shortcut keyboard yang digunakan untuk menyalin (copy) objek/teks pada sistem operasi komputer adalah ....",
+                            image: "",
+                            options: ["Ctrl + V", "Ctrl + C", "Ctrl + X", "Ctrl + Z", "Ctrl + S"],
+                            correctKey: 1,
+                            weight: 20
+                        }
+                    ],
+                    "B": []
+                },
+                "SUB-19900210": {
+                    "A": []
+                }
+            },
+            deletedQuestionIds: new Set(),
+            modifiedQuestionsMap: {},
             cheatLogs: [],
             results: [],
-            examPackages: {}
+            studentAnswersMap: {}
         };
 
         async function apiCall(action, payload = {}) {
             if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("PASTE_YOUR_WEB_APP_URL")) {
                 return null;
             }
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3500);
+
             try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 2000); 
                 const res = await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -158,6 +196,7 @@
                 clearTimeout(timeoutId);
                 return await res.json();
             } catch (err) {
+                clearTimeout(timeoutId);
                 return null;
             }
         }
@@ -166,7 +205,9 @@
             currentUser: null,
             activeExam: null,
             examTimerInterval: null,
-            realtimeSyncInterval: null,
+            studentExamSyncInterval: null,
+            adminRealtimeSyncInterval: null,
+            teacherRealtimeSyncInterval: null,
             remainingSeconds: 0,
             userAnswers: {},
             violationsCount: 0,
@@ -178,102 +219,44 @@
             unlockedQuestionsMap: {},
             
             teacherActiveTab: 'review', 
-            teacherSelectedSubject: '',
+            teacherSelectedSubject: 'SUB-19850715',
             teacherSelectedPkg: 'A',
             activeMathCategory: 'all',
+
             adminActiveTab: 'publication',
 
             getCleanQuestions(subId, pkg) {
-                try {
-                    if (!DB.examPackages) DB.examPackages = {};
-                    if (!DB.examPackages[subId]) DB.examPackages[subId] = {};
-                    if (!DB.examPackages[subId][pkg]) DB.examPackages[subId][pkg] = [];
+                if (!DB.examPackages[subId] || !DB.examPackages[subId][pkg]) return [];
+                const rawList = DB.examPackages[subId][pkg];
+                const seenIds = new Set();
+                const cleanList = [];
 
-                    const rawList = DB.examPackages[subId][pkg];
-                    const cleanList = [];
-                    const seenIds = new Set();
+                for (let i = 0; i < rawList.length; i++) {
+                    const q = rawList[i];
+                    if (!q) continue;
+                    const qId = String(q.id || '').trim();
+                    if (!qId) continue;
+                    if (DB.deletedQuestionIds && DB.deletedQuestionIds.has(qId)) continue;
+                    if (seenIds.has(qId)) continue;
+                    seenIds.add(qId);
 
-                    for (let i = 0; i < rawList.length; i++) {
-                        let q = rawList[i];
-                        if (!q || !q.id) continue;
-                        if (seenIds.has(String(q.id))) continue;
-                        
-                        seenIds.add(String(q.id));
-                        q.weight = Number(q.weight) || 0;
-                        cleanList.push(q);
-                    }
-                    DB.examPackages[subId][pkg] = cleanList;
-                    return cleanList;
-                } catch(e) {
-                    return [];
+                    const resolvedQ = (DB.modifiedQuestionsMap && DB.modifiedQuestionsMap[qId]) 
+                        ? { ...DB.modifiedQuestionsMap[qId] } 
+                        : { ...q };
+                    resolvedQ.id = qId;
+                    resolvedQ.weight = Number(resolvedQ.weight) || 0;
+                    cleanList.push(resolvedQ);
                 }
+                DB.examPackages[subId][pkg] = cleanList;
+                return cleanList;
             },
 
             init() {
-                try {
-                    this.generateDeviceFingerprint();
-                    this.setupSecurityListeners();
-                    
-                    this.fastSyncCloudData(true).finally(() => {
-                        if (!this.currentUser) {
-                            this.renderLoginView();
-                        }
-                    });
-                } catch(e) {
-                    this.renderLoginView();
-                }
-            },
-
-            async fastSyncCloudData(isInitial = false) {
-                try {
-                    const [remoteUsers, remoteSub, remoteResults, remoteCheat] = await Promise.all([
-                        apiCall('getUsers').catch(()=>null),
-                        apiCall('getSubjects').catch(()=>null),
-                        apiCall('getResults').catch(()=>null),
-                        apiCall('getCheatLogs').catch(()=>null)
-                    ]);
-
-                    if (remoteUsers && remoteUsers.status === 'success' && Array.isArray(remoteUsers.data)) {
-                        const st = [];
-                        const tc = [];
-                        remoteUsers.data.forEach(u => {
-                            if (u.role === 'student') st.push({ nis: u.id, name: u.name, class: u.class, deviceId: u.deviceId });
-                            else if (u.role === 'teacher') tc.push({ nip: u.id, name: u.name, subject: u.subject || 'Mapel', subjectId: 'SUB-' + u.id });
-                        });
-                        DB.students = st;
-                        DB.teachers = tc;
-                    }
-
-                    if (remoteSub && remoteSub.status === 'success' && Array.isArray(remoteSub.data)) {
-                        DB.subjects = remoteSub.data;
-                        if (!DB.examPackages) DB.examPackages = {};
-                        
-                        const qPromises = [];
-                        for (let s of DB.subjects) {
-                            for (let p of (s.packages || ['A', 'B', 'C'])) {
-                                qPromises.push(
-                                    apiCall('getQuestions', { subjectId: s.id, package: p }).then(qRes => {
-                                        if (qRes && qRes.status === 'success' && Array.isArray(qRes.data) && qRes.data.length > 0) {
-                                            if (!DB.examPackages[s.id]) DB.examPackages[s.id] = {};
-                                            DB.examPackages[s.id][p] = qRes.data;
-                                        }
-                                    }).catch(() => {})
-                                );
-                            }
-                        }
-                        await Promise.all(qPromises);
-                    }
-
-                    if (remoteResults && remoteResults.status === 'success' && Array.isArray(remoteResults.data)) {
-                        DB.results = remoteResults.data;
-                    }
-
-                    if (remoteCheat && remoteCheat.status === 'success' && Array.isArray(remoteCheat.data)) {
-                        DB.cheatLogs = remoteCheat.data;
-                    }
-                } catch(e) {}
-
+                this.generateDeviceFingerprint();
+                this.setupSecurityListeners();
                 this.ensureSubjectsUpToDate();
+                this.syncUsersFromBackend();
+                this.renderLoginView();
             },
 
             formatImageUrl(url) {
@@ -305,7 +288,7 @@
                 document.addEventListener('keyup', e => {
                     if (!this.activeExam) return;
                     if (e.key === 'PrintScreen') {
-                        try { navigator.clipboard.writeText(''); } catch(ex){}
+                        navigator.clipboard.writeText('');
                         this.handleViolation("Percobaan Tangkapan Layar (Screenshot) Terdeteksi!");
                     }
                 });
@@ -320,7 +303,7 @@
                 const handleFullscreenChange = () => {
                     const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
                     if (this.activeExam && !isFullscreen) {
-                        this.handleViolation("Siswa Keluar dari Layar Penuh (Fullscreen Lockdown)!");
+                        this.handleViolation("Siswa Keluar dari Layar Penuh (Fullscreen Lockdown & Notifikasi Terblokir)!");
                     }
                 };
 
@@ -337,7 +320,24 @@
 
                 window.addEventListener('blur', () => {
                     if (this.activeExam) {
-                        this.handleViolation("Aplikasi Kehilangan Fokus / Layar Terbelah (Split Screen)!");
+                        this.handleViolation("Aplikasi Kehilangan Fokus / Layar Terbelah (Split Screen) / Notifikasi Terbuka!");
+                    }
+                });
+
+                document.addEventListener('keydown', e => {
+                    if (!this.activeExam) return;
+                    const key = e.key || e.keyCode;
+                    const isCtrl = e.ctrlKey || e.metaKey;
+
+                    if (
+                        key === 'F12' || key === 'F5' || key === 'F11' || key === 'F1' || key === 'PrintScreen' ||
+                        (isCtrl && (key === 'r' || key === 'R' || key === 'i' || key === 'I' || key === 'u' || key === 'U' || key === 'p' || key === 'P' || key === 's' || key === 'S' || key === 'c' || key === 'C' || key === 'v' || key === 'V' || key === 'x' || key === 'X' || key === 'a' || key === 'A')) ||
+                        e.altKey || e.metaKey || key === 'Meta' || key === 'Tab' || key === 'Escape'
+                    ) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.handleViolation(`Pintasan Tombol / Shortcut (${e.key || 'Dilarang'})`);
+                        return false;
                     }
                 });
             },
@@ -345,27 +345,52 @@
             requestFullScreenMode() {
                 const elem = document.documentElement;
                 try {
-                    if (elem.requestFullscreen) elem.requestFullscreen().catch(() => {});
-                    else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
-                    else if (elem.mozRequestFullScreen) elem.mozRequestFullScreen();
-                    else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+                    if (elem.requestFullscreen) {
+                        elem.requestFullscreen().catch(() => {});
+                    } else if (elem.webkitRequestFullscreen) {
+                        elem.webkitRequestFullscreen();
+                    } else if (elem.mozRequestFullScreen) {
+                        elem.mozRequestFullScreen();
+                    } else if (elem.msRequestFullscreen) {
+                        elem.msRequestFullscreen();
+                    }
                 } catch(e) {}
+
+                if (window.FlutterExamBridge) {
+                    try { 
+                        window.FlutterExamBridge.postMessage('ENABLE_IMMERSIVE_STICKY'); 
+                        window.FlutterExamBridge.postMessage('DISABLE_NOTIFICATIONS_AND_SCREENSHOTS');
+                    } catch(e){}
+                }
+
+                if (screen.orientation && screen.orientation.lock) {
+                    screen.orientation.lock('portrait').catch(() => {});
+                }
+
                 history.pushState(null, document.title, location.href);
             },
 
             exitFullScreenMode() {
                 try {
                     if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
-                        if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
-                        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-                        else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
-                        else if (document.msExitFullscreen) document.msExitFullscreen();
+                        if (document.exitFullscreen) {
+                            document.exitFullscreen().catch(() => {});
+                        } else if (document.webkitExitFullscreen) {
+                            document.webkitExitFullscreen();
+                        } else if (document.mozCancelFullScreen) {
+                            document.mozCancelFullScreen();
+                        } else if (document.msExitFullscreen) {
+                            document.msExitFullscreen();
+                        }
                     }
                 } catch(e) {}
+
+                if (window.FlutterExamBridge) {
+                    try { window.FlutterExamBridge.postMessage('DISABLE_IMMERSIVE_STICKY'); } catch(e){}
+                }
             },
 
             ensureSubjectsUpToDate() {
-                if (!DB.subjects) DB.subjects = [];
                 DB.teachers.forEach(tc => {
                     if (tc.subject && tc.subject !== '-' && tc.subject !== 'Mapel') {
                         const subId = tc.subjectId || ('SUB-' + tc.nip);
@@ -386,13 +411,17 @@
                                 packageDurations: { "A": 60, "B": 60, "C": 60 },
                                 durationMin: 60,
                                 finalizedPackages: [],
-                                publishedPackages: []
+                                publishedPackages: [],
+                                randomizeQuestions: { "A": false, "B": false, "C": false },
+                                randomizeOptions: { "A": false, "B": false, "C": false }
                             };
                             DB.subjects.push(sub);
                         } else {
                             sub.teacherNip = tc.nip;
                             sub.name = tc.subject;
                             if (!sub.packages) sub.packages = ["A", "B", "C"];
+                            if (!sub.randomizeQuestions) sub.randomizeQuestions = {};
+                            if (!sub.randomizeOptions) sub.randomizeOptions = {};
                             if (!sub.packageTokens) {
                                 sub.packageTokens = {
                                     "A": sub.token || 'TOK123',
@@ -407,6 +436,21 @@
                         }
                     }
                 });
+            },
+
+            async syncUsersFromBackend() {
+                const remote = await apiCall('getUsers');
+                if (remote && remote.status === 'success' && Array.isArray(remote.data) && remote.data.length > 0) {
+                    const st = [];
+                    const tc = [];
+                    remote.data.forEach(u => {
+                        if (u.role === 'student') st.push({ nis: u.id, name: u.name, class: u.class, deviceId: u.deviceId });
+                        else if (u.role === 'teacher') tc.push({ nip: u.id, name: u.name, subject: u.subject || 'Mapel', subjectId: 'SUB-' + u.id });
+                    });
+                    if (st.length > 0) DB.students = st;
+                    if (tc.length > 0) DB.teachers = tc;
+                    this.ensureSubjectsUpToDate();
+                }
             },
 
             showToast(msg, type = 'info') {
@@ -426,12 +470,11 @@
                     </button>
                 `;
                 container.appendChild(toast);
-                setTimeout(() => { if (toast.parentElement) toast.remove(); }, 3000);
+                setTimeout(() => { if (toast.parentElement) toast.remove(); }, 3200);
             },
 
             showModal(title, bodyHtml, footerHtml = '') {
                 const modal = document.getElementById('modalContainer');
-                if (!modal) return;
                 modal.innerHTML = `
                     <div class="fixed inset-0 bg-slate-900 bg-opacity-60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
                         <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-150">
@@ -451,17 +494,16 @@
             },
 
             closeModal() {
-                const modal = document.getElementById('modalContainer');
-                if (modal) modal.innerHTML = '';
+                document.getElementById('modalContainer').innerHTML = '';
             },
 
             renderLoginView() {
-                if (this.realtimeSyncInterval) clearInterval(this.realtimeSyncInterval);
+                if (this.studentExamSyncInterval) clearInterval(this.studentExamSyncInterval);
+                if (this.adminRealtimeSyncInterval) clearInterval(this.adminRealtimeSyncInterval);
+                if (this.teacherRealtimeSyncInterval) clearInterval(this.teacherRealtimeSyncInterval);
 
                 const body = document.getElementById('appBody');
-                if (!body) return;
-                const topBar = document.getElementById('topUserBar');
-                if (topBar) topBar.classList.add('hidden');
+                document.getElementById('topUserBar').classList.add('hidden');
 
                 body.innerHTML = `
                     <div class="mobile-shell flex flex-col justify-between p-6 border border-slate-200 rounded-3xl bg-white shadow-xl my-4">
@@ -487,7 +529,7 @@
                             <div id="loginFormContainer" class="space-y-4">
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1">Nomor Induk Siswa (NIS)</label>
-                                    <input type="text" id="loginIdInput" placeholder="Masukkan NIS Anda..." class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none bg-white">
+                                    <input type="text" id="loginIdInput" placeholder="Masukkan NIS Anda..." class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
                                 </div>
                                 <button onclick="EduGuard.login('student')" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-xl shadow-md transition active:scale-95 flex items-center justify-center gap-2 text-sm">
                                     <i class="fa-solid fa-right-to-bracket"></i> Masuk Ujian (Murid)
@@ -500,7 +542,6 @@
 
             switchRoleTab(role) {
                 const container = document.getElementById('loginFormContainer');
-                if (!container) return;
                 const btnStudent = document.getElementById('btnRoleStudent');
                 const btnTeacher = document.getElementById('btnRoleTeacher');
                 const btnAdmin = document.getElementById('btnRoleAdmin');
@@ -514,7 +555,7 @@
                     container.innerHTML = `
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Nomor Induk Siswa (NIS)</label>
-                            <input type="text" id="loginIdInput" placeholder="Masukkan NIS Anda..." class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none bg-white">
+                            <input type="text" id="loginIdInput" placeholder="Masukkan NIS Anda..." class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
                         </div>
                         <button onclick="EduGuard.login('student')" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-xl text-sm shadow-md transition active:scale-95 flex items-center justify-center gap-2">
                             <i class="fa-solid fa-right-to-bracket"></i> Masuk Ujian (Murid)
@@ -525,10 +566,10 @@
                     container.innerHTML = `
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">Nomor Induk Pegawai (NIP Guru)</label>
-                            <input type="text" id="loginIdInput" placeholder="Masukkan NIP Anda..." class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none bg-white">
+                            <input type="text" id="loginIdInput" placeholder="Masukkan NIP Guru..." class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
                         </div>
                         <button onclick="EduGuard.login('teacher')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3.5 rounded-xl text-sm shadow-md transition active:scale-95 flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-right-to-bracket"></i> Masuk Panel Guru
+                            <i class="fa-solid fa-right-to-bracket"></i> Masuk Panel Guru (1 Mapel Terisolasi)
                         </button>
                     `;
                 } else {
@@ -536,7 +577,7 @@
                     container.innerHTML = `
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">ID Administrator</label>
-                            <input type="text" id="loginIdInput" placeholder="Masukkan ID Admin..." class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white">
+                            <input type="text" id="loginIdInput" placeholder="Masukkan ID Administrator..." class="w-full px-4 py-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                         </div>
                         <button onclick="EduGuard.login('admin')" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3.5 rounded-xl text-sm shadow-md transition active:scale-95 flex items-center justify-center gap-2">
                             <i class="fa-solid fa-right-to-bracket"></i> Masuk Panel Admin
@@ -546,12 +587,8 @@
             },
 
             async login(role) {
-                const inputEl = document.getElementById('loginIdInput');
-                if (!inputEl) return;
-                const val = inputEl.value.trim();
+                const val = document.getElementById('loginIdInput').value.trim();
                 if (!val) return this.showToast('Harap isi ID / NIS / NIP terlebih dahulu!', 'warning');
-
-                await this.fastSyncCloudData();
 
                 const remoteRes = await apiCall('login', { id: val, deviceId: this.deviceFingerprint });
                 if (remoteRes && remoteRes.status === 'success') {
@@ -562,27 +599,33 @@
                     }
                     this.showToast(`Selamat datang ${this.currentUser.name}!`, 'success');
                     this.redirectRoleDashboard();
+                } else if (remoteRes && remoteRes.status === 'error') {
+                    this.showToast(remoteRes.message, 'error');
                 } else {
-                    if (role === 'student') {
-                        const st = DB.students.find(s => String(s.nis) === String(val));
-                        if (st) this.currentUser = { ...st, role: 'student' };
-                    } else if (role === 'teacher') {
-                        const tc = DB.teachers.find(t => String(t.nip) === String(val));
-                        if (tc) {
-                            this.currentUser = { ...tc, role: 'teacher' };
-                            const assignedSub = DB.subjects.find(s => String(s.teacherNip) === String(tc.nip) || s.id === tc.subjectId);
-                            this.teacherSelectedSubject = assignedSub ? assignedSub.id : ('SUB-' + tc.nip);
-                        }
-                    } else if (role === 'admin' && val.toLowerCase() === DB.admin.id) {
-                        this.currentUser = { ...DB.admin, role: 'admin' };
-                    }
+                    this.quickLogin(role, val);
+                }
+            },
 
-                    if (this.currentUser) {
-                        this.showToast(`Selamat datang ${this.currentUser.name}!`, 'success');
-                        this.redirectRoleDashboard();
-                    } else {
-                        this.showToast('ID / NIS / NIP tidak terdaftar di sistem sekolah!', 'error');
+            quickLogin(role, id) {
+                if (role === 'student') {
+                    const st = DB.students.find(s => s.nis === id);
+                    if (st) this.currentUser = { ...st, role: 'student' };
+                } else if (role === 'teacher') {
+                    const tc = DB.teachers.find(t => t.nip === id);
+                    if (tc) {
+                        this.currentUser = { ...tc, role: 'teacher' };
+                        const assignedSub = DB.subjects.find(s => String(s.teacherNip) === String(tc.nip) || s.id === tc.subjectId);
+                        this.teacherSelectedSubject = assignedSub ? assignedSub.id : ('SUB-' + tc.nip);
                     }
+                } else {
+                    this.currentUser = { ...DB.admin, role: 'admin' };
+                }
+
+                if (this.currentUser) {
+                    this.showToast(`Selamat datang ${this.currentUser.name}!`, 'success');
+                    this.redirectRoleDashboard();
+                } else {
+                    this.showToast('User ID tidak ditemukan dalam data!', 'error');
                 }
             },
 
@@ -592,92 +635,32 @@
                 if (this.currentUser.role === 'student') this.renderStudentDashboard();
                 else if (this.currentUser.role === 'teacher') this.renderTeacherDashboard();
                 else this.renderAdminDashboard();
-
-                this.startGlobalRealtimeSync();
-            },
-
-            startGlobalRealtimeSync() {
-                if (this.realtimeSyncInterval) clearInterval(this.realtimeSyncInterval);
-                this.realtimeSyncInterval = setInterval(async () => {
-                    if (!this.currentUser) return;
-                    
-                    try {
-                        const [resData, cheatData] = await Promise.all([
-                            apiCall('getResults').catch(()=>null),
-                            apiCall('getCheatLogs').catch(()=>null)
-                        ]);
-
-                        if (resData && resData.status === 'success' && Array.isArray(resData.data)) {
-                            DB.results = resData.data;
-
-                            if (this.currentUser.role === 'teacher' && this.teacherActiveTab === 'results') {
-                                const tbody = document.getElementById('tblTeacherResultsBody');
-                                const pkgSel = document.getElementById('filterTeacherResultPkg');
-                                if (tbody && pkgSel) tbody.innerHTML = this.renderTeacherResultsRows(this.teacherSelectedSubject, pkgSel.value);
-                            } else if (this.currentUser.role === 'admin' && this.adminActiveTab === 'results') {
-                                const tbody = document.getElementById('tblAdminResultsBody');
-                                const subSel = document.getElementById('filterResultSubject');
-                                const pkgSel = document.getElementById('filterResultPackage');
-                                if (tbody && subSel && pkgSel) tbody.innerHTML = this.renderAdminResultsRows(subSel.value, pkgSel.value);
-                            }
-                        }
-
-                        if (cheatData && cheatData.status === 'success' && Array.isArray(cheatData.data)) {
-                            DB.cheatLogs = cheatData.data;
-                            if (this.currentUser.role === 'teacher' && this.teacherActiveTab === 'cheat') {
-                                const cheatTbody = document.getElementById('tblTeacherCheatBody');
-                                if (cheatTbody) cheatTbody.innerHTML = this.renderTeacherCheatLogsRows();
-                            } else if (this.currentUser.role === 'admin' && this.adminActiveTab === 'cheat') {
-                                const cheatTbody = document.getElementById('tblAdminCheatBody');
-                                if (cheatTbody) cheatTbody.innerHTML = DB.cheatLogs.length === 0 ? `<tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada catatan kecurangan.</td></tr>` : DB.cheatLogs.map(l => `
-                                    <tr>
-                                        <td class="p-3">${l.timestamp || '-'}</td>
-                                        <td class="p-3 font-bold">${l.nis}</td>
-                                        <td class="p-3">${l.name}</td>
-                                        <td class="p-3">${l.subject}</td>
-                                        <td class="p-3 text-red-600 font-semibold">${l.violationType}</td>
-                                        <td class="p-3 font-bold">${l.count}</td>
-                                        <td class="p-3">
-                                            <button onclick="EduGuard.resetStudentViolation('${l.nis}')" class="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold shadow-sm transition active:scale-95">
-                                                Reset Point
-                                            </button>
-                                        </td>
-                                    </tr>
-                                `).join('');
-                            }
-                        }
-                    } catch(e) {}
-                }, 1500);
             },
 
             logout() {
                 if (this.examTimerInterval) clearInterval(this.examTimerInterval);
-                if (this.realtimeSyncInterval) clearInterval(this.realtimeSyncInterval);
+                if (this.studentExamSyncInterval) clearInterval(this.studentExamSyncInterval);
+                if (this.adminRealtimeSyncInterval) clearInterval(this.adminRealtimeSyncInterval);
+                if (this.teacherRealtimeSyncInterval) clearInterval(this.teacherRealtimeSyncInterval);
                 this.exitFullScreenMode();
                 this.activeExam = null;
                 this.currentUser = null;
-                const cheatO = document.getElementById('cheatOverlay');
-                const termO = document.getElementById('terminatedOverlay');
-                if (cheatO) cheatO.classList.add('hidden');
-                if (termO) termO.classList.add('hidden');
+                document.getElementById('cheatOverlay').classList.add('hidden');
+                document.getElementById('terminatedOverlay').classList.add('hidden');
                 this.renderLoginView();
             },
 
             updateHeaderBar() {
                 if (!this.currentUser) return;
                 const bar = document.getElementById('topUserBar');
-                if (!bar) return;
                 bar.classList.remove('hidden');
                 bar.classList.add('flex');
-                const nameEl = document.getElementById('topUserName');
-                const roleEl = document.getElementById('topUserRole');
-                if (nameEl) nameEl.innerText = this.currentUser.name;
-                if (roleEl) roleEl.innerText = this.currentUser.role.toUpperCase();
+                document.getElementById('topUserName').innerText = this.currentUser.name;
+                document.getElementById('topUserRole').innerText = this.currentUser.role.toUpperCase();
             },
 
             renderTeacherDashboard() {
                 const body = document.getElementById('appBody');
-                if (!body) return;
                 const tc = this.currentUser;
 
                 this.ensureSubjectsUpToDate();
@@ -685,11 +668,16 @@
                 let assignedSub = DB.subjects.find(s => String(s.teacherNip) === String(tc.nip) || s.id === tc.subjectId);
                 if (!assignedSub) {
                     assignedSub = {
-                        id: 'SUB-' + tc.nip, name: tc.subject || 'Mata Pelajaran Guru',
-                        teacherNip: tc.nip, packages: ["A", "B", "C"],
-                        token: 'TOK123', packageTokens: { "A": "TOK123", "B": "PBK123", "C": "PCK123" },
-                        packageDurations: { "A": 60, "B": 60, "C": 60 }, durationMin: 60,
-                        finalizedPackages: [], publishedPackages: []
+                        id: 'SUB-' + tc.nip,
+                        name: tc.subject || 'Mata Pelajaran Guru',
+                        teacherNip: tc.nip,
+                        packages: ["A", "B", "C"],
+                        token: 'TOK123',
+                        packageTokens: { "A": "TOK123", "B": "PBK123", "C": "PCK123" },
+                        packageDurations: { "A": 60, "B": 60, "C": 60 },
+                        durationMin: 60,
+                        finalizedPackages: [],
+                        publishedPackages: []
                     };
                     DB.subjects.push(assignedSub);
                 }
@@ -703,15 +691,11 @@
                 if (!subjectObj.packages) subjectObj.packages = ["A", "B", "C"];
                 if (!subjectObj.packageDurations) subjectObj.packageDurations = { "A": 60, "B": 60, "C": 60 };
                 if (!subjectObj.packageTokens) subjectObj.packageTokens = { "A": "TOK123", "B": "PBK123", "C": "PCK123" };
-                if (!subjectObj.packageShuffleQuestions) subjectObj.packageShuffleQuestions = {};
-                if (!subjectObj.packageShuffleOptions) subjectObj.packageShuffleOptions = {};
 
                 const questionsList = this.getCleanQuestions(activeSub, activePkg);
                 const isFinalized = (subjectObj.finalizedPackages || []).includes(activePkg);
                 const currentPkgToken = subjectObj.packageTokens[activePkg] || 'TOK123';
                 const currentPkgDuration = subjectObj.packageDurations[activePkg] || 60;
-                const isShuffleQ = Boolean(subjectObj.packageShuffleQuestions[activePkg]);
-                const isShuffleO = Boolean(subjectObj.packageShuffleOptions[activePkg]);
 
                 const totalWeight = questionsList.reduce((sum, q) => sum + (Number(q.weight) || 0), 0);
 
@@ -799,7 +783,7 @@
                                 <i class="fa-solid fa-list-check"></i> 3. Cek Soal & Preview (Realtime)
                             </button>
                             <button onclick="EduGuard.switchTeacherTab('finalize')" class="px-3 py-2 rounded-xl flex items-center gap-1.5 whitespace-nowrap transition ${activeTab === 'finalize' ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'text-slate-500 hover:bg-slate-50'}">
-                                <i class="fa-solid fa-lock"></i> 4. Finalisasi Paket & Pengacakan
+                                <i class="fa-solid fa-lock"></i> 4. Finalisasi Paket
                             </button>
                             <button onclick="EduGuard.switchTeacherTab('results')" class="px-3 py-2 rounded-xl flex items-center gap-1.5 whitespace-nowrap transition ${activeTab === 'results' ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'text-slate-500 hover:bg-slate-50'}">
                                 <i class="fa-solid fa-square-poll-vertical"></i> 5. Rekap Nilai Siswa (Realtime)
@@ -810,10 +794,46 @@
                         </div>
 
                         <div id="teacherTabContent" class="pt-2">
-                            ${this.renderTeacherTabContent(activeTab, activeSub, activePkg, questionsList, isFinalized, isShuffleQ, isShuffleO)}
+                            ${this.renderTeacherTabContent(activeTab, activeSub, activePkg, questionsList, isFinalized)}
                         </div>
                     </div>
                 `;
+
+                if (this.teacherRealtimeSyncInterval) clearInterval(this.teacherRealtimeSyncInterval);
+                if (activeTab === 'review' || activeTab === 'results' || activeTab === 'cheat') {
+                    this.teacherRealtimeSyncInterval = setInterval(async () => {
+                        if (this.currentUser && this.currentUser.role === 'teacher') {
+                            const remoteQ = await apiCall('getQuestions', { subjectId: activeSub, package: activePkg });
+                            if (remoteQ && remoteQ.status === 'success' && Array.isArray(remoteQ.data)) {
+                                if (!DB.examPackages[activeSub]) DB.examPackages[activeSub] = {};
+                                const cleanLocalMap = new Map();
+                                
+                                (DB.examPackages[activeSub][activePkg] || []).forEach(q => {
+                                    if (q && q.id) {
+                                        const cleanId = String(q.id).trim();
+                                        if (!DB.deletedQuestionIds || !DB.deletedQuestionIds.has(cleanId)) {
+                                            cleanLocalMap.set(cleanId, q);
+                                        }
+                                    }
+                                });
+
+                                remoteQ.data.forEach(rq => {
+                                    if (!rq || !rq.id) return;
+                                    const rqId = String(rq.id).trim();
+                                    if (DB.deletedQuestionIds && DB.deletedQuestionIds.has(rqId)) return;
+                                    if (DB.modifiedQuestionsMap && DB.modifiedQuestionsMap[rqId]) {
+                                        cleanLocalMap.set(rqId, { ...DB.modifiedQuestionsMap[rqId] });
+                                    } else {
+                                        cleanLocalMap.set(rqId, rq);
+                                    }
+                                });
+
+                                DB.examPackages[activeSub][activePkg] = Array.from(cleanLocalMap.values());
+                                if (activeTab === 'review') this.refreshTeacherReviewUI();
+                            }
+                        }
+                    }, 5000);
+                }
             },
 
             selectTeacherPackageOnly(pkg) {
@@ -846,24 +866,6 @@
 
                     apiCall('savePackageToken', { subjectId: subId, package: pkg, token: tokenVal, durationMin: durationVal });
                     this.showToast(`Pengaturan Paket ${pkg} disimpan: Token ${tokenVal} & Durasi ${durationVal} Menit`, 'success');
-                    this.renderTeacherDashboard();
-                }
-            },
-
-            async saveTeacherShuffleSettings(subId, pkg) {
-                const shuffleQ = document.getElementById('checkShuffleQuestions').checked;
-                const shuffleO = document.getElementById('checkShuffleOptions').checked;
-
-                const subject = DB.subjects.find(s => s.id === subId);
-                if (subject) {
-                    if (!subject.packageShuffleQuestions) subject.packageShuffleQuestions = {};
-                    if (!subject.packageShuffleOptions) subject.packageShuffleOptions = {};
-
-                    subject.packageShuffleQuestions[pkg] = shuffleQ;
-                    subject.packageShuffleOptions[pkg] = shuffleO;
-
-                    apiCall('savePackageShuffle', { subjectId: subId, package: pkg, shuffleQuestions: shuffleQ, shuffleOptions: shuffleO });
-                    this.showToast(`Pengaturan Pengacakan Soal & Opsi Paket ${pkg} berhasil disimpan!`, 'success');
                     this.renderTeacherDashboard();
                 }
             },
@@ -901,13 +903,9 @@
                     subject.packages.push(pkgName);
                     if (!subject.packageTokens) subject.packageTokens = {};
                     if (!subject.packageDurations) subject.packageDurations = {};
-                    if (!subject.packageShuffleQuestions) subject.packageShuffleQuestions = {};
-                    if (!subject.packageShuffleOptions) subject.packageShuffleOptions = {};
 
                     subject.packageTokens[pkgName] = 'PAK' + Math.floor(100 + Math.random() * 900);
                     subject.packageDurations[pkgName] = subject.durationMin || 60;
-                    subject.packageShuffleQuestions[pkgName] = false;
-                    subject.packageShuffleOptions[pkgName] = false;
 
                     this.teacherSelectedPkg = pkgName;
                     this.closeModal();
@@ -935,7 +933,7 @@
                         </div>
                         <h4 class="font-bold text-slate-800 text-sm">Hapus Butir Soal Ini?</h4>
                         <p class="text-xs text-slate-500 max-w-sm mx-auto">
-                            Soal yang dihapus akan langsung dihilangkan dari Paket <strong>${pkg}</strong> secara realtime dan dihapus dari database:<br>
+                            Soal yang dihapus akan langsung dihilangkan dari Paket <strong>${pkg}</strong> secara realtime:<br>
                             <span class="font-semibold text-slate-700 mt-1 block italic bg-slate-100 p-2 rounded-xl">"${previewText}"</span>
                         </p>
                     </div>
@@ -956,17 +954,23 @@
 
                 if (DB.examPackages[subId] && DB.examPackages[subId][pkg]) {
                     DB.examPackages[subId][pkg] = DB.examPackages[subId][pkg].filter(q => String(q.id) !== String(qId));
-                    this.showToast('Butir soal berhasil dihapus dari database!', 'success');
+                    if (!DB.deletedQuestionIds) DB.deletedQuestionIds = new Set();
+                    DB.deletedQuestionIds.add(String(qId));
+                    if (DB.modifiedQuestionsMap) delete DB.modifiedQuestionsMap[String(qId)];
+
+                    this.showToast('Butir soal berhasil dihapus!', 'success');
                     this.refreshTeacherReviewUI();
-                    apiCall('deleteQuestion', { questionId: qId, subjectId: subId, package: pkg });
+
+                    apiCall('deleteQuestion', { questionId: qId });
                 }
             },
 
             openEditQuestionModal(qId) {
                 const subId = this.teacherSelectedSubject;
                 const pkg = this.teacherSelectedPkg;
-                const qList = (DB.examPackages[subId] && DB.examPackages[subId][pkg]) || [];
-                const q = qList.find(item => String(item.id) === String(qId));
+                const qList = this.getCleanQuestions(subId, pkg);
+                const targetId = String(qId).trim();
+                const q = qList.find(item => String(item.id).trim() === targetId);
                 if (!q) return this.showToast('Data butir soal tidak ditemukan!', 'error');
 
                 let optionsFormHtml = '';
@@ -1113,11 +1117,7 @@
                         <div class="space-y-1">
                             <div class="flex justify-between items-center">
                                 <label class="block text-xs font-bold text-slate-700">Teks Pertanyaan Soal</label>
-                                <div class="flex gap-1">
-                                    <button type="button" onclick="EduGuard.insertFormatTagToEdit('b')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 rounded font-bold text-[11px]" title="Tebal"><b>B</b></button>
-                                    <button type="button" onclick="EduGuard.insertFormatTagToEdit('i')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 rounded italic text-[11px]" title="Miring"><i>I</i></button>
-                                    <button type="button" onclick="EduGuard.insertFormatTagToEdit('u')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 rounded underline text-[11px]" title="Underline"><u>U</u></button>
-                                </div>
+                                <span class="text-[10px] text-slate-400">Sisipkan rumus lewat tombol cepat:</span>
                             </div>
                             <div class="flex flex-wrap gap-1 p-1 bg-slate-100 border rounded-lg max-h-20 overflow-y-auto mb-1">
                                 ${['²', '³', '√', 'π', '±', '×', '÷', '≠', '≤', '≥', '∞', '∑', '∫', 'sin', 'cos', 'tan', '→', 'H₂O', 'CO₂', 'Ω', '°C'].map(sym => `
@@ -1151,33 +1151,6 @@
                 this.showModal(`Edit Butir Soal (${q.type})`, body, footer);
             },
 
-            insertFormatTag(tag) {
-                const el = document.getElementById('manualText');
-                if (!el) return;
-                const start = el.selectionStart || 0;
-                const end = el.selectionEnd || 0;
-                const selectedText = el.value.substring(start, end);
-                const replacement = `<${tag}>${selectedText || 'Teks'}</${tag}>`;
-                el.value = el.value.substring(0, start) + replacement + el.value.substring(end);
-                el.focus();
-                el.selectionStart = start;
-                el.selectionEnd = start + replacement.length;
-                this.updateMathPreviewLive();
-            },
-
-            insertFormatTagToEdit(tag) {
-                const el = document.getElementById('editQuestionText');
-                if (!el) return;
-                const start = el.selectionStart || 0;
-                const end = el.selectionEnd || 0;
-                const selectedText = el.value.substring(start, end);
-                const replacement = `<${tag}>${selectedText || 'Teks'}</${tag}>`;
-                el.value = el.value.substring(0, start) + replacement + el.value.substring(end);
-                el.focus();
-                el.selectionStart = start;
-                el.selectionEnd = start + replacement.length;
-            },
-
             insertSymbolToEdit(sym) {
                 const el = document.getElementById('editQuestionText');
                 if (!el) return;
@@ -1193,17 +1166,19 @@
                 const pkg = this.teacherSelectedPkg;
                 if (!DB.examPackages[subId]) DB.examPackages[subId] = {};
                 if (!DB.examPackages[subId][pkg]) DB.examPackages[subId][pkg] = [];
-                
-                const qList = DB.examPackages[subId][pkg];
-                const qIdx = qList.findIndex(item => String(item.id) === String(qId));
-                
-                if (qIdx === -1) return this.showToast('Soal tidak ditemukan!', 'error');
 
-                const q = { ...qList[qIdx] };
+                const targetId = String(qId).trim();
+                let currentList = this.getCleanQuestions(subId, pkg);
+                const qIndex = currentList.findIndex(item => String(item.id).trim() === targetId);
+                if (qIndex === -1) return this.showToast('Soal tidak ditemukan berdasarkan ID!', 'error');
 
                 const newText = document.getElementById('editQuestionText').value.trim();
                 if (!newText) return this.showToast('Teks pertanyaan tidak boleh kosong!', 'warning');
 
+                const q = { ...currentList[qIndex] };
+                q.id = targetId;
+                q.subjectId = subId;
+                q.package = pkg;
                 q.text = newText;
                 q.weight = Number(document.getElementById('editQuestionWeight').value || 20);
                 q.image = document.getElementById('editQuestionImg').value.trim() || null;
@@ -1296,25 +1271,45 @@
                     }
                 }
 
-                qList[qIdx] = q;
+                // Perbarui butir soal pada list secara in-place dan eliminasi duplikasi jika ada
+                const deduplicated = [];
+                const seen = new Set();
+                currentList.forEach(item => {
+                    const itemId = String(item.id).trim();
+                    if (seen.has(itemId)) return;
+                    seen.add(itemId);
+                    if (itemId === targetId) {
+                        deduplicated.push({ ...q });
+                    } else {
+                        deduplicated.push(item);
+                    }
+                });
+
+                if (!seen.has(targetId)) {
+                    deduplicated.push({ ...q });
+                }
+
+                DB.examPackages[subId][pkg] = deduplicated;
+
+                if (!DB.modifiedQuestionsMap) DB.modifiedQuestionsMap = {};
+                DB.modifiedQuestionsMap[targetId] = { ...q };
 
                 this.closeModal();
-                this.showToast('Butir soal berhasil di-update tanpa duplikasi!', 'success');
+                this.showToast(`Soal ID ${targetId} berhasil di-update tanpa duplikat!`, 'success');
                 this.refreshTeacherReviewUI();
 
-                apiCall('editQuestion', { subjectId: subId, package: pkg, question: q });
+                // Simpan update ke Google Sheets secara tepat pada baris ID Soal
+                apiCall('saveQuestionsBatch', { subjectId: subId, package: pkg, questions: [q] });
             },
 
             refreshTeacherReviewUI() {
                 const subId = this.teacherSelectedSubject;
                 const pkg = this.teacherSelectedPkg;
                 const currentQList = this.getCleanQuestions(subId, pkg);
-                
                 const container = document.getElementById('teacherReviewQuestionsContainer');
                 if (container) {
                     container.innerHTML = this.renderTeacherReviewQuestionsListHTML(currentQList);
                 }
-                
                 const totalWeight = currentQList.reduce((sum, q) => sum + (Number(q.weight) || 0), 0);
                 const banner = document.getElementById('teacherScoreWeightBanner');
                 if (banner) {
@@ -1352,11 +1347,28 @@
 
             getMathSymbolCategories() {
                 return {
-                    aljabar: ['x', 'y', 'z', 'a', 'b', 'c', 'n', '²', '³', '⁴', '⁵', 'ⁿ', '⁻¹', '⁻²', '√', '∛', '∜', '½', '⅓', '⅔', '¼', '¾', '±', '×', '÷', '≠', '≈', '≤', '≥', '∝', '∞', '|x|', '∑', '∏'],
-                    trigo_geo: ['sin', 'cos', 'tan', 'cot', 'sec', 'csc', 'arcsin', 'arccos', 'arctan', 'π', 'θ', 'α', 'β', 'γ', 'φ', 'λ', 'ω', '°', '∠', '⊥', '∥', '△', '≅', '∼', 'rad'],
-                    kalkulus: ['∫', '∬', '∭', '∮', 'dx', 'dy', 'dt', '∂', 'lim', 'log', 'log₁₀', 'log₂', 'ln', 'f(x)', "f'(x)", "f''(x)", 'dy/dx', 'Δx', '→', '←', '↔', '⇒', '⇔'],
-                    logika_himpunan: ['∈', '∉', '⊂', '⊃', '⊆', '⊇', '∪', '∩', '∅', '∀', '∃', '∄', '∧', '∨', '¬', '⊕', '∴', '∵', 'ℕ', 'ℤ', 'ℚ', 'ℝ', 'ℂ'],
-                    sains: ['H₂O', 'CO₂', 'O₂', 'N₂', 'H⁺', 'OH⁻', 'SO₄²⁻', 'NO₃⁻', 'NH₃', 'HCl', 'NaCl', 'CH₃COOH', '⇄', '⇌', 'aq', '(s)', '(l)', '(g)', '°C', 'K', 'v₀', 's(t)', 'a(t)', 'F', 'W', 'P', 'E_k', 'E_p', 'Q', 'I', 'V', 'R', 'C', 'Ω', 'μ₀', 'ε₀', 'B', 'Φ', 'Hz', 'J', 'N']
+                    aljabar: [
+                        'x', 'y', 'z', 'a', 'b', 'c', 'n', '²', '³', '⁴', '⁵', 'ⁿ', '⁻¹', '⁻²', 
+                        '√', '∛', '∜', '½', '⅓', '⅔', '¼', '¾', '±', '×', '÷', '≠', '≈', '≤', '≥', 
+                        '∝', '∞', '|x|', '∑', '∏'
+                    ],
+                    trigo_geo: [
+                        'sin', 'cos', 'tan', 'cot', 'sec', 'csc', 'arcsin', 'arccos', 'arctan',
+                        'π', 'θ', 'α', 'β', 'γ', 'φ', 'λ', 'ω', '°', '∠', '⊥', '∥', '△', '≅', '∼', 'rad'
+                    ],
+                    kalkulus: [
+                        '∫', '∬', '∭', '∮', 'dx', 'dy', 'dt', '∂', 'lim', 'log', 'log₁₀', 'log₂', 'ln',
+                        'f(x)', "f'(x)", "f''(x)", 'dy/dx', 'Δx', '→', '←', '↔', '⇒', '⇔'
+                    ],
+                    logika_himpunan: [
+                        '∈', '∉', '⊂', '⊃', '⊆', '⊇', '∪', '∩', '∅', '∀', '∃', '∄',
+                        '∧', '∨', '¬', '⊕', '∴', '∵', 'ℕ', 'ℤ', 'ℚ', 'ℝ', 'ℂ'
+                    ],
+                    sains: [
+                        'H₂O', 'CO₂', 'O₂', 'N₂', 'H⁺', 'OH⁻', 'SO₄²⁻', 'NO₃⁻', 'NH₃', 'HCl', 'NaCl', 'CH₃COOH',
+                        '⇄', '⇌', 'aq', '(s)', '(l)', '(g)', '°C', 'K',
+                        'v₀', 's(t)', 'a(t)', 'F', 'W', 'P', 'E_k', 'E_p', 'Q', 'I', 'V', 'R', 'C', 'Ω', 'μ₀', 'ε₀', 'B', 'Φ', 'Hz', 'J', 'N'
+                    ]
                 };
             },
 
@@ -1391,11 +1403,38 @@
                 this.updateMathPreviewLive();
             },
 
+            formatManualText(tag) {
+                const textarea = document.getElementById('manualText');
+                if (!textarea) return;
+
+                const start = textarea.selectionStart || 0;
+                const end = textarea.selectionEnd || 0;
+                const text = textarea.value;
+                const selected = text.substring(start, end);
+
+                let openTag = `<${tag}>`;
+                let closeTag = `</${tag}>`;
+                let replacement = "";
+
+                if (selected.length > 0) {
+                    replacement = openTag + selected + closeTag;
+                } else {
+                    replacement = openTag + "teks" + closeTag;
+                }
+
+                textarea.value = text.substring(0, start) + replacement + text.substring(end);
+                textarea.focus();
+                textarea.selectionStart = start + openTag.length;
+                textarea.selectionEnd = textarea.selectionStart + (selected.length > 0 ? selected.length : 4);
+
+                this.updateMathPreviewLive();
+            },
+
             updateMathPreviewLive() {
                 const text = document.getElementById('manualText')?.value || '';
                 const previewEl = document.getElementById('manualMathPreview');
                 if (previewEl) {
-                    previewEl.innerText = text || '(Pratinjau paragraf soal matematika, kimia, fisika akan muncul di sini...)';
+                    previewEl.innerHTML = text || '(Pratinjau paragraf soal matematika, kimia, fisika dengan format tebal, miring, garis bawah akan muncul di sini...)';
                 }
             },
 
@@ -1427,7 +1466,7 @@
             },
 
             renderTeacherReviewQuestionsListHTML(questionsList) {
-                if (!questionsList || questionsList.length === 0) {
+                if (questionsList.length === 0) {
                     return `
                         <div class="text-center py-8 text-slate-400 text-xs border rounded-2xl bg-white p-6 shadow-sm">
                             <i class="fa-solid fa-folder-open text-3xl mb-2 block text-slate-300"></i>
@@ -1468,7 +1507,14 @@
                 }).join('');
             },
 
-            renderTeacherTabContent(tab, subjectId, pkg, questionsList, isFinalized, isShuffleQ, isShuffleO) {
+            renderTeacherTabContent(tab, subjectId, pkg, questionsList, isFinalized) {
+                const subjectObj = DB.subjects.find(s => s.id === subjectId) || {
+                    id: subjectId,
+                    name: 'Mata Pelajaran',
+                    randomizeQuestions: {},
+                    randomizeOptions: {}
+                };
+
                 if (tab === 'manual') {
                     return `
                         <div class="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200 max-w-3xl space-y-4">
@@ -1498,9 +1544,20 @@
 
                             <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm space-y-2">
                                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2">
-                                    <span class="text-[10px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1">
-                                        <i class="fa-solid fa-square-root-variable text-purple-600"></i> Toolbar Rumus & Simbol Lengkap (Klik untuk Sisipkan):
-                                    </span>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-[10px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1 mr-2">
+                                            <i class="fa-solid fa-font text-purple-600"></i> Format Teks:
+                                        </span>
+                                        <button type="button" onclick="EduGuard.formatManualText('b')" class="px-2.5 py-1 bg-slate-100 hover:bg-purple-100 text-slate-700 hover:text-purple-800 border rounded-lg font-extrabold text-xs transition active:scale-95" title="Tebal (Bold)">
+                                            <i class="fa-solid fa-bold"></i>
+                                        </button>
+                                        <button type="button" onclick="EduGuard.formatManualText('i')" class="px-2.5 py-1 bg-slate-100 hover:bg-purple-100 text-slate-700 hover:text-purple-800 border rounded-lg italic text-xs transition active:scale-95" title="Miring (Italic)">
+                                            <i class="fa-solid fa-italic"></i>
+                                        </button>
+                                        <button type="button" onclick="EduGuard.formatManualText('u')" class="px-2.5 py-1 bg-slate-100 hover:bg-purple-100 text-slate-700 hover:text-purple-800 border rounded-lg underline text-xs transition active:scale-95" title="Garis Bawah (Underline)">
+                                            <i class="fa-solid fa-underline"></i>
+                                        </button>
+                                    </div>
                                     <div class="flex flex-wrap gap-1">
                                         <button type="button" data-category="all" onclick="EduGuard.setMathSymbolCategory('all')" class="sym-category-btn ${this.activeMathCategory === 'all' ? 'active' : ''}">Semua</button>
                                         <button type="button" data-category="aljabar" onclick="EduGuard.setMathSymbolCategory('aljabar')" class="sym-category-btn ${this.activeMathCategory === 'aljabar' ? 'active' : ''}">Aljabar & Eksponen</button>
@@ -1518,19 +1575,15 @@
                             <div>
                                 <div class="flex justify-between items-center mb-1">
                                     <label class="block text-xs font-bold text-slate-700">Pertanyaan / Paragraf Teks Soal</label>
-                                    <div class="flex gap-1">
-                                        <button type="button" onclick="EduGuard.insertFormatTag('b')" class="px-2 py-0.5 bg-slate-200 hover:bg-slate-300 rounded font-bold text-[11px]" title="Tebal"><b>B</b></button>
-                                        <button type="button" onclick="EduGuard.insertFormatTag('i')" class="px-2 py-0.5 bg-slate-200 hover:bg-slate-300 rounded italic text-[11px]" title="Miring"><i>I</i></button>
-                                        <button type="button" onclick="EduGuard.insertFormatTag('u')" class="px-2 py-0.5 bg-slate-200 hover:bg-slate-300 rounded underline text-[11px]" title="Underline"><u>U</u></button>
-                                    </div>
+                                    <span class="text-[10px] text-purple-700 font-semibold">Mendukung tag: &lt;b&gt;, &lt;i&gt;, &lt;u&gt;, dan simbol</span>
                                 </div>
-                                <textarea id="manualText" rows="4" oninput="EduGuard.updateMathPreviewLive()" placeholder="Ketik paragraf pertanyaan soal di sini..." class="w-full px-3 py-2.5 border rounded-xl text-xs bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 font-sans leading-relaxed"></textarea>
+                                <textarea id="manualText" rows="4" oninput="EduGuard.updateMathPreviewLive()" placeholder="Ketik paragraf pertanyaan soal di sini... Blok teks lalu klik tombol B / I / U untuk memberi penekanan tebal, miring, atau garis bawah." class="w-full px-3 py-2.5 border rounded-xl text-xs bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 font-sans leading-relaxed"></textarea>
                             </div>
 
                             <div class="p-3 bg-purple-50/60 border border-purple-200 rounded-xl">
-                                <span class="text-[10px] font-bold text-purple-800 uppercase block mb-1">Pratinjau Teks Paragraf Soal:</span>
-                                <div id="manualMathPreview" class="text-xs text-slate-700 italic leading-relaxed whitespace-pre-line">
-                                    (Pratinjau paragraf soal matematika, kimia, fisika akan muncul di sini...)
+                                <span class="text-[10px] font-bold text-purple-800 uppercase block mb-1">Pratinjau Teks Paragraf Soal (Realtime):</span>
+                                <div id="manualMathPreview" class="text-xs text-slate-800 leading-relaxed whitespace-pre-line">
+                                    (Pratinjau paragraf soal matematika, kimia, fisika dengan format tebal, miring, garis bawah akan muncul di sini...)
                                 </div>
                             </div>
 
@@ -1554,7 +1607,7 @@
                             <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                 <div>
                                     <h4 class="font-bold text-blue-900 text-xs sm:text-sm">Template Impor Soal (.DOCX / .PDF / .XLSX)</h4>
-                                    <p class="text-xs text-blue-700">Dukungan 5 jenis soal objektif (PG, PGK, B/S, Urutan, Jodoh) dengan lebar kolom Excel terstruktur.</p>
+                                    <p class="text-xs text-blue-700">Dukungan 5 jenis soal objektif (PG, PGK, B/S, Urutan, Jodoh) tanpa essay.</p>
                                 </div>
                                 <div class="flex gap-2">
                                     <button onclick="EduGuard.downloadQuestionExcelTemplate()" class="bg-emerald-600 text-white px-3 py-2 rounded-xl text-xs font-bold hover:bg-emerald-700 shadow-sm flex items-center gap-1.5 transition active:scale-95">
@@ -1590,14 +1643,16 @@
                     const currentTotalWeight = cleanQList.reduce((s, q) => s + (Number(q.weight) || 0), 0);
                     return `
                         <div class="space-y-3">
-                            <div class="flex justify-between items-center bg-slate-100 p-3 rounded-2xl">
+                            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 bg-slate-100 p-3 rounded-2xl">
                                 <div>
                                     <span class="font-bold text-xs text-slate-700">Total Soal di Paket ${pkg} (Realtime): <strong class="text-purple-700 text-sm">${cleanQList.length}</strong></span>
                                     <span class="text-[11px] text-slate-500 block">Total Bobot: <strong>${currentTotalWeight} Poin</strong></span>
                                 </div>
-                                <button onclick="EduGuard.openExamPreviewModal('${subjectId}', '${pkg}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-md transition active:scale-95 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-eye"></i> Simulasi Preview Soal
-                                </button>
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <button onclick="EduGuard.openExamPreviewModal('${subjectId}', '${pkg}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-md transition active:scale-95 flex items-center gap-1.5">
+                                        <i class="fa-solid fa-eye"></i> Simulasi Preview Soal
+                                    </button>
+                                </div>
                             </div>
 
                             <div id="teacherReviewQuestionsContainer" class="space-y-3">
@@ -1606,46 +1661,49 @@
                         </div>
                     `;
                 } else if (tab === 'finalize') {
+                    const isRandQ = subjectObj.randomizeQuestions && subjectObj.randomizeQuestions[pkg] === true;
+                    const isRandOpt = subjectObj.randomizeOptions && subjectObj.randomizeOptions[pkg] === true;
+
                     return `
-                        <div class="space-y-4">
-                            <div class="bg-slate-50 border p-5 rounded-2xl max-w-xl space-y-3 shadow-sm">
+                        <div class="space-y-4 max-w-xl">
+                            <div class="bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-4 shadow-sm">
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                        <i class="fa-solid fa-shuffle text-purple-600"></i> Pengaturan Acak Soal & Opsi (Paket ${pkg})
+                                    </h4>
+                                    <p class="text-xs text-slate-500 mt-0.5">Konfigurasi bagaimana butir soal dan pilihan jawaban disajikan ke perangkat siswa.</p>
+                                </div>
+
+                                <div class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-3">
+                                    <label class="flex items-start gap-3 cursor-pointer">
+                                        <input type="checkbox" id="chkRandomizeQuestions" ${isRandQ ? 'checked' : ''} onchange="EduGuard.updatePackageRandomSettings('${subjectId}', '${pkg}', 'questions', this.checked)" class="w-4 h-4 mt-0.5 text-purple-600 rounded focus:ring-purple-500">
+                                        <div>
+                                            <span class="text-xs font-bold text-slate-800 block">Acak Urutan Soal (Nomor Soal Berbeda Antar Siswa)</span>
+                                            <span class="text-[11px] text-slate-500">Jika diaktifkan, nomor urut butir soal pada setiap siswa akan diacak otomatis saat ujian dimulai.</span>
+                                        </div>
+                                    </label>
+
+                                    <div class="border-t border-slate-100 pt-3">
+                                        <label class="flex items-start gap-3 cursor-pointer">
+                                            <input type="checkbox" id="chkRandomizeOptions" ${isRandOpt ? 'checked' : ''} onchange="EduGuard.updatePackageRandomSettings('${subjectId}', '${pkg}', 'options', this.checked)" class="w-4 h-4 mt-0.5 text-purple-600 rounded focus:ring-purple-500">
+                                            <div>
+                                                <span class="text-xs font-bold text-slate-800 block">Acak Opsi Pilihan Jawaban (A-E Berbeda Posisi)</span>
+                                                <span class="text-[11px] text-slate-500">Pilihan A, B, C, D, E akan diacak posisinya pada setiap perangkat siswa untuk mencegah saling mencontek.</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-50 border p-5 rounded-2xl space-y-3 shadow-sm">
                                 <h4 class="font-bold text-slate-800 text-sm">Status Finalisasi Paket ${pkg}</h4>
-                                <p class="text-xs text-slate-600">Setelah Paket ${pkg} difinalisasikan oleh Guru, Admin dapat mempublikasikan paket ini agar muncul pada dashboard siswa.</p>
+                                <p class="text-xs text-slate-600">Setelah Paket ${pkg} difinalisasikan oleh Guru, Admin dapat mempublikasikan paket ini agar dapat dikerjakan siswa.</p>
                                 <div class="p-3.5 rounded-xl border flex justify-between items-center ${isFinalized ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-amber-50 border-amber-200 text-amber-800'}">
                                     <span class="font-bold text-xs">${isFinalized ? '✅ Sudah Difinalkan Guru' : '⏳ Belum Difinalkan (Draf)'}</span>
                                     <button onclick="EduGuard.toggleTeacherFinalize('${pkg}')" class="px-4 py-2 rounded-xl text-xs font-bold ${isFinalized ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-emerald-600 hover:bg-emerald-700 text-white'} transition shadow-md active:scale-95">
                                         ${isFinalized ? 'Batalkan Finalisasi' : 'Finalkan Paket Soal'}
                                     </button>
                                 </div>
-                            </div>
-
-                            <div class="bg-purple-50 border border-purple-200 p-5 rounded-2xl max-w-xl space-y-4 shadow-sm">
-                                <h4 class="font-bold text-purple-900 text-sm flex items-center gap-2">
-                                    <i class="fa-solid fa-shuffle text-purple-600"></i> Pengaturan Soal Acak & Opsi Acak (Paket ${pkg})
-                                </h4>
-                                <p class="text-xs text-purple-700">Aktifkan pengacakan agar setiap siswa mendapatkan urutan butir soal dan pilihan ganda yang berbeda saat ujian.</p>
-                                
-                                <div class="space-y-2.5 pt-2">
-                                    <label class="flex items-center gap-3 p-3 bg-white border border-purple-200 rounded-xl cursor-pointer hover:bg-purple-100/50 transition">
-                                        <input type="checkbox" id="checkShuffleQuestions" ${isShuffleQ ? 'checked' : ''} class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
-                                        <div>
-                                            <span class="font-bold text-xs text-slate-800 block">Acak Urutan Soal (Shuffle Questions)</span>
-                                            <span class="text-[11px] text-slate-500">Urutan nomor butir soal akan diacak secara otomatis per siswa.</span>
-                                        </div>
-                                    </label>
-
-                                    <label class="flex items-center gap-3 p-3 bg-white border border-purple-200 rounded-xl cursor-pointer hover:bg-purple-100/50 transition">
-                                        <input type="checkbox" id="checkShuffleOptions" ${isShuffleO ? 'checked' : ''} class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500">
-                                        <div>
-                                            <span class="font-bold text-xs text-slate-800 block">Acak Pilihan Ganda (Shuffle Options A-E)</span>
-                                            <span class="text-[11px] text-slate-500">Posisi opsi pilihan ganda (A, B, C, D, E) akan diacak tanpa mengubah kunci jawaban.</span>
-                                        </div>
-                                    </label>
-                                </div>
-
-                                <button onclick="EduGuard.saveTeacherShuffleSettings('${subjectId}', '${pkg}')" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-md transition active:scale-95 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-floppy-disk"></i> Simpan Pengaturan Pengacakan
-                                </button>
                             </div>
                         </div>
                     `;
@@ -1659,9 +1717,9 @@
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-purple-50 border border-purple-200 p-4 rounded-2xl">
                                 <div>
                                     <h4 class="font-bold text-purple-900 text-xs sm:text-sm flex items-center gap-2">
-                                        <i class="fa-solid fa-square-poll-vertical text-purple-600"></i> Rekapitulasi Nilai & Laporan Jawaban Siswa
+                                        <i class="fa-solid fa-square-poll-vertical text-purple-600"></i> Rekapitulasi Nilai Siswa (Realtime Sync)
                                     </h4>
-                                    <p class="text-xs text-purple-700">Mapel: <strong>${subjectName}</strong> | Klik "Detail Jawaban" untuk lembar jawab siswa.</p>
+                                    <p class="text-xs text-purple-700">Mapel: <strong>${subjectName}</strong> | Sortir & Klik Detail Jawaban per Siswa.</p>
                                 </div>
                                 <div class="flex gap-2 items-center flex-wrap">
                                     <select id="filterTeacherResultPkg" onchange="EduGuard.filterTeacherResults()" class="px-3 py-2 border rounded-xl text-xs bg-white font-bold text-purple-900 shadow-sm">
@@ -1685,7 +1743,7 @@
                                             <th class="p-3 font-extrabold text-purple-800">Skor Akhir (Max 100)</th>
                                             <th class="p-3">Status</th>
                                             <th class="p-3">Waktu Selesai</th>
-                                            <th class="p-3 text-center">Laporan Jawaban</th>
+                                            <th class="p-3 text-center">Lembar Jawaban</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tblTeacherResultsBody" class="divide-y text-slate-600">
@@ -1698,7 +1756,7 @@
                 } else if (tab === 'cheat') {
                     return `
                         <div class="space-y-3">
-                            <h4 class="font-bold text-slate-800 text-sm">Log Pelanggaran Siswa (Realtime Sync - Mapel Diampu)</h4>
+                            <h4 class="font-bold text-slate-800 text-sm">Log Pelanggaran Siswa (Realtime Sync)</h4>
                             <div class="overflow-x-auto border rounded-2xl bg-white shadow-sm">
                                 <table class="w-full text-left border-collapse text-xs">
                                     <thead class="bg-red-50 text-red-800 font-bold border-b">
@@ -1706,7 +1764,6 @@
                                             <th class="p-3">Waktu</th>
                                             <th class="p-3">NIS</th>
                                             <th class="p-3">Nama Siswa</th>
-                                            <th class="p-3">Mapel</th>
                                             <th class="p-3">Jenis Pelanggaran</th>
                                             <th class="p-3">KALI</th>
                                         </tr>
@@ -1723,18 +1780,14 @@
             },
 
             renderTeacherCheatLogsRows() {
-                const teacherSubjectName = DB.subjects.find(s => s.id === this.teacherSelectedSubject)?.name || this.currentUser.subject || '';
-                const filteredLogs = DB.cheatLogs.filter(l => !teacherSubjectName || l.subject === teacherSubjectName || l.subject.includes(teacherSubjectName) || teacherSubjectName.includes(l.subject));
-
-                if (filteredLogs.length === 0) {
-                    return `<tr><td colspan="6" class="p-4 text-center text-slate-400">Belum ada catatan pelanggaran siswa untuk mapel ${teacherSubjectName}.</td></tr>`;
+                if (DB.cheatLogs.length === 0) {
+                    return `<tr><td colspan="5" class="p-4 text-center text-slate-400">Belum ada catatan pelanggaran siswa.</td></tr>`;
                 }
-                return filteredLogs.map(l => `
+                return DB.cheatLogs.map(l => `
                     <tr class="hover:bg-slate-50 transition">
                         <td class="p-3 font-mono text-xs">${l.timestamp || '-'}</td>
                         <td class="p-3 font-bold text-slate-800">${l.nis}</td>
                         <td class="p-3 text-slate-700">${l.name}</td>
-                        <td class="p-3 font-semibold text-purple-800">${l.subject}</td>
                         <td class="p-3 text-red-600 font-semibold">${l.violationType}</td>
                         <td class="p-3 font-bold text-center">${l.count}</td>
                     </tr>
@@ -1754,117 +1807,127 @@
                     return `<tr><td colspan="8" class="p-4 text-center text-slate-400">Belum ada data pengerjaan ujian siswa dengan filter tersebut.</td></tr>`;
                 }
 
-                return filtered.map(r => {
-                    const safeNis = String(r.nis).replace(/'/g, "\\'");
-                    const safeSubject = String(r.subject || subjectName).replace(/'/g, "\\'");
-                    const safePkg = String(r.package || 'A').replace(/'/g, "\\'");
-                    return `
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="p-3 font-bold text-slate-800">${r.nis}</td>
-                            <td class="p-3 font-semibold text-slate-700">${r.name}</td>
-                            <td class="p-3">${r.class || '-'}</td>
-                            <td class="p-3"><span class="bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded text-[10px]">Paket ${r.package || 'A'}</span></td>
-                            <td class="p-3 font-black text-purple-700 text-sm">${r.totalScore}</td>
-                            <td class="p-3">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.status && r.status.includes('Dibatalkan') ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${r.status || 'Selesai'}</span>
-                            </td>
-                            <td class="p-3 text-slate-500 font-mono">${r.submittedAt || '-'}</td>
-                            <td class="p-3 text-center">
-                                <button onclick="EduGuard.openStudentAnswersReportModal('${safeNis}', '${safeSubject}', '${safePkg}')" class="bg-purple-100 hover:bg-purple-200 text-purple-800 px-3 py-1.5 rounded-lg text-xs font-bold transition active:scale-95 shadow-sm inline-flex items-center gap-1">
-                                    <i class="fa-solid fa-file-lines"></i> Detail Jawaban
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
+                return filtered.map(r => `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3 font-bold text-slate-800">${r.nis}</td>
+                        <td class="p-3 font-semibold text-slate-700">${r.name}</td>
+                        <td class="p-3">${r.class || '-'}</td>
+                        <td class="p-3"><span class="bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded text-[10px]">Paket ${r.package || 'A'}</span></td>
+                        <td class="p-3 font-black text-purple-700 text-sm">${r.totalScore}</td>
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.status && r.status.includes('Dibatalkan') ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${r.status || 'Selesai'}</span>
+                        </td>
+                        <td class="p-3 text-slate-500 font-mono">${r.submittedAt || '-'}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="EduGuard.openSingleStudentAnswerModal('${r.nis}', '${r.package || 'A'}')" class="bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 mx-auto shadow-sm active:scale-95" title="Buka Rincian Jawaban Siswa">
+                                <i class="fa-solid fa-clipboard-list text-purple-600"></i> Detail Jawaban
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
             },
 
-            openStudentAnswersReportModal(nis, subjectName, pkg) {
-                const studentResult = DB.results.find(r => String(r.nis) === String(nis) && (r.subject === subjectName || subjectName.includes(r.subject) || r.subject.includes(subjectName)) && String(r.package || 'A') === String(pkg));
-                
-                let studentAnswers = {};
-                if (studentResult && studentResult.userAnswers) {
-                    try {
-                        studentAnswers = typeof studentResult.userAnswers === 'string' ? JSON.parse(studentResult.userAnswers) : studentResult.userAnswers;
-                    } catch(e) {
-                        studentAnswers = {};
-                    }
+            openSingleStudentAnswerModal(nis, pkg) {
+                const subId = this.teacherSelectedSubject;
+                const subject = DB.subjects.find(s => s.id === subId);
+                const subName = subject ? subject.name : 'Mata Pelajaran';
+                const questions = this.getCleanQuestions(subId, pkg);
+
+                const studentResult = DB.results.find(r => 
+                    String(r.nis) === String(nis) && 
+                    String(r.package || 'A') === String(pkg) && 
+                    (!r.subject || r.subject === subName || subName.includes(r.subject) || r.subject.includes(subName))
+                );
+
+                if (!studentResult) {
+                    return this.showToast(`Data ujian siswa NIS ${nis} tidak ditemukan!`, 'warning');
                 }
 
-                const questions = this.getCleanQuestions(this.teacherSelectedSubject, pkg);
+                const ansKey = `${studentResult.nis}_${subName}_${pkg}`;
+                const answers = (DB.studentAnswersMap && DB.studentAnswersMap[ansKey]) || studentResult.userAnswers || {};
 
-                if (questions.length === 0) {
-                    return this.showToast('Data butir soal paket ini tidak ditemukan!', 'warning');
-                }
-
-                let reportHtml = `
+                const body = `
                     <div class="space-y-4">
-                        <div class="bg-purple-50 border border-purple-200 p-3.5 rounded-xl flex justify-between items-center">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-purple-50 border border-purple-200 p-4 rounded-2xl">
                             <div>
-                                <h4 class="font-bold text-xs sm:text-sm text-purple-900">Laporan Lembar Jawab Siswa: ${studentResult ? studentResult.name : nis}</h4>
-                                <p class="text-[11px] text-purple-700">Mapel: ${subjectName} | Paket ${pkg} | Skor Akhir: <strong>${studentResult ? studentResult.totalScore : '-'} Poin</strong></p>
+                                <h4 class="font-extrabold text-sm text-purple-900">${studentResult.name}</h4>
+                                <p class="text-xs text-purple-700 mt-0.5">NIS: <strong>${studentResult.nis}</strong> | Kelas: <strong>${studentResult.class || '-'}</strong> | Paket Soal: <strong>${pkg}</strong></p>
+                                <span class="text-[11px] text-slate-500 font-mono mt-1 block">Waktu Pengiriman: ${studentResult.submittedAt || '-'}</span>
                             </div>
-                            <span class="text-[10px] bg-purple-200 text-purple-800 font-bold px-2 py-1 rounded-full">NIS: ${nis}</span>
+                            <div class="text-right bg-white p-3 rounded-xl border border-purple-200 shadow-sm min-w-[110px]">
+                                <span class="text-2xl font-black text-purple-700 leading-none">${studentResult.totalScore}</span>
+                                <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider mt-1">Skor Akhir</span>
+                            </div>
                         </div>
 
                         <div class="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+                            <div class="flex items-center justify-between px-1">
+                                <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Rincian Butir Soal & Koreksi Jawaban:</span>
+                                <span class="text-[11px] text-slate-500">Total ${questions.length} Soal</span>
+                            </div>
+
                             ${questions.map((q, qIdx) => {
-                                const userAns = studentAnswers[qIdx];
+                                const uAns = answers[qIdx];
                                 let isCorrect = false;
+                                let displayAns = "-";
+                                let displayKey = "-";
 
-                                if (q.type === 'PG' && userAns === q.correctKey) isCorrect = true;
-                                else if (q.type === 'PGK' && Array.isArray(userAns) && Array.isArray(q.correctKeys)) {
-                                    if ([...userAns].sort().join(',') === [...q.correctKeys].sort().join(',')) isCorrect = true;
-                                } else if (q.type === 'BS') {
-                                    if (typeof userAns === 'object' && userAns !== null) {
-                                        const statements = q.statements || q.options;
-                                        let cCnt = 0;
-                                        const keysObj = q.correctKey || {};
-                                        statements.forEach((st, stIdx) => {
-                                            const uVal = String(userAns[stIdx] || '').toUpperCase();
-                                            const cVal = String(keysObj[stIdx] || 'BENAR').toUpperCase();
-                                            if (uVal === cVal || (uVal === 'B' && cVal === 'BENAR') || (uVal === 'S' && cVal === 'SALAH')) cCnt++;
-                                        });
-                                        if (cCnt === statements.length) isCorrect = true;
-                                    } else {
-                                        const uAns = String(userAns || '').toUpperCase();
-                                        const cKey = String(q.correctKey || 'BENAR').toUpperCase();
-                                        if (uAns === cKey || (uAns === 'B' && cKey === 'BENAR') || (uAns === 'S' && cKey === 'SALAH')) isCorrect = true;
-                                    }
-                                } else if (q.type === 'URUTAN' && Array.isArray(userAns) && Array.isArray(q.correctOrder)) {
-                                    if (JSON.stringify(userAns) === JSON.stringify(q.correctOrder)) isCorrect = true;
-                                } else if (q.type === 'JODOH' && Array.isArray(userAns) && Array.isArray(q.pairs)) {
-                                    let cCnt = 0;
-                                    q.pairs.forEach((pair, pIdx) => {
-                                        if (userAns[pIdx] && userAns[pIdx].userRight === pair.right) cCnt++;
-                                    });
-                                    if (cCnt === q.pairs.length) isCorrect = true;
-                                }
-
-                                let userDisplayAnswer = '-';
                                 if (q.type === 'PG') {
-                                    userDisplayAnswer = userAns !== undefined && q.options && q.options[userAns] ? `${String.fromCharCode(65 + userAns)}. ${q.options[userAns]}` : '<span class="text-slate-400 italic">Tidak dijawab</span>';
+                                    isCorrect = uAns === q.correctKey;
+                                    displayAns = (uAns !== undefined && uAns !== null && uAns !== '') 
+                                        ? `${String.fromCharCode(65 + uAns)} (${(q.options && q.options[uAns]) || ''})` 
+                                        : '<span class="text-red-500 font-bold">Tidak Diisi</span>';
+                                    displayKey = `${String.fromCharCode(65 + q.correctKey)} (${(q.options && q.options[q.correctKey]) || ''})`;
                                 } else if (q.type === 'PGK') {
-                                    userDisplayAnswer = Array.isArray(userAns) && userAns.length > 0 && q.options ? userAns.map(idx => `${String.fromCharCode(65 + idx)}. ${q.options[idx]}`).join(', ') : '<span class="text-slate-400 italic">Tidak dijawab</span>';
+                                    const userArr = Array.isArray(uAns) ? [...uAns].sort().join(',') : '';
+                                    const keyArr = Array.isArray(q.correctKeys) ? [...q.correctKeys].sort().join(',') : '';
+                                    isCorrect = userArr === keyArr && userArr.length > 0;
+                                    displayAns = (Array.isArray(uAns) && uAns.length > 0) 
+                                        ? uAns.map(idx => String.fromCharCode(65 + idx)).join(', ') 
+                                        : '<span class="text-red-500 font-bold">Tidak Diisi</span>';
+                                    displayKey = Array.isArray(q.correctKeys) ? q.correctKeys.map(idx => String.fromCharCode(65 + idx)).join(', ') : '-';
                                 } else if (q.type === 'BS') {
-                                    userDisplayAnswer = typeof userAns === 'object' ? JSON.stringify(userAns) : (userAns || '<span class="text-slate-400 italic">Tidak dijawab</span>');
+                                    if (typeof uAns === 'object' && uAns !== null) {
+                                        displayAns = Object.entries(uAns).map(([k, v]) => `Kasus ${Number(k)+1}: ${v}`).join(' | ');
+                                        const keyObj = typeof q.correctKey === 'object' && q.correctKey !== null ? q.correctKey : {};
+                                        displayKey = Object.entries(keyObj).map(([k, v]) => `Kasus ${Number(k)+1}: ${v}`).join(' | ');
+                                        isCorrect = JSON.stringify(uAns) === JSON.stringify(keyObj);
+                                    } else {
+                                        isCorrect = String(uAns || '').toUpperCase() === String(q.correctKey || 'BENAR').toUpperCase();
+                                        displayAns = uAns || '<span class="text-red-500 font-bold">Tidak Diisi</span>';
+                                        displayKey = q.correctKey || 'BENAR';
+                                    }
                                 } else if (q.type === 'URUTAN') {
-                                    userDisplayAnswer = Array.isArray(userAns) ? userAns.join(' ➔ ') : '-';
+                                    displayAns = Array.isArray(uAns) ? uAns.join(' ➔ ') : '<span class="text-red-500 font-bold">Kosong</span>';
+                                    displayKey = Array.isArray(q.correctOrder) ? q.correctOrder.join(' ➔ ') : '-';
+                                    isCorrect = JSON.stringify(uAns) === JSON.stringify(q.correctOrder);
                                 } else if (q.type === 'JODOH') {
-                                    userDisplayAnswer = Array.isArray(userAns) ? userAns.map(p => `${p.left} ➔ ${p.userRight || '?'}`).join(', ') : '-';
+                                    displayAns = Array.isArray(uAns) ? uAns.map(p => `${p.left} ➔ ${p.userRight || '(Kosong)'}`).join(' | ') : '<span class="text-red-500 font-bold">Kosong</span>';
+                                    displayKey = Array.isArray(q.pairs) ? q.pairs.map(p => `${p.left} ➔ ${p.right}`).join(' | ') : '-';
+                                    let matched = 0;
+                                    if (Array.isArray(uAns) && Array.isArray(q.pairs)) {
+                                        q.pairs.forEach((pair, pIdx) => {
+                                            if (uAns[pIdx] && uAns[pIdx].userRight === pair.right) matched++;
+                                        });
+                                        isCorrect = matched === q.pairs.length;
+                                    }
                                 }
 
                                 return `
-                                    <div class="p-3.5 border rounded-xl bg-slate-50 space-y-2 text-xs shadow-sm">
+                                    <div class="p-3.5 border rounded-2xl text-xs space-y-2 ${isCorrect ? 'bg-emerald-50/50 border-emerald-200' : 'bg-red-50/50 border-red-200'}">
                                         <div class="flex justify-between items-center">
-                                            <span class="font-bold text-slate-800">Soal ${qIdx + 1} (${q.type})</span>
-                                            <span class="px-2.5 py-0.5 rounded-full font-bold text-[10px] ${isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}">
-                                                ${isCorrect ? '✅ Benar' : '❌ Salah'} (Bobot: ${q.weight || 20})
+                                            <div class="flex items-center gap-2">
+                                                <span class="font-extrabold text-slate-800">Nomor ${qIdx + 1} (${q.type})</span>
+                                                <span class="text-[10px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-bold">Bobot: ${q.weight || 20} Poin</span>
+                                            </div>
+                                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${isCorrect ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-red-100 text-red-800 border border-red-300'}">
+                                                ${isCorrect ? '✓ Benar' : '✗ Salah'}
                                             </span>
                                         </div>
-                                        <p class="font-medium text-slate-700 whitespace-pre-line">${q.text}</p>
-                                        <div class="bg-white p-2.5 rounded-lg border space-y-1">
-                                            <p class="text-slate-600">Jawaban Siswa: <strong class="text-slate-900">${userDisplayAnswer}</strong></p>
+                                        <p class="text-slate-700 leading-relaxed whitespace-pre-line">${q.text}</p>
+                                        <div class="bg-white p-2.5 rounded-xl border border-slate-200 space-y-1 text-[11px]">
+                                            <p class="text-slate-700"><strong>Jawaban Siswa:</strong> ${displayAns}</p>
+                                            <p class="text-emerald-700 font-semibold"><strong>Kunci Sistem:</strong> ${displayKey}</p>
                                         </div>
                                     </div>
                                 `;
@@ -1873,7 +1936,7 @@
                     </div>
                 `;
 
-                this.showModal(`Detail Lembar Jawab Siswa - ${studentResult ? studentResult.name : nis}`, reportHtml, `<button onclick="EduGuard.closeModal()" class="bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold">Tutup Laporan</button>`);
+                this.showModal(`Detail Lembar Jawaban: ${studentResult.name}`, body, `<button onclick="EduGuard.closeModal()" class="bg-slate-800 hover:bg-slate-900 text-white px-5 py-2 rounded-xl text-xs font-bold transition active:scale-95">Tutup Rincian</button>`);
             },
 
             filterTeacherResults() {
@@ -1896,7 +1959,7 @@
 
                 let csv = 'NIS,Nama,Kelas,Paket,Skor Akhir,Status,Waktu Selesai\n';
                 filtered.forEach(r => {
-                    csv += `"${r.nis}","${r.name}","${r.class || '-'}","Paket ${r.package || 'A'}","${r.totalScore}","${r.status || 'Selesai'}","${r.submittedAt || '-'}"\n`;
+                    csv += `"${r.nis}","${r.name}","${r.class || '-'}","Paket ${r.package || 'A'}",${r.totalScore},"${r.status || 'Selesai'}","${r.submittedAt || '-'}"\n`;
                 });
 
                 const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -1926,20 +1989,228 @@
                 this.renderTeacherDashboard();
             },
 
+            updatePackageRandomSettings(subId, pkg, type, isChecked) {
+                const subject = DB.subjects.find(s => s.id === subId);
+                if (!subject) return;
+
+                if (type === 'questions') {
+                    if (!subject.randomizeQuestions) subject.randomizeQuestions = {};
+                    subject.randomizeQuestions[pkg] = isChecked;
+                    this.showToast(`Pengacakan soal Paket ${pkg}: ${isChecked ? 'Diaktifkan' : 'Dinonaktifkan'}`, 'info');
+                } else if (type === 'options') {
+                    if (!subject.randomizeOptions) subject.randomizeOptions = {};
+                    subject.randomizeOptions[pkg] = isChecked;
+                    this.showToast(`Pengacakan opsi jawaban Paket ${pkg}: ${isChecked ? 'Diaktifkan' : 'Dinonaktifkan'}`, 'info');
+                }
+            },
+
+            openStudentAnswersDetailModal(subId, pkg) {
+                const subject = DB.subjects.find(s => s.id === subId);
+                const subName = subject ? subject.name : 'Mapel';
+                const questions = this.getCleanQuestions(subId, pkg);
+
+                let studentResults = DB.results.filter(r => (r.subject === subName || subName.includes(r.subject) || r.subject.includes(subName)) && String(r.package || 'A') === String(pkg));
+
+                if (studentResults.length === 0) {
+                    return this.showToast(`Belum ada siswa yang menyelesaikan Paket ${pkg} ini.`, 'info');
+                }
+
+                const body = `
+                    <div class="space-y-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-emerald-50 border border-emerald-200 p-3 rounded-xl">
+                            <div>
+                                <h4 class="font-bold text-xs text-emerald-900">Detail Hasil & Lembar Jawaban Siswa (Paket ${pkg})</h4>
+                                <p class="text-[11px] text-emerald-700">Mapel: <strong>${subName}</strong> | Total Peserta Selesai: <strong>${studentResults.length}</strong> Siswa</p>
+                            </div>
+                            <span class="text-[10px] bg-emerald-200 text-emerald-800 font-bold px-2 py-0.5 rounded-full">Koreksi Realtime</span>
+                        </div>
+
+                        <div class="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+                            ${studentResults.map((st, sIdx) => {
+                                const ansKey = `${st.nis}_${subName}_${pkg}`;
+                                const answers = (DB.studentAnswersMap && DB.studentAnswersMap[ansKey]) || st.userAnswers || {};
+
+                                return `
+                                    <div class="border border-slate-200 rounded-2xl p-3.5 bg-white shadow-sm space-y-3">
+                                        <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                                            <div>
+                                                <span class="font-extrabold text-xs text-slate-800">${sIdx + 1}. ${st.name}</span>
+                                                <span class="text-[11px] text-slate-500 block">NIS: ${st.nis} | Kelas: ${st.class || '-'}</span>
+                                            </div>
+                                            <div class="text-right">
+                                                <span class="text-base font-black text-purple-700">${st.totalScore}</span>
+                                                <span class="text-[10px] text-slate-400 block">Skor Akhir</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="space-y-2 border-t pt-2">
+                                            <span class="text-[10px] font-bold text-slate-600 uppercase tracking-wider block">Rincian Jawaban Per Butir Soal:</span>
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                ${questions.map((q, qIdx) => {
+                                                    const uAns = answers[qIdx];
+                                                    let isCorrect = false;
+                                                    let displayAns = "-";
+                                                    let displayKey = "-";
+
+                                                    if (q.type === 'PG') {
+                                                        isCorrect = uAns === q.correctKey;
+                                                        displayAns = uAns !== undefined ? `${String.fromCharCode(65 + uAns)} (${(q.options && q.options[uAns]) || ''})` : 'Tidak Diisi';
+                                                        displayKey = `${String.fromCharCode(65 + q.correctKey)} (${(q.options && q.options[q.correctKey]) || ''})`;
+                                                    } else if (q.type === 'PGK') {
+                                                        const userArr = Array.isArray(uAns) ? [...uAns].sort().join(',') : '';
+                                                        const keyArr = Array.isArray(q.correctKeys) ? [...q.correctKeys].sort().join(',') : '';
+                                                        isCorrect = userArr === keyArr && userArr.length > 0;
+                                                        displayAns = Array.isArray(uAns) ? uAns.map(idx => String.fromCharCode(65 + idx)).join(', ') : 'Tidak Diisi';
+                                                        displayKey = Array.isArray(q.correctKeys) ? q.correctKeys.map(idx => String.fromCharCode(65 + idx)).join(', ') : '-';
+                                                    } else if (q.type === 'BS') {
+                                                        if (typeof uAns === 'object' && uAns !== null) {
+                                                            displayAns = JSON.stringify(uAns);
+                                                            displayKey = JSON.stringify(q.correctKey);
+                                                            isCorrect = JSON.stringify(uAns) === JSON.stringify(q.correctKey);
+                                                        } else {
+                                                            isCorrect = String(uAns || '').toUpperCase() === String(q.correctKey || 'BENAR').toUpperCase();
+                                                            displayAns = uAns || 'Tidak Diisi';
+                                                            displayKey = q.correctKey || 'BENAR';
+                                                        }
+                                                    } else {
+                                                        displayAns = JSON.stringify(uAns || 'Kosong');
+                                                        displayKey = JSON.stringify(q.correctKey || q.correctOrder || q.pairs || '-');
+                                                    }
+
+                                                    return `
+                                                        <div class="p-2 border rounded-xl text-[11px] ${isCorrect ? 'bg-emerald-50/60 border-emerald-200' : 'bg-red-50/60 border-red-200'}">
+                                                            <div class="flex justify-between items-center font-bold mb-1">
+                                                                <span class="text-slate-700">No. ${qIdx + 1} (${q.type})</span>
+                                                                <span class="${isCorrect ? 'text-emerald-700' : 'text-red-700'}">${isCorrect ? '✓ Benar' : '✗ Salah'}</span>
+                                                            </div>
+                                                            <p class="text-slate-600 truncate mb-1"><strong>Siswa:</strong> ${displayAns}</p>
+                                                            <p class="text-emerald-700 truncate font-semibold"><strong>Kunci:</strong> ${displayKey}</p>
+                                                        </div>
+                                                    `;
+                                                }).join('')}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+
+                this.showModal('Detail Lembar Jawaban Siswa', body, `<button onclick="EduGuard.closeModal()" class="bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold">Tutup</button>`);
+            },
+
             downloadQuestionExcelTemplate() {
-                const headers = ["TYPE", "TEXT", "IMAGE_URL", "WEIGHT", "OPTION_A", "OPTION_B", "OPTION_C", "OPTION_D", "OPTION_E", "KEY"];
-                const sampleRow = ["PG", "Shortcut untuk copy teks di Windows adalah?", "", 20, "Ctrl+V", "Ctrl+C", "Ctrl+X", "Ctrl+Z", "Ctrl+S", "B"];
-                const wsData = [headers, sampleRow];
-                const ws = XLSX.utils.aoa_to_sheet(wsData);
+                try {
+                    const headers = [
+                        "NO",
+                        "TIPE",
+                        "PERTANYAAN",
+                        "URL_GAMBAR",
+                        "BOBOT",
+                        "OPSI_A",
+                        "GAMBAR_OPSI_A",
+                        "OPSI_B",
+                        "GAMBAR_OPSI_B",
+                        "OPSI_C",
+                        "GAMBAR_OPSI_C",
+                        "OPSI_D",
+                        "GAMBAR_OPSI_D",
+                        "OPSI_E",
+                        "GAMBAR_OPSI_E",
+                        "KUNCI_JAWABAN"
+                    ];
 
-                ws['!cols'] = [
-                    { wch: 12 }, { wch: 50 }, { wch: 30 }, { wch: 10 },
-                    { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 12 }
-                ];
+                    const sampleRows = [
+                        [
+                            1,
+                            "PG",
+                            "Shortcut keyboard yang digunakan untuk menyalin (copy) objek/teks pada sistem operasi adalah ....",
+                            "",
+                            20,
+                            "Ctrl + V",
+                            "",
+                            "Ctrl + C",
+                            "",
+                            "Ctrl + X",
+                            "",
+                            "Ctrl + Z",
+                            "",
+                            "Ctrl + S",
+                            "",
+                            "B"
+                        ],
+                        [
+                            2,
+                            "BS",
+                            "HTML merupakan bahasa pemrograman murni yang digunakan untuk mengolah algoritma matematika rumit.",
+                            "",
+                            20,
+                            "BENAR",
+                            "",
+                            "SALAH",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "SALAH"
+                        ],
+                        [
+                            3,
+                            "PGK",
+                            "Manakah yang merupakan perangkat keras kategori Input Device? (Centang jawaban yang benar)",
+                            "",
+                            20,
+                            "Keyboard",
+                            "",
+                            "Mouse",
+                            "",
+                            "Monitor",
+                            "",
+                            "Scanner",
+                            "",
+                            "Speaker",
+                            "",
+                            "A,B,D"
+                        ]
+                    ];
 
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Template Soal");
-                XLSX.writeFile(wb, "Template_Soal_CBT.xlsx");
+                    if (typeof XLSX === 'undefined') {
+                        throw new Error('Pustaka Excel sedang dimuat. Silakan coba sesaat lagi.');
+                    }
+
+                    const wb = XLSX.utils.book_new();
+                    const wsData = [headers, ...sampleRows];
+                    const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+                    ws['!cols'] = [
+                        { wch: 6 },  // NO
+                        { wch: 10 }, // TIPE
+                        { wch: 45 }, // PERTANYAAN
+                        { wch: 25 }, // URL_GAMBAR
+                        { wch: 8 },  // BOBOT
+                        { wch: 20 }, // OPSI_A
+                        { wch: 15 }, // GAMBAR_OPSI_A
+                        { wch: 20 }, // OPSI_B
+                        { wch: 15 }, // GAMBAR_OPSI_B
+                        { wch: 20 }, // OPSI_C
+                        { wch: 15 }, // GAMBAR_OPSI_C
+                        { wch: 20 }, // OPSI_D
+                        { wch: 15 }, // GAMBAR_OPSI_D
+                        { wch: 20 }, // OPSI_E
+                        { wch: 15 }, // GAMBAR_OPSI_E
+                        { wch: 18 }  // KUNCI_JAWABAN
+                    ];
+
+                    XLSX.utils.book_append_sheet(wb, ws, "Template_Soal");
+                    XLSX.writeFile(wb, "Template_Soal_CBT_SMAN1Kutowinangun.xlsx");
+                    this.showToast("Template Excel (.xlsx) dengan kolom terpisah berhasil diunduh!", "success");
+                } catch(err) {
+                    this.showToast("Gagal membuat template Excel: " + err.message, "error");
+                }
             },
 
             showTemplateModal() {
@@ -2010,10 +2281,10 @@
                 const parsedQuestions = [];
 
                 rows.forEach((r, idx) => {
-                    const type = (r.TYPE || r.type || 'PG').toUpperCase();
-                    const text = r.TEXT || r.text || r.Pertanyaan || '';
-                    const weight = Number(r.WEIGHT || r.weight || 20);
-                    const image = r.IMAGE_URL || r.image || '';
+                    const type = String(r.TIPE || r.TYPE || r.tipe || r.type || 'PG').toUpperCase().trim();
+                    const text = String(r.PERTANYAAN || r.TEXT || r.pertanyaan || r.text || r.Pertanyaan || '').trim();
+                    const weight = Number(r.BOBOT || r.WEIGHT || r.bobot || r.weight || 20);
+                    const image = String(r.URL_GAMBAR || r.IMAGE_URL || r.image || r.gambar || '').trim();
 
                     if (text) {
                         const qObj = {
@@ -2025,21 +2296,50 @@
                         };
 
                         if (type === 'PG') {
-                            const opts = [r.OPTION_A || r.A, r.OPTION_B || r.B, r.OPTION_C || r.C, r.OPTION_D || r.D, r.OPTION_E || r.E].filter(Boolean);
+                            const opts = [
+                                r.OPSI_A || r.OPTION_A || r.A,
+                                r.OPSI_B || r.OPTION_B || r.B,
+                                r.OPSI_C || r.OPTION_C || r.C,
+                                r.OPSI_D || r.OPTION_D || r.D,
+                                r.OPSI_E || r.OPTION_E || r.E
+                            ].filter(v => v !== undefined && v !== null && String(v).trim() !== '');
+
+                            const optImgs = [
+                                r.GAMBAR_OPSI_A || r.IMAGE_A || null,
+                                r.GAMBAR_OPSI_B || r.IMAGE_B || null,
+                                r.GAMBAR_OPSI_C || r.IMAGE_C || null,
+                                r.GAMBAR_OPSI_D || r.IMAGE_D || null,
+                                r.GAMBAR_OPSI_E || r.IMAGE_E || null
+                            ];
+
                             qObj.options = opts;
-                            const keyLetter = String(r.KEY || r.Kunci || 'A').toUpperCase().trim();
+                            qObj.optionImages = optImgs;
+
+                            const keyLetter = String(r.KUNCI_JAWABAN || r.KEY || r.kunci || r.Kunci || 'A').toUpperCase().trim();
                             const keyIdx = ['A', 'B', 'C', 'D', 'E'].indexOf(keyLetter);
                             qObj.correctKey = keyIdx >= 0 ? keyIdx : 0;
+                        } else if (type === 'PGK') {
+                            const opts = [
+                                r.OPSI_A || r.OPTION_A || r.A,
+                                r.OPSI_B || r.OPTION_B || r.B,
+                                r.OPSI_C || r.OPTION_C || r.C,
+                                r.OPSI_D || r.OPTION_D || r.D,
+                                r.OPSI_E || r.OPTION_E || r.E
+                            ].filter(v => v !== undefined && v !== null && String(v).trim() !== '');
+
+                            qObj.options = opts;
+                            const keyRaw = String(r.KUNCI_JAWABAN || r.KEY || r.kunci || 'A').toUpperCase().replace(/\s+/g, '');
+                            const keyLetters = keyRaw.split(',');
+                            qObj.correctKeys = keyLetters.map(l => ['A', 'B', 'C', 'D', 'E'].indexOf(l)).filter(i => i >= 0);
                         } else if (type === 'BS') {
                             qObj.options = ['BENAR', 'SALAH'];
-                            qObj.correctKey = String(r.KEY || r.Kunci || 'BENAR').toUpperCase().trim();
+                            qObj.correctKey = String(r.KUNCI_JAWABAN || r.KEY || r.kunci || 'BENAR').toUpperCase().trim();
                         }
                         parsedQuestions.push(qObj);
                     }
                 });
 
                 if (parsedQuestions.length > 0) {
-                    if (!DB.examPackages) DB.examPackages = {};
                     if (!DB.examPackages[subId]) DB.examPackages[subId] = {};
                     if (!DB.examPackages[subId][pkg]) DB.examPackages[subId][pkg] = [];
                     
@@ -2108,7 +2408,6 @@
                 });
 
                 if (imported.length > 0) {
-                    if (!DB.examPackages) DB.examPackages = {};
                     if (!DB.examPackages[subId]) DB.examPackages[subId] = {};
                     if (!DB.examPackages[subId][pkg]) DB.examPackages[subId][pkg] = [];
                     
@@ -2405,10 +2704,10 @@
                     newQ.pairs = pairs;
                 }
 
-                if (!DB.examPackages) DB.examPackages = {};
                 if (!DB.examPackages[subId]) DB.examPackages[subId] = {};
                 if (!DB.examPackages[subId][pkg]) DB.examPackages[subId][pkg] = [];
 
+                DB.examPackages[subId][pkg] = DB.examPackages[subId][pkg].filter(q => String(q.id) !== String(newQ.id));
                 DB.examPackages[subId][pkg].push(newQ);
                 this.getCleanQuestions(subId, pkg);
 
@@ -2420,7 +2719,6 @@
 
             async renderStudentDashboard() {
                 const body = document.getElementById('appBody');
-                if (!body) return;
                 this.ensureSubjectsUpToDate();
                 
                 body.innerHTML = `
@@ -2452,6 +2750,13 @@
                 `;
 
                 await this.refreshPublishedExamsForStudent(true);
+
+                if (this.studentExamSyncInterval) clearInterval(this.studentExamSyncInterval);
+                this.studentExamSyncInterval = setInterval(() => {
+                    if (this.currentUser && this.currentUser.role === 'student' && !this.activeExam) {
+                        this.refreshPublishedExamsForStudent(true);
+                    }
+                }, 6000);
             },
 
             hasStudentCompletedPackage(subjectName, pkg) {
@@ -2463,13 +2768,13 @@
                 const container = document.getElementById('studentPublishedExamsContainer');
                 let subjects = DB.subjects;
 
-                const remoteSub = await apiCall('getSubjects').catch(()=>null);
-                if (remoteSub && remoteSub.status === 'success' && Array.isArray(remoteSub.data)) {
+                const remoteSub = await apiCall('getSubjects');
+                if (remoteSub && remoteSub.status === 'success' && Array.isArray(remoteSub.data) && remoteSub.data.length > 0) {
                     subjects = remoteSub.data;
                     DB.subjects = subjects;
                 }
 
-                const remoteResults = await apiCall('getResults').catch(()=>null);
+                const remoteResults = await apiCall('getResults');
                 if (remoteResults && remoteResults.status === 'success' && Array.isArray(remoteResults.data)) {
                     DB.results = remoteResults.data;
                 }
@@ -2566,7 +2871,7 @@
                 const tokenInput = tokenInputEl ? tokenInputEl.value.trim().toUpperCase() : '';
                 
                 let subjects = DB.subjects;
-                const remoteSub = await apiCall('getSubjects').catch(()=>null);
+                const remoteSub = await apiCall('getSubjects');
                 if (remoteSub && remoteSub.status === 'success') subjects = remoteSub.data;
 
                 const subject = subjects.find(s => s.id === subjectId);
@@ -2585,9 +2890,8 @@
                     return this.showToast(`Token untuk Paket ${targetPkg} salah! Silakan minta token ke Pengawas Ruang.`, 'error');
                 }
 
-                if (!DB.examPackages) DB.examPackages = {};
                 let questions = (DB.examPackages[subjectId] && DB.examPackages[subjectId][targetPkg]) || [];
-                const remoteQ = await apiCall('getQuestions', { subjectId: subjectId, package: targetPkg }).catch(()=>null);
+                const remoteQ = await apiCall('getQuestions', { subjectId: subjectId, package: targetPkg });
                 if (remoteQ && remoteQ.status === 'success' && remoteQ.data.length > 0) {
                     questions = remoteQ.data;
                 }
@@ -2596,35 +2900,35 @@
                     return this.showToast(`Belum ada butir soal pada Paket ${targetPkg}!`, 'warning');
                 }
 
-                const shuffleQ = subject.packageShuffleQuestions && subject.packageShuffleQuestions[targetPkg];
-                const shuffleO = subject.packageShuffleOptions && subject.packageShuffleOptions[targetPkg];
+                // Cek pengaturan acak soal dan opsi dari data guru
+                let preparedQuestions = JSON.parse(JSON.stringify(questions));
 
-                let processedQuestions = JSON.parse(JSON.stringify(questions));
-
-                if (shuffleQ) {
-                    for (let i = processedQuestions.length - 1; i > 0; i--) {
+                if (subject.randomizeQuestions && subject.randomizeQuestions[targetPkg] === true) {
+                    // Algoritma Fisher-Yates untuk acak urutan soal
+                    for (let i = preparedQuestions.length - 1; i > 0; i--) {
                         const j = Math.floor(Math.random() * (i + 1));
-                        [processedQuestions[i], processedQuestions[j]] = [processedQuestions[j], processedQuestions[i]];
+                        [preparedQuestions[i], preparedQuestions[j]] = [preparedQuestions[j], preparedQuestions[i]];
                     }
                 }
 
-                if (shuffleO) {
-                    processedQuestions.forEach(q => {
-                        if (q.type === 'PG' && Array.isArray(q.options) && q.options.length > 0) {
-                            const originalCorrectOptText = q.options[q.correctKey];
-                            let optPairs = q.options.map((optText, optIdx) => ({
-                                text: optText,
-                                img: q.optionImages && q.optionImages[optIdx] ? q.optionImages[optIdx] : null
+                if (subject.randomizeOptions && subject.randomizeOptions[targetPkg] === true) {
+                    // Acak pilihan jawaban PG dan sesuaikan kunci jawaban otomatis
+                    preparedQuestions.forEach(q => {
+                        if (q.type === 'PG' && Array.isArray(q.options) && q.options.length > 1) {
+                            const originalOptions = q.options.map((opt, idx) => ({
+                                text: opt,
+                                image: q.optionImages ? q.optionImages[idx] : null,
+                                isCorrect: idx === q.correctKey
                             }));
 
-                            for (let i = optPairs.length - 1; i > 0; i--) {
+                            for (let i = originalOptions.length - 1; i > 0; i--) {
                                 const j = Math.floor(Math.random() * (i + 1));
-                                [optPairs[i], optPairs[j]] = [optPairs[j], optPairs[i]];
+                                [originalOptions[i], originalOptions[j]] = [originalOptions[j], originalOptions[i]];
                             }
 
-                            q.options = optPairs.map(p => p.text);
-                            q.optionImages = optPairs.map(p => p.img);
-                            q.correctKey = q.options.indexOf(originalCorrectOptText);
+                            q.options = originalOptions.map(o => o.text);
+                            q.optionImages = originalOptions.map(o => o.image);
+                            q.correctKey = originalOptions.findIndex(o => o.isCorrect);
                         }
                     });
                 }
@@ -2638,7 +2942,7 @@
                     subjectName: subject.name,
                     package: targetPkg,
                     durationMin: pkgDuration,
-                    questions: processedQuestions,
+                    questions: preparedQuestions,
                     currentQuestionIdx: 0
                 };
 
@@ -2709,7 +3013,6 @@
 
             renderExamInterface() {
                 const body = document.getElementById('appBody');
-                if (!body) return;
                 const ex = this.activeExam;
                 const q = ex.questions[ex.currentQuestionIdx];
                 const formattedQImg = this.formatImageUrl(q.image);
@@ -2897,7 +3200,7 @@
                                 <button onclick="EduGuard.selectBSOption(${qIdx}, 'BENAR')" class="p-4 rounded-xl border-2 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 ${userAns === 'BENAR' ? 'bg-emerald-600 text-white border-emerald-600 shadow-md ring-2 ring-emerald-300' : 'bg-white text-emerald-700 border-slate-200 hover:bg-emerald-50'}">
                                     <i class="fa-solid fa-circle-check text-base"></i> BENAR
                                 </button>
-                                <button onclick="EduGuard.selectBSOption(${qIdx}, 'SALAH')" class="p-4 rounded-xl border-2 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 ${userAns === 'SALAH' ? 'bg-red-600 text-white border-red-600 shadow-md ring-2 ring-red-300' : 'bg-white text-red-700 border-slate-200 hover:bg-emerald-50'}">
+                                <button onclick="EduGuard.selectBSOption(${qIdx}, 'SALAH')" class="p-4 rounded-xl border-2 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 ${userAns === 'SALAH' ? 'bg-red-600 text-white border-red-600 shadow-md ring-2 ring-red-300' : 'bg-white text-red-700 border-slate-200 hover:bg-red-50'}">
                                     <i class="fa-solid fa-circle-xmark text-base"></i> SALAH
                                 </button>
                             </div>
@@ -2937,7 +3240,7 @@
                     return userPairs.map((p, pIdx) => `
                         <div class="bg-white p-3 border rounded-xl mb-2 space-y-1.5 shadow-sm">
                             <span class="text-xs font-bold text-slate-800 block">${pIdx + 1}. ${p.left}</span>
-                            <select onchange="EduGuard.selectJodohPair(${qIdx}, ${pIdx}, this.value)" class="w-full p-2.5 border rounded-xl text-xs bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 font-medium text-slate-700">
+                            <select onchange="EduGuard.selectJodohPair(${qIdx}, ${pIdx}, this.value)" class="w-full p-2.5 border rounded-lg text-xs bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 font-medium text-slate-700">
                                 <option value="">-- Pilih Pasangan Tepat --</option>
                                 ${rightOptions.map(rOpt => `
                                     <option value="${rOpt}" ${p.userRight === rOpt ? 'selected' : ''}>${rOpt}</option>
@@ -3052,31 +3355,21 @@
                 apiCall('logViolation', { log: logData });
                 DB.cheatLogs.push({ ...logData, timestamp: new Date().toLocaleTimeString() });
 
-                const cheatO = document.getElementById('cheatOverlay');
-                const termO = document.getElementById('terminatedOverlay');
-
                 if (this.violationsCount >= this.maxViolations) {
-                    if (cheatO) cheatO.classList.add('hidden');
-                    if (termO) {
-                        termO.classList.remove('hidden');
-                        termO.classList.add('flex');
-                    }
+                    document.getElementById('cheatOverlay').classList.add('hidden');
+                    document.getElementById('terminatedOverlay').classList.remove('hidden');
+                    document.getElementById('terminatedOverlay').classList.add('flex');
                     this.submitExam(true);
                 } else {
-                    const strikeEl = document.getElementById('overlayStrikeCount');
-                    const maxStrikeEl = document.getElementById('overlayMaxStrike');
-                    if (strikeEl) strikeEl.innerText = this.violationsCount;
-                    if (maxStrikeEl) maxStrikeEl.innerText = this.maxViolations;
-                    if (cheatO) {
-                        cheatO.classList.remove('hidden');
-                        cheatO.classList.add('flex');
-                    }
+                    document.getElementById('overlayStrikeCount').innerText = this.violationsCount;
+                    document.getElementById('overlayMaxStrike').innerText = this.maxViolations;
+                    document.getElementById('cheatOverlay').classList.remove('hidden');
+                    document.getElementById('cheatOverlay').classList.add('flex');
                 }
             },
 
             resumeExamFromWarning() {
-                const cheatO = document.getElementById('cheatOverlay');
-                if (cheatO) cheatO.classList.add('hidden');
+                document.getElementById('cheatOverlay').classList.add('hidden');
                 this.requestFullScreenMode();
             },
 
@@ -3095,6 +3388,7 @@
                         <div class="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs text-left">
                             <p class="font-bold mb-1 flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation"></i> PERINGATAN KERAS: Masih ada ${unansweredList.length} butir soal belum terjawab!</p>
                             <p class="text-[11px]">Nomor soal belum terisi: <strong>${unansweredList.join(', ')}</strong></p>
+                            <p class="text-[11px] mt-1 text-red-600 font-semibold">Sistem menyarankan Anda memeriksa kembali palet nomor agar nilai maksimal.</p>
                         </div>
                     `;
                 } else {
@@ -3174,20 +3468,22 @@
                     userAnswers: this.userAnswers
                 };
 
+                if (!DB.studentAnswersMap) DB.studentAnswersMap = {};
+                DB.studentAnswersMap[`${this.currentUser.nis}_${this.activeExam.subjectName}_${this.activeExam.package}`] = this.userAnswers;
+
                 apiCall('submitExam', { result: resultPayload });
                 DB.results.push({ ...resultPayload, rowIdx: DB.results.length + 2, submittedAt: new Date().toLocaleTimeString() });
 
                 this.exitFullScreenMode();
 
                 const body = document.getElementById('appBody');
-                if (!body) return;
                 body.innerHTML = `
                     <div class="mobile-shell bg-white border border-slate-200 rounded-3xl p-6 text-center shadow-xl my-4">
                         <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl mb-4">
                             <i class="fa-solid fa-circle-check"></i>
                         </div>
                         <h3 class="text-xl font-bold text-slate-800 mb-2">Ujian Berhasil Dikirim!</h3>
-                        <p class="text-xs text-slate-500 mb-6">Seluruh lembar jawaban Anda telah tersimpan aman di server sekolah.</p>
+                        <p class="text-xs text-slate-500 mb-6">Seluruh lembar jawaban Anda telah tersimpan aman di server sekolah. Nilai akan diolah secara resmi oleh Guru Pengampu.</p>
                         <button onclick="EduGuard.renderStudentDashboard()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-xl text-xs shadow-md transition active:scale-95">
                             Kembali ke Menu Ujian
                         </button>
@@ -3198,7 +3494,6 @@
 
             renderAdminDashboard() {
                 const body = document.getElementById('appBody');
-                if (!body) return;
                 this.ensureSubjectsUpToDate();
                 const activeTab = this.adminActiveTab;
 
@@ -3209,7 +3504,7 @@
                                 <h2 class="text-lg sm:text-xl font-extrabold text-slate-800 flex items-center gap-2">
                                     <i class="fa-solid fa-user-shield text-emerald-600"></i> Panel Administrator
                                 </h2>
-                                <p class="text-xs text-slate-500">Kontrol Publikasi Multi-Paket, Data User, & Monitoring Realtime</p>
+                                <p class="text-xs text-slate-500">Kontrol Publikasi Multi-Paket, Data User (1 Guru = 1 Mapel), & Monitoring Realtime</p>
                             </div>
                             <button onclick="EduGuard.triggerAutoSetupDatabase()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95">
                                 <i class="fa-solid fa-database"></i> Inisialisasi Database Google Sheets
@@ -3239,6 +3534,50 @@
                         </div>
                     </div>
                 `;
+
+                if (this.adminRealtimeSyncInterval) clearInterval(this.adminRealtimeSyncInterval);
+                if (activeTab === 'results' || activeTab === 'cheat') {
+                    this.adminRealtimeSyncInterval = setInterval(async () => {
+                        if (this.currentUser && this.currentUser.role === 'admin') {
+                            const remoteRes = await apiCall('getResults');
+                            if (remoteRes && remoteRes.status === 'success' && Array.isArray(remoteRes.data)) {
+                                DB.results = remoteRes.data;
+                            }
+                            const remoteCheat = await apiCall('getCheatLogs');
+                            if (remoteCheat && remoteCheat.status === 'success' && Array.isArray(remoteCheat.data)) {
+                                DB.cheatLogs = remoteCheat.data;
+                            }
+
+                            if (activeTab === 'results') {
+                                const tbody = document.getElementById('tblAdminResultsBody');
+                                const subSel = document.getElementById('filterResultSubject');
+                                const pkgSel = document.getElementById('filterResultPackage');
+                                if (tbody && subSel && pkgSel) {
+                                    tbody.innerHTML = this.renderAdminResultsRows(subSel.value, pkgSel.value);
+                                }
+                            } else if (activeTab === 'cheat') {
+                                const cheatTbody = document.getElementById('tblAdminCheatBody');
+                                if (cheatTbody) {
+                                    cheatTbody.innerHTML = DB.cheatLogs.length === 0 ? `<tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada catatan kecurangan.</td></tr>` : DB.cheatLogs.map(l => `
+                                        <tr>
+                                            <td class="p-3">${l.timestamp || '-'}</td>
+                                            <td class="p-3 font-bold">${l.nis}</td>
+                                            <td class="p-3">${l.name}</td>
+                                            <td class="p-3">${l.subject}</td>
+                                            <td class="p-3 text-red-600 font-semibold">${l.violationType}</td>
+                                            <td class="p-3 font-bold">${l.count}</td>
+                                            <td class="p-3">
+                                                <button onclick="EduGuard.resetStudentViolation('${l.nis}')" class="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold shadow-sm transition active:scale-95">
+                                                    Reset Point
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `).join('');
+                                }
+                            }
+                        }
+                    }, 5000);
+                }
             },
 
             async triggerAutoSetupDatabase() {
@@ -3249,7 +3588,7 @@
                 } else if (res) {
                     this.showToast('❌ Gagal: ' + res.message, 'error');
                 } else {
-                    this.showToast('Tersambung ke Google Sheet Backend.', 'info');
+                    this.showToast('Tersambung ke Mode Offline / Demo.', 'info');
                 }
             },
 
@@ -3274,9 +3613,7 @@
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                ${DB.subjects.length === 0 ? `
-                                    <div class="col-span-2 text-center py-6 text-slate-400 text-xs">Belum ada mata pelajaran atau guru terdaftar.</div>
-                                ` : DB.subjects.map(s => {
+                                ${DB.subjects.map(s => {
                                     const teacherObj = DB.teachers.find(t => String(t.nip) === String(s.teacherNip) || t.subjectId === s.id) || { name: "Guru Pengampu", nip: s.teacherNip || "-" };
                                     const pkgs = s.packages || ['A', 'B', 'C'];
                                     
@@ -3431,7 +3768,7 @@
                                         <label class="block text-[11px] font-bold text-slate-700 mb-1">Peran / Role</label>
                                         <select id="addUserRole" onchange="EduGuard.toggleUserFormRole(this.value)" class="w-full px-3 py-2 border rounded-xl text-xs bg-white">
                                             <option value="student">Murid (Siswa)</option>
-                                            <option value="teacher">Guru Pengampu</option>
+                                            <option value="teacher">Guru Pengampu (1 Guru = 1 Mapel)</option>
                                         </select>
                                     </div>
                                     <div>
@@ -3487,7 +3824,7 @@
 
                             <div class="space-y-3">
                                 <div class="flex justify-between items-center">
-                                    <h4 class="font-bold text-slate-800 text-xs sm:text-sm">Daftar Guru & Murid Terdaftar</h4>
+                                    <h4 class="font-bold text-slate-800 text-xs sm:text-sm">Daftar Guru & Murid Terdaftar (1 Guru = 1 Mapel)</h4>
                                     <div class="flex gap-2">
                                         <select onchange="EduGuard.filterUserTableRole(this.value)" class="px-2.5 py-1.5 border rounded-xl text-xs bg-white font-medium shadow-sm">
                                             <option value="all">Semua Peran</option>
@@ -3824,8 +4161,7 @@
             },
 
             filterUserTableRole(role) {
-                const tblBody = document.getElementById('tblUsersBody');
-                if (tblBody) tblBody.innerHTML = this.renderUserTableRows(role);
+                document.getElementById('tblUsersBody').innerHTML = this.renderUserTableRows(role);
             },
 
             async deleteUser(id, role) {
@@ -3878,7 +4214,7 @@
             exportToExcel() {
                 let csv = 'NIS,Nama,Kelas,Mata Pelajaran,Paket,Skor Total,Status\n';
                 DB.results.forEach(r => {
-                    csv += `"${r.nis}","${r.name}","${r.class || '-'}","${r.subject}","Paket ${r.package || 'A'}","${r.totalScore}","${r.status || 'Selesai'}"\n`;
+                    csv += `"${r.nis}","${r.name}","${r.class || '-'}","${r.subject}","Paket ${r.package || 'A'}",${r.totalScore},"${r.status || 'Selesai'}"\n`;
                 });
                 const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
                 const url = window.URL.createObjectURL(blob);
@@ -3894,11 +4230,7 @@
         };
 
         window.addEventListener('DOMContentLoaded', () => {
-            try {
-                EduGuard.init();
-            } catch(e) {
-                EduGuard.renderLoginView();
-            }
+            EduGuard.init();
         });
     </script>
 </body>
