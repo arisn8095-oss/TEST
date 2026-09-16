@@ -29,6 +29,12 @@
             }
         }
     </script>
+                                    <!-- Konfigurasi PWA iOS -->
+                                    <link rel="manifest" href="./manifest.json">
+                                    <meta name="apple-mobile-web-app-capable" content="yes">
+                                    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+                                    <meta name="apple-mobile-web-app-title" content="AppNama">
+                                    <link rel="apple-touch-icon" href="./icon-192.png">
     <style>
         .no-select { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -112,7 +118,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsDRL46Bp-2qmw-iQ24AptXPsofSi_IXtWJwjDiM75RHbtGMQzpvX8flUX5U9KMNvM/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx7yrF9umYHbZMYkOvPOzUTBN9jVegqGYacMJstrxuUjLTc95xbqWYGG7xSIvJzAxTi/exec";
 
         const DB = {
             admin: { id: "ADMIN01", name: "Administrator Utama", role: "admin" },
@@ -2034,19 +2040,49 @@
                     return this.showToast('Tidak ada data siswa untuk diunduh dengan filter tersebut!', 'warning');
                 }
 
-                let csv = 'NIS,Nama,Kelas,Paket,Skor Akhir,Status,Waktu Selesai\n';
+                const safeClassName = classVal === 'all' ? 'Semua_Kelas' : classVal.replace(/\s+/g, '_');
+                const fileName = `Rekap_Nilai_${subName.replace(/\s+/g, '_')}_${safeClassName}_Paket_${pkgVal}.xlsx`;
+
+                const headers = ["NIS", "Nama Siswa", "Kelas", "Paket", "Skor Akhir", "Status", "Waktu Selesai"];
+                const rowsData = [headers];
                 filtered.forEach(r => {
-                    csv += `"${r.nis}","${r.name}","${r.class || '-'}","Paket ${r.package || 'A'}",${r.totalScore},"${r.status || 'Selesai'}","${r.submittedAt || '-'}"\n`;
+                    rowsData.push([
+                        r.nis,
+                        r.name,
+                        r.class || '-',
+                        `Paket ${r.package || 'A'}`,
+                        r.totalScore,
+                        r.status || 'Selesai',
+                        r.submittedAt || '-'
+                    ]);
                 });
 
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                const safeClassName = classVal === 'all' ? 'Semua_Kelas' : classVal.replace(/\s+/g, '_');
-                a.download = `Rekap_Nilai_${subName.replace(/\s+/g, '_')}_${safeClassName}_Paket_${pkgVal}.csv`;
-                a.click();
-                this.showToast(`Rekap nilai kelas ${classVal === 'all' ? 'semua kelas' : classVal} berhasil diunduh!`, 'success');
+                try {
+                    if (typeof XLSX === 'undefined') throw new Error('Pustaka Excel sedang memuat');
+                    const wb = XLSX.utils.book_new();
+                    const ws = XLSX.utils.aoa_to_sheet(rowsData);
+                    ws['!cols'] = [
+                        { wch: 14 },
+                        { wch: 30 },
+                        { wch: 16 },
+                        { wch: 12 },
+                        { wch: 14 },
+                        { wch: 16 },
+                        { wch: 18 }
+                    ];
+                    XLSX.utils.book_append_sheet(wb, ws, "Rekap_Nilai");
+                    XLSX.writeFile(wb, fileName);
+                    this.showToast(`Rekap nilai kelas ${classVal === 'all' ? 'semua kelas' : classVal} berhasil diunduh (.xlsx)!`, 'success');
+                } catch(e) {
+                    let csv = '\uFEFF' + rowsData.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(';')).join('\n');
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileName.replace('.xlsx', '.csv');
+                    a.click();
+                    this.showToast(`Rekap nilai kelas ${classVal === 'all' ? 'semua kelas' : classVal} berhasil diunduh!`, 'success');
+                }
             },
 
             checkIsAnswerCorrect(q, uAns) {
@@ -2351,7 +2387,20 @@
                 }
 
                 const totalStudents = studentResults.length;
-                let csv = 'No Soal,Tipe Soal,Pertanyaan,Bobot,Jumlah Siswa Benar,Jumlah Siswa Salah,Total Siswa,Persentase Ketepatan (%),Kategori Tingkat Kesukaran,Rekomendasi\n';
+                const headers = [
+                    "NO SOAL",
+                    "TIPE SOAL",
+                    "PERTANYAAN",
+                    "BOBOT (POIN)",
+                    "JUMLAH SISWA BENAR",
+                    "JUMLAH SISWA SALAH",
+                    "TOTAL SISWA",
+                    "PERSENTASE KETEPATAN (%)",
+                    "TINGKAT KESUKARAN",
+                    "REKOMENDASI EVALUASI"
+                ];
+
+                const rowsData = [headers];
 
                 questions.forEach((q, qIdx) => {
                     let correctCount = 0;
@@ -2365,23 +2414,71 @@
 
                     const percentage = Math.round((correctCount / totalStudents) * 100);
                     let category = 'Sedang';
-                    let recommendation = 'Butir soal ideal untuk evaluasi.';
-                    if (percentage < 30) { category = 'Sangat Sulit'; recommendation = 'Perlu penguatan materi & pembahasan ulang.'; }
-                    else if (percentage < 50) { category = 'Sulit'; recommendation = 'Soal HOTS / daya pembeda tinggi.'; }
-                    else if (percentage > 75) { category = 'Mudah'; recommendation = 'Materi dikuasai dengan sangat baik.'; }
+                    let recommendation = 'Butir soal ideal untuk evaluasi capaian belajar.';
+                    if (percentage < 30) { 
+                        category = 'Sangat Sulit'; 
+                        recommendation = 'Perlu pendalaman materi & pembahasan ulang bersama siswa.'; 
+                    } else if (percentage < 50) { 
+                        category = 'Sulit'; 
+                        recommendation = 'Kategori soal menantang (HOTS), daya pembeda materi tinggi.'; 
+                    } else if (percentage > 75) { 
+                        category = 'Mudah'; 
+                        recommendation = 'Materi ini telah dikuasai dengan sangat baik oleh mayoritas siswa.'; 
+                    }
 
-                    const cleanText = (q.text || '').replace(/"/g, '""').replace(/(\r\n|\n|\r)/gm, ' ');
-                    csv += `"${qIdx + 1}","${q.type}","${cleanText}",${q.weight || 20},${correctCount},${totalStudents - correctCount},${totalStudents},${percentage}%,"${category}","${recommendation}"\n`;
+                    const cleanText = (q.text || '').replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
+
+                    rowsData.push([
+                        qIdx + 1,
+                        q.type,
+                        cleanText,
+                        Number(q.weight) || 20,
+                        correctCount,
+                        totalStudents - correctCount,
+                        totalStudents,
+                        `${percentage}%`,
+                        category,
+                        recommendation
+                    ]);
                 });
 
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
                 const safeClassName = classVal === 'all' ? 'Semua_Kelas' : classVal.replace(/\s+/g, '_');
-                a.download = `Analisis_Butir_Soal_${subName.replace(/\s+/g, '_')}_${safeClassName}_Paket_${pkg}.csv`;
-                a.click();
-                this.showToast(`Laporan analisis butir soal (${classVal === 'all' ? 'semua kelas' : classVal}) berhasil diunduh!`, 'success');
+                const fileName = `Analisis_Butir_Soal_${subName.replace(/\s+/g, '_')}_${safeClassName}_Paket_${pkg}.xlsx`;
+
+                try {
+                    if (typeof XLSX === 'undefined') {
+                        throw new Error('Pustaka Excel sedang memuat');
+                    }
+                    const wb = XLSX.utils.book_new();
+                    const ws = XLSX.utils.aoa_to_sheet(rowsData);
+
+                    // Pengaturan lebar kolom resmi Excel (Kolom sebagai pembatas mandiri)
+                    ws['!cols'] = [
+                        { wch: 10 }, // NO SOAL
+                        { wch: 14 }, // TIPE SOAL
+                        { wch: 50 }, // PERTANYAAN
+                        { wch: 14 }, // BOBOT
+                        { wch: 20 }, // JUMLAH SISWA BENAR
+                        { wch: 20 }, // JUMLAH SISWA SALAH
+                        { wch: 14 }, // TOTAL SISWA
+                        { wch: 26 }, // PERSENTASE KETEPATAN (%)
+                        { wch: 20 }, // TINGKAT KESUKARAN
+                        { wch: 45 }  // REKOMENDASI EVALUASI
+                    ];
+
+                    XLSX.utils.book_append_sheet(wb, ws, "Analisis_Soal");
+                    XLSX.writeFile(wb, fileName);
+                    this.showToast(`Laporan analisis butir soal Excel (${classVal === 'all' ? 'semua kelas' : classVal}) dengan kolom terpisah berhasil diunduh!`, 'success');
+                } catch(err) {
+                    let csv = '\uFEFF' + rowsData.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(';')).join('\n');
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileName.replace('.xlsx', '.csv');
+                    a.click();
+                    this.showToast(`Laporan analisis butir soal (${classVal === 'all' ? 'semua kelas' : classVal}) berhasil diunduh!`, 'success');
+                }
             },
 
             openSingleStudentAnswerModal(nis, pkg) {
@@ -5165,5 +5262,10 @@
             EduGuard.init();
         }
     </script>
+                                <script>
+                                  if ('serviceWorker' in navigator) {
+                                    navigator.serviceWorker.register('./sw.js');
+                                  }
+                                </script>
 </body>
 </html>
