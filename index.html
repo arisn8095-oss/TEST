@@ -10,9 +10,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script>
-        if (window.pdfjsLib) {
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-        }
+        try {
+            if (window.pdfjsLib) {
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+            }
+        } catch(e) {}
         tailwind.config = {
             theme: {
                 extend: {
@@ -114,7 +116,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxOZdtp3OEJcRFDN-RFGGaTYExY9AU5BKf7ubVOxgw83zPipeZyZ-CKhzjAKv6BzHuR/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-ZsdcitAohBt2YLVRXAr3dk6f-5oax7zVG-ESzaHfkHkoEOKIgIFmsdqL8OD6h2v1/exec";
 
         const DB = {
             admin: { id: "ADMIN01", name: "Administrator Utama", role: "admin" },
@@ -220,10 +222,10 @@
             if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("PASTE_YOUR_WEB_APP_URL")) {
                 return null;
             }
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 4500);
-
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 4500);
+
                 const res = await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -233,7 +235,6 @@
                 clearTimeout(timeoutId);
                 return await res.json();
             } catch (err) {
-                clearTimeout(timeoutId);
                 return null;
             }
         }
@@ -310,12 +311,16 @@
             },
 
             generateDeviceFingerprint() {
-                let saved = localStorage.getItem('EDUGUARD_DEVICE_FP');
-                if (!saved) {
-                    saved = 'DEV-HP-' + Math.floor(1000 + Math.random() * 9000);
-                    localStorage.setItem('EDUGUARD_DEVICE_FP', saved);
+                try {
+                    let saved = localStorage.getItem('EDUGUARD_DEVICE_FP');
+                    if (!saved) {
+                        saved = 'DEV-HP-' + Math.floor(1000 + Math.random() * 9000);
+                        localStorage.setItem('EDUGUARD_DEVICE_FP', saved);
+                    }
+                    this.deviceFingerprint = saved;
+                } catch(e) {
+                    this.deviceFingerprint = 'DEV-HP-' + Math.floor(1000 + Math.random() * 9000);
                 }
-                this.deviceFingerprint = saved;
             },
 
             setupSecurityListeners() {
@@ -327,14 +332,16 @@
                 document.addEventListener('keyup', e => {
                     if (!this.activeExam) return;
                     if (e.key === 'PrintScreen') {
-                        navigator.clipboard.writeText('');
+                        try {
+                            if (document.execCommand) document.execCommand('copy');
+                        } catch(err) {}
                         this.handleViolation("Percobaan Tangkapan Layar (Screenshot) Terdeteksi!");
                     }
                 });
 
                 window.addEventListener('popstate', () => {
                     if (this.activeExam) {
-                        history.pushState(null, document.title, location.href);
+                        try { history.pushState(null, document.title, location.href); } catch(e) {}
                         this.handleViolation("Tombol Navigasi Kembali (Back) HP Ditekan!");
                     }
                 });
@@ -372,7 +379,7 @@
                     else if (elem.mozRequestFullScreen) elem.mozRequestFullScreen();
                     else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
                 } catch(e) {}
-                history.pushState(null, document.title, location.href);
+                try { history.pushState(null, document.title, location.href); } catch(e) {}
             },
 
             exitFullScreenMode() {
@@ -435,18 +442,20 @@
             },
 
             async syncUsersFromBackend() {
-                const remote = await apiCall('getUsers');
-                if (remote && remote.status === 'success' && Array.isArray(remote.data) && remote.data.length > 0) {
-                    const st = [];
-                    const tc = [];
-                    remote.data.forEach(u => {
-                        if (u.role === 'student') st.push({ nis: u.id, name: u.name, class: u.class, deviceId: u.deviceId });
-                        else if (u.role === 'teacher') tc.push({ nip: u.id, name: u.name, subject: u.subject || 'Mapel', subjectId: 'SUB-' + u.id });
-                    });
-                    if (st.length > 0) DB.students = st;
-                    if (tc.length > 0) DB.teachers = tc;
-                    this.ensureSubjectsUpToDate();
-                }
+                try {
+                    const remote = await apiCall('getUsers');
+                    if (remote && remote.status === 'success' && Array.isArray(remote.data) && remote.data.length > 0) {
+                        const st = [];
+                        const tc = [];
+                        remote.data.forEach(u => {
+                            if (u.role === 'student') st.push({ nis: u.id, name: u.name, class: u.class, deviceId: u.deviceId });
+                            else if (u.role === 'teacher') tc.push({ nip: u.id, name: u.name, subject: u.subject || 'Mapel', subjectId: 'SUB-' + u.id });
+                        });
+                        if (st.length > 0) DB.students = st;
+                        if (tc.length > 0) DB.teachers = tc;
+                        this.ensureSubjectsUpToDate();
+                    }
+                } catch(e) {}
             },
 
             showToast(msg, type = 'info') {
@@ -868,6 +877,7 @@
                             </span>
                         </div>
 
+                        <!-- 7 Teacher Sub-menus -->
                         <div class="flex overflow-x-auto gap-2 border-b border-slate-100 pb-2 text-xs font-bold">
                             <button onclick="EduGuard.switchTeacherTab('manual')" class="px-3 py-2 rounded-xl flex items-center gap-1.5 whitespace-nowrap transition ${activeTab === 'manual' ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'text-slate-500 hover:bg-slate-50'}">
                                 <i class="fa-solid fa-pen-to-square"></i> 1. Input Soal Manual &amp; Simbol
@@ -1164,6 +1174,70 @@
                 this.showModal(`Edit Butir Soal (${q.type})`, body, footer);
             },
 
+            saveEditedQuestion(qId) {
+                try {
+                    const subId = this.teacherSelectedSubject;
+                    const pkg = this.teacherSelectedPkg;
+                    const qList = this.getCleanQuestions(subId, pkg);
+                    const targetId = String(qId).trim();
+                    const q = qList.find(item => String(item.id).trim() === targetId);
+                    if (!q) return this.showToast('Data butir soal tidak ditemukan!', 'error');
+
+                    const newText = document.getElementById('editQuestionText')?.value.trim();
+                    const newWeight = Number(document.getElementById('editQuestionWeight')?.value) || 20;
+                    const newImg = document.getElementById('editQuestionImg')?.value.trim() || '';
+
+                    if (!newText) return this.showToast('Pertanyaan soal tidak boleh kosong!', 'warning');
+
+                    q.text = newText;
+                    q.weight = newWeight;
+                    q.image = newImg;
+
+                    if (q.type === 'PG') {
+                        const opts = [];
+                        const optImgs = [];
+                        for (let i = 0; i < 5; i++) {
+                            const optEl = document.getElementById(`editOpt_${i}`);
+                            const imgEl = document.getElementById(`editOptImg_${i}`);
+                            if (optEl && optEl.value.trim()) {
+                                opts.push(optEl.value.trim());
+                                optImgs.push(imgEl ? imgEl.value.trim() : '');
+                            }
+                        }
+                        if (opts.length < 2) return this.showToast('Minimal 2 pilihan opsi!', 'warning');
+                        q.options = opts;
+                        q.optionImages = optImgs;
+
+                        const radios = document.getElementsByName('editPgCorrectRadio');
+                        for (let r of radios) {
+                            if (r.checked) {
+                                q.correctKey = Number(r.value);
+                                break;
+                            }
+                        }
+                    } else if (q.type === 'BS') {
+                        const bsRadios = document.getElementsByName('editBsSingleKey');
+                        for (let r of bsRadios) {
+                            if (r.checked) {
+                                q.correctKey = r.value;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!DB.modifiedQuestionsMap) DB.modifiedQuestionsMap = {};
+                    DB.modifiedQuestionsMap[targetId] = { ...q };
+
+                    apiCall('saveQuestionsBatch', { subjectId: subId, package: pkg, questions: [q] });
+
+                    this.closeModal();
+                    this.showToast('Perubahan butir soal berhasil disimpan!', 'success');
+                    this.refreshTeacherReviewUI();
+                } catch(err) {
+                    this.showToast('Gagal menyimpan soal: ' + err.message, 'error');
+                }
+            },
+
             setMathSymbolCategory(category) {
                 this.activeMathCategory = category;
                 const container = document.getElementById('mathSymbolsListContainer');
@@ -1395,7 +1469,7 @@
                                 <i class="fa-solid fa-file-arrow-up text-4xl text-purple-600 mb-3"></i>
                                 <h4 class="font-bold text-slate-800 text-sm">Unggah File Soal (.XLSX Excel)</h4>
                                 <input type="file" id="fileImportInput" accept=".xlsx, .xls, .csv" onchange="EduGuard.handleFileUpload(event)" class="hidden">
-                                <label for="fileImportInput" class="cursor-pointer bg-purple-600 hover:bg-purple-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-md inline-block transition active:scale-95">
+                                <label for="fileImportInput" class="cursor-pointer bg-purple-600 hover:bg-purple-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-md inline-block transition active:scale-95 mt-3">
                                     Pilih File Excel
                                 </label>
                             </div>
@@ -1603,6 +1677,114 @@
                     `;
                 }
                 return '';
+            },
+
+            downloadQuestionExcelTemplate() {
+                try {
+                    if (typeof XLSX === 'undefined') {
+                        return this.showToast('Library XLSX belum selesai dimuat!', 'warning');
+                    }
+                    const headers = ["NOMOR", "TIPE", "PERTANYAAN", "GAMBAR_URL", "OPSI_A", "OPSI_B", "OPSI_C", "OPSI_D", "OPSI_E", "KUNCI_JAWABAN", "BOBOT"];
+                    const sampleRows = [
+                        [1, "PG", "Shortcut keyboard untuk menyalin teks adalah...", "", "Ctrl + V", "Ctrl + C", "Ctrl + X", "Ctrl + Z", "Ctrl + S", "B", 50],
+                        [2, "BS", "HTML adalah bahasa markup untuk mendesain struktur web.", "", "BENAR", "SALAH", "", "", "", "BENAR", 50]
+                    ];
+                    const wb = XLSX.utils.book_new();
+                    const ws = XLSX.utils.aoa_to_sheet([headers, ...sampleRows]);
+                    ws['!cols'] = [{ wch: 8 }, { wch: 8 }, { wch: 45 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 16 }, { wch: 8 }];
+                    XLSX.utils.book_append_sheet(wb, ws, "Template_Soal");
+                    XLSX.writeFile(wb, "Template_Soal_CBT_SMAN1Kutowinangun.xlsx");
+                    this.showToast("Template Excel (.xlsx) berhasil diunduh!", "success");
+                } catch(err) {
+                    this.showToast("Gagal mengunduh template: " + err.message, "error");
+                }
+            },
+
+            async handleFileUpload(event) {
+                const file = event.target.files && event.target.files[0];
+                if (!file) return;
+
+                const subId = this.teacherSelectedSubject;
+                const pkg = this.teacherSelectedPkg;
+                this.showToast(`Membaca file "${file.name}"...`, 'info');
+
+                try {
+                    const data = await file.arrayBuffer();
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                    if (!rows || rows.length < 2) {
+                        return this.showToast('File kosong atau format template tidak sesuai!', 'error');
+                    }
+
+                    const newQuestions = [];
+                    for (let i = 1; i < rows.length; i++) {
+                        const row = rows[i];
+                        if (!row || !row[2]) continue;
+                        const qType = String(row[1] || 'PG').toUpperCase().trim();
+                        const qText = String(row[2] || '').trim();
+                        const qImg = String(row[3] || '').trim();
+                        const qWeight = Number(row[10]) || 20;
+
+                        if (qType === 'PG') {
+                            const opts = [];
+                            for (let o = 4; o <= 8; o++) {
+                                if (row[o] !== undefined && String(row[o]).trim() !== '') {
+                                    opts.push(String(row[o]).trim());
+                                }
+                            }
+                            const keyRaw = String(row[9] || 'A').toUpperCase().trim();
+                            let keyIdx = 0;
+                            if (['A','B','C','D','E'].includes(keyRaw)) {
+                                keyIdx = keyRaw.charCodeAt(0) - 65;
+                            } else if (!isNaN(Number(keyRaw))) {
+                                keyIdx = Number(keyRaw);
+                            }
+
+                            newQuestions.push({
+                                id: 'Q_' + Date.now() + '_' + i,
+                                type: 'PG',
+                                text: qText,
+                                image: qImg,
+                                options: opts.length > 0 ? opts : ['A', 'B', 'C', 'D', 'E'],
+                                correctKey: keyIdx,
+                                weight: qWeight
+                            });
+                        } else if (qType === 'BS') {
+                            const keyRaw = String(row[9] || 'BENAR').toUpperCase().trim();
+                            newQuestions.push({
+                                id: 'Q_' + Date.now() + '_' + i,
+                                type: 'BS',
+                                text: qText,
+                                image: qImg,
+                                options: ['BENAR', 'SALAH'],
+                                correctKey: keyRaw.includes('S') ? 'SALAH' : 'BENAR',
+                                weight: qWeight
+                            });
+                        }
+                    }
+
+                    if (newQuestions.length === 0) {
+                        return this.showToast('Tidak ada butir soal valid yang dapat diimpor!', 'warning');
+                    }
+
+                    if (!DB.examPackages[subId]) DB.examPackages[subId] = {};
+                    if (!DB.examPackages[subId][pkg]) DB.examPackages[subId][pkg] = [];
+
+                    DB.examPackages[subId][pkg].push(...newQuestions);
+                    this.getCleanQuestions(subId, pkg);
+
+                    apiCall('saveQuestionsBatch', { subjectId: subId, package: pkg, questions: newQuestions });
+
+                    this.showToast(`Berhasil mengimpor ${newQuestions.length} butir soal ke Paket ${pkg}!`, 'success');
+                    this.switchTeacherTab('review');
+                } catch(err) {
+                    this.showToast('Gagal memproses file: ' + err.message, 'error');
+                } finally {
+                    event.target.value = '';
+                }
             },
 
             renderTeacherCheatLogsRows() {
@@ -2070,7 +2252,7 @@
             },
 
             filterTeacherResults() {
-                const pkgVal = document.getElementById('filterTeacherResultPkg').value;
+                const pkgVal = document.getElementById('filterTeacherResultPkg')?.value || 'all';
                 const tbody = document.getElementById('tblTeacherResultsBody');
                 if (tbody) {
                     tbody.innerHTML = this.renderTeacherResultsRows(this.teacherSelectedSubject, pkgVal);
@@ -2128,11 +2310,13 @@
                 const container = document.getElementById('studentPublishedExamsContainer');
                 let subjects = DB.subjects;
 
-                const remoteSub = await apiCall('getSubjects');
-                if (remoteSub && remoteSub.status === 'success' && Array.isArray(remoteSub.data) && remoteSub.data.length > 0) {
-                    subjects = remoteSub.data;
-                    DB.subjects = subjects;
-                }
+                try {
+                    const remoteSub = await apiCall('getSubjects');
+                    if (remoteSub && remoteSub.status === 'success' && Array.isArray(remoteSub.data) && remoteSub.data.length > 0) {
+                        subjects = remoteSub.data;
+                        DB.subjects = subjects;
+                    }
+                } catch(e) {}
 
                 if (!container) return;
                 const publishedList = subjects.filter(sub => sub.publishedPackages && sub.publishedPackages.length > 0);
@@ -2205,8 +2389,10 @@
                 const tokenInput = tokenInputEl ? tokenInputEl.value.trim().toUpperCase() : '';
                 
                 let subjects = DB.subjects;
-                const remoteSub = await apiCall('getSubjects');
-                if (remoteSub && remoteSub.status === 'success') subjects = remoteSub.data;
+                try {
+                    const remoteSub = await apiCall('getSubjects');
+                    if (remoteSub && remoteSub.status === 'success' && Array.isArray(remoteSub.data)) subjects = remoteSub.data;
+                } catch(e) {}
 
                 const subject = subjects.find(s => s.id === subjectId);
                 if (!subject) return;
@@ -2225,10 +2411,12 @@
                 }
 
                 let questions = (DB.examPackages[subjectId] && DB.examPackages[subjectId][targetPkg]) || [];
-                const remoteQ = await apiCall('getQuestions', { subjectId: subjectId, package: targetPkg });
-                if (remoteQ && remoteQ.status === 'success' && remoteQ.data.length > 0) {
-                    questions = remoteQ.data;
-                }
+                try {
+                    const remoteQ = await apiCall('getQuestions', { subjectId: subjectId, package: targetPkg });
+                    if (remoteQ && remoteQ.status === 'success' && remoteQ.data.length > 0) {
+                        questions = remoteQ.data;
+                    }
+                } catch(e) {}
 
                 if (questions.length === 0) {
                     return this.showToast(`Belum ada butir soal pada Paket ${targetPkg}!`, 'warning');
@@ -2594,6 +2782,7 @@
                             <i class="fa-solid fa-circle-check"></i>
                         </div>
                         <h3 class="text-xl font-bold text-slate-800 mb-2">Ujian Berhasil Dikirim!</h3>
+                        <p class="text-xs text-slate-500 mb-6">Skor akumulasi pengerjaan Anda telah tersimpan rapi di sistem CBT sekolah.</p>
                         <button onclick="EduGuard.renderStudentDashboard()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-xl text-xs shadow-md transition active:scale-95">
                             Kembali ke Menu Ujian
                         </button>
