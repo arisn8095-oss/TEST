@@ -145,7 +145,7 @@
     </div>
 
     <script>
-        let GOOGLE_SCRIPT_URL = localStorage.getItem('CBT_APPSCRIPT_URL') || "https://script.google.com/macros/s/AKfycbxklQ5WyZZCRogtFPUb83jsXYUw4vYLz89DlbdoM57CpfjBNq0DQX_6CxWNVANXmJjc/exec";
+        let GOOGLE_SCRIPT_URL = localStorage.getItem('CBT_APPSCRIPT_URL') || "https://script.google.com/macros/s/AKfycbxJkkNAf7k0kIvJYg-fs-eMqsxfaMKp9ZQvI-hIrfFWqk-zIPZRyr1Ni_fi3GzGJAr1/exec";
         const SPREADSHEET_DB_SISTEM = "1nD60VMcGXeEED5JJVVzZAbU7BmkyIOE7EZtHEnsUkac";
         const SPREADSHEET_DB_SOAL   = "14Iy4Y18ITNtWciKrhQIFd2o_aq9KW1ARKxwV2HqE8KU";
 
@@ -484,9 +484,9 @@
             },
 
             /**
-             * RUMUS RESMI SKOR AKHIR: AKUMULASI BOBOT SOAL YANG BENAR
-             * Jika jawaban siswa benar: Skor bertambah sebesar Bobot soal (q.weight)
-             * Jika jawaban salah / kosong: Bobot bernilai 0
+             * RUMUS RESMI SKOR AKHIR: AKUMULASI JUMLAH BOBOT SOAL YANG BENAR
+             * - Jika jawaban siswa BENAR : Skor bertambah sebesar bobot soal (q.weight)
+             * - Jika jawaban siswa SALAH / KOSONG : Bobot bernilai 0
              */
             calculateStudentAccumulatedScore(nis, subId, subName, pkg, studentAnswersFallback = {}) {
                 const cleanQuestions = this.getCleanQuestions(subId, pkg);
@@ -498,17 +498,18 @@
                 let totalAccumulatedScore = 0;
 
                 cleanQuestions.forEach((q, idx) => {
-                    // Cek jawaban baik dengan index angka maupun string index (JSON serialised)
                     const uAns = (answers[idx] !== undefined) ? answers[idx] : answers[String(idx)];
                     const weight = Number(q.weight || 20);
 
                     if (q.type === 'PG') {
                         if (uAns !== undefined && uAns !== null && String(uAns).trim() !== '') {
                             if (Number(uAns) === Number(q.correctKey)) {
-                                totalAccumulatedScore += weight; // Benar: dapat bobot
+                                totalAccumulatedScore += weight; // Benar: dapat nilai bobot
                             } else {
-                                // Salah: bobot adalah 0
+                                totalAccumulatedScore += 0;      // Salah: bobot adalah 0
                             }
+                        } else {
+                            totalAccumulatedScore += 0;          // Kosong: bobot adalah 0
                         }
                     } else if (q.type === 'BS') {
                         if (uAns !== undefined && uAns !== null && String(uAns).trim() !== '') {
@@ -518,10 +519,12 @@
                                             (normUser === 'B' && normKey === 'BENAR') || 
                                             (normUser === 'S' && normKey === 'SALAH');
                             if (isMatch) {
-                                totalAccumulatedScore += weight; // Benar: dapat bobot
+                                totalAccumulatedScore += weight; // Benar: dapat nilai bobot
                             } else {
-                                // Salah: bobot adalah 0
+                                totalAccumulatedScore += 0;      // Salah: bobot adalah 0
                             }
+                        } else {
+                            totalAccumulatedScore += 0;          // Kosong: bobot adalah 0
                         }
                     }
                 });
@@ -537,6 +540,7 @@
 
                 const tasks = [];
 
+                // Tab Cek Soal & Preview (review), Analisis Soal (analisis), dan Rekap Nilai (results)
                 if (tab === 'review' || tab === 'analisis' || tab === 'results') {
                     tasks.push((async () => {
                         const remoteQ = await apiCall('getQuestions', { subjectId: subId, package: pkg });
@@ -584,7 +588,7 @@
                 }
 
                 try {
-                    // Batas pengerjaan sinkronisasi data maksimal 10 detik
+                    // Batas waktu pengambilan data dari Google Sheets maksimal 10 detik
                     await Promise.race([
                         Promise.all(tasks),
                         new Promise(resolve => setTimeout(resolve, 10000))
@@ -603,15 +607,15 @@
                         <div class="w-14 h-14 mx-auto rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-2xl shadow-sm">
                             <i class="fa-solid fa-cloud-arrow-down animate-bounce"></i>
                         </div>
-                        <h4 class="font-extrabold text-slate-800 text-sm">Mengambil Data ${tabTitles[tabName] || 'Data'}</h4>
-                        <p class="text-xs text-slate-500 max-w-sm mx-auto">Menghubungkan ke DB Soal &amp; DB Sistem melalui jaringan HP...</p>
+                        <h4 class="font-extrabold text-slate-800 text-sm">Mengambil Data Google Sheets: ${tabTitles[tabName] || 'Data'}</h4>
+                        <p class="text-xs text-slate-500 max-w-sm mx-auto">Menghubungkan ke DB Soal &amp; DB Sistem secara langsung (Maksimal 10 detik)...</p>
                         
-                        <div class="bg-purple-50 text-purple-800 font-bold px-3 py-1.5 rounded-xl border border-purple-200 text-xs inline-flex items-center gap-2">
+                        <div class="bg-purple-50 text-purple-800 font-bold px-3.5 py-1.5 rounded-xl border border-purple-200 text-xs inline-flex items-center gap-2 shadow-sm">
                             <i class="fa-solid fa-clock-rotate-left text-purple-600"></i>
-                            Batas waktu muat: <span id="loadingCountdownVal" class="text-purple-900 font-black text-sm">10</span>s
+                            Batas waktu muat database: <span id="loadingCountdownVal" class="text-purple-900 font-black text-sm">10</span> detik
                         </div>
 
-                        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mt-2">
+                        <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden mt-2 p-0.5 border border-slate-200">
                             <div id="loadingCountdownBar" class="h-full bg-purple-600 transition-all duration-1000 ease-linear rounded-full" style="width: 100%;"></div>
                         </div>
                     </div>
@@ -977,7 +981,7 @@
                     }
 
                     if (typeof XLSX !== 'undefined') {
-                        // Kolom tabel terpisah secara eksplisit (tiap indeks menjadi kolom sel tersendiri di Excel)
+                        // Kolom tabel terpisah secara eksplisit sebagai pembatas kolom di Excel
                         const headers = ["NO", "NIS", "NAMA_SISWA", "KELAS", "MATA_PELAJARAN", "PAKET_SOAL", "SKOR_AKHIR_BOBOT", "STATUS_UJIAN", "WAKTU_SELESAI"];
                         const rows = filtered.map((r, idx) => {
                             const currentPkg = r.package || 'A';
@@ -998,7 +1002,7 @@
 
                         const wb = XLSX.utils.book_new();
                         const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-                        // Menetapkan lebar tiap kolom pembatas agar tidak terpotong
+                        // Menetapkan batas lebar tiap kolom sel terpisah
                         ws['!cols'] = [
                             { wch: 6 },  // NO
                             { wch: 14 }, // NIS
@@ -1012,9 +1016,9 @@
                         ];
                         XLSX.utils.book_append_sheet(wb, ws, "Rekap_Nilai");
                         XLSX.writeFile(wb, `Rekap_Nilai_${subName.replace(/\s+/g, '_')}_Paket_${pkgVal}.xlsx`);
-                        this.showToast("File Rekap Nilai Excel (.xlsx) kolom terpisah berhasil diunduh!", "success");
+                        this.showToast("File Rekap Nilai Excel (.xlsx) dengan kolom terpisah berhasil diunduh!", "success");
                     } else {
-                        // Cadangan format CSV dengan UTF-8 BOM dan titik koma (;) agar otomatis terpisah kolom di Excel
+                        // Cadangan CSV UTF-8 dengan pembatas titik koma (;) kolom terpisah di Excel Indonesia
                         let csv = "\uFEFFNO;NIS;Nama Siswa;Kelas;Mata Pelajaran;Paket;Skor Akhir (Bobot);Status;Waktu Selesai\r\n";
                         filtered.forEach((r, idx) => {
                             const currentPkg = r.package || 'A';
@@ -1865,7 +1869,7 @@
                     ];
                     const wb = XLSX.utils.book_new();
                     const ws = XLSX.utils.aoa_to_sheet([headers, ...sampleRows]);
-                    // Penataan lebar tiap kolom sel
+                    // Penataan pembatas lebar tiap kolom sel terpisah
                     ws['!cols'] = [
                         { wch: 8 },  // NOMOR
                         { wch: 8 },  // TIPE
@@ -1899,78 +1903,78 @@
                     const data = await file.arrayBuffer();
                     const workbook = XLSX.read(data, { type: 'array' });
                     const sheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[sheetName];
-                    const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+            exportAnalysisExcel() {
+                try {
+                    const subId = this.teacherSelectedSubject;
+                    const pkg = this.teacherSelectedPkg;
+                    const questions = this.getCleanQuestions(subId, pkg);
+                    const activeSubjectObj = DB.subjects.find(s => s.id === subId);
+                    const subjectName = activeSubjectObj ? activeSubjectObj.name : 'Mata Pelajaran';
+                    const selectedClass = document.getElementById('filterAnalysisClassSelect')?.value || 'all';
 
-                    if (!rows || rows.length < 2) {
-                        return this.showToast('File kosong atau format template tidak sesuai!', 'error');
+                    let relevantResults = DB.results.filter(r => 
+                        (!r.subject || r.subject === subjectName || subjectName.includes(r.subject) || r.subject.includes(subjectName)) &&
+                        String(r.package || 'A') === String(pkg)
+                    );
+
+                    if (selectedClass !== 'all') {
+                        relevantResults = relevantResults.filter(r => (r.class || '') === selectedClass);
                     }
 
-                    const newQuestions = [];
-                    for (let i = 1; i < rows.length; i++) {
-                        const row = rows[i];
-                        if (!row || !row[2]) continue;
-                        const qType = String(row[1] || 'PG').toUpperCase().trim();
-                        const qText = String(row[2] || '').trim();
-                        const qImg = String(row[3] || '').trim();
-                        const qWeight = Number(row[10]) || 20;
+                    const totalExaminees = relevantResults.length;
+                    const headers = ["NO", "ID_SOAL", "TIPE", "PERTANYAAN", "BOBOT_POIN", "TOTAL_PESERTA", "JUMLAH_BENAR", "JUMLAH_SALAH", "INDEKS_KESUKARAN_P", "KATEGORI_SOAL", "FILTER_KELAS"];
 
-                        if (qType === 'PG') {
-                            const opts = [];
-                            for (let o = 4; o <= 8; o++) {
-                                if (row[o] !== undefined && String(row[o]).trim() !== '') {
-                                    opts.push(String(row[o]).trim());
+                    const rows = questions.map((q, qIdx) => {
+                        let correctCount = 0;
+                        if (totalExaminees > 0) {
+                            relevantResults.forEach(r => {
+                                const ansKey = `${r.nis}_${subjectName}_${pkg}`;
+                                const answers = (DB.studentAnswersMap && DB.studentAnswersMap[ansKey]) || r.userAnswers || {};
+                                const uAns = (answers[qIdx] !== undefined) ? answers[qIdx] : answers[String(qIdx)];
+                                if (q.type === 'PG' && uAns !== undefined && uAns !== null && Number(uAns) === Number(q.correctKey)) correctCount++;
+                                else if (q.type === 'BS') {
+                                    const normU = String(uAns || '').toUpperCase();
+                                    const normK = String(q.correctKey || 'BENAR').toUpperCase();
+                                    if (normU === normK || (normU === 'B' && normK === 'BENAR') || (normU === 'S' && normK === 'SALAH')) correctCount++;
                                 }
-                            }
-                            const keyRaw = String(row[9] || 'A').toUpperCase().trim();
-                            let keyIdx = 0;
-                            if (['A','B','C','D','E'].includes(keyRaw)) {
-                                keyIdx = keyRaw.charCodeAt(0) - 65;
-                            } else if (!isNaN(Number(keyRaw))) {
-                                keyIdx = Number(keyRaw);
-                            }
-
-                            newQuestions.push({
-                                id: 'Q_' + Date.now() + '_' + i,
-                                type: 'PG',
-                                text: qText,
-                                image: qImg,
-                                options: opts.length > 0 ? opts : ['A', 'B', 'C', 'D', 'E'],
-                                correctKey: keyIdx,
-                                weight: qWeight
-                            });
-                        } else if (qType === 'BS') {
-                            const keyRaw = String(row[9] || 'BENAR').toUpperCase().trim();
-                            newQuestions.push({
-                                id: 'Q_' + Date.now() + '_' + i,
-                                type: 'BS',
-                                text: qText,
-                                image: qImg,
-                                options: ['BENAR', 'SALAH'],
-                                correctKey: keyRaw.includes('S') ? 'SALAH' : 'BENAR',
-                                weight: qWeight
                             });
                         }
+
+                        const wrongCount = totalExaminees - correctCount;
+                        const pVal = totalExaminees > 0 ? Number((correctCount / totalExaminees).toFixed(2)) : 0;
+                        let cat = "Belum Ada Data";
+                        if (totalExaminees > 0) {
+                            if (pVal > 0.70) cat = "MUDAH";
+                            else if (pVal >= 0.30) cat = "SEDANG";
+                            else cat = "SULIT";
+                        }
+
+                        return [qIdx + 1, q.id, q.type, q.text, q.weight || 20, totalExaminees, correctCount, wrongCount, pVal, cat, selectedClass === 'all' ? 'Semua Kelas' : selectedClass];
+                    });
+
+                    if (typeof XLSX !== 'undefined') {
+                        const wb = XLSX.utils.book_new();
+                        const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+                        // Menetapkan pembatas kolom sel dengan lebar presisi
+                        ws['!cols'] = [
+                            { wch: 6 },  // NO
+                            { wch: 15 }, // ID_SOAL
+                            { wch: 10 }, // TIPE
+                            { wch: 55 }, // PERTANYAAN
+                            { wch: 14 }, // BOBOT_POIN
+                            { wch: 16 }, // TOTAL_PESERTA
+                            { wch: 16 }, // JUMLAH_BENAR
+                            { wch: 16 }, // JUMLAH_SALAH
+                            { wch: 22 }, // INDEKS_KESUKARAN_P
+                            { wch: 18 }, // KATEGORI_SOAL
+                            { wch: 16 }  // FILTER_KELAS
+                        ];
+                        XLSX.utils.book_append_sheet(wb, ws, "Analisis_Soal");
+                        XLSX.writeFile(wb, `Analisis_Butir_Soal_${subjectName.replace(/\s+/g, '_')}_Paket_${pkg}.xlsx`);
+                        this.showToast("File analisis butir soal Excel (.xlsx) dengan kolom terpisah berhasil diunduh!", "success");
                     }
-
-                    if (newQuestions.length === 0) {
-                        return this.showToast('Tidak ada butir soal valid yang dapat diimpor!', 'warning');
-                    }
-
-                    if (!DB.examPackages[subId]) DB.examPackages[subId] = {};
-                    if (!DB.examPackages[subId][pkg]) DB.examPackages[subId][pkg] = [];
-
-                    DB.examPackages[subId][pkg].push(...newQuestions);
-                    this.getCleanQuestions(subId, pkg);
-
-                    apiCall('saveQuestionsBatch', { subjectId: subId, package: pkg, questions: newQuestions });
-
-                    this.showToast(`Berhasil mengimpor ${newQuestions.length} butir soal ke DB Soal!`, 'success');
-                    this.switchTeacherTab('review');
                 } catch(err) {
-                    this.showToast('Gagal memproses file: ' + err.message, 'error');
-                } finally {
-                    event.target.value = '';
+                    this.showToast("Gagal mengunduh file analisis: " + err.message, "error");
                 }
             },
 
@@ -2859,7 +2863,7 @@
 
             exportAdminResultsExcel() {
                 try {
-                    if (typeof XLSX === 'undefined') {
+                    if (typeof XLSX !== 'undefined') {
                         return this.showToast('Library XLSX belum selesai dimuat!', 'warning');
                     }
                     const headers = ["NO", "NIS", "NAMA_SISWA", "KELAS", "MATA_PELAJARAN", "PAKET", "SKOR_TOTAL", "STATUS_UJIAN", "WAKTU_SUBMIT"];
@@ -2877,6 +2881,7 @@
 
                     const wb = XLSX.utils.book_new();
                     const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+                    // Menetapkan pembatas kolom sel
                     ws['!cols'] = [
                         { wch: 6 },  // NO
                         { wch: 14 }, // NIS
