@@ -145,7 +145,7 @@
     </div>
 
     <script>
-        let GOOGLE_SCRIPT_URL = localStorage.getItem('CBT_APPSCRIPT_URL') || "https://script.google.com/macros/s/AKfycbypzwOd3pCeulgGa3HzKlexdf3jqHxnDFVARxXHPtmr2nsylJHUl9wCeI084jImpkz5/exec";
+        let GOOGLE_SCRIPT_URL = localStorage.getItem('CBT_APPSCRIPT_URL') || "https://script.google.com/macros/s/AKfycbxklQ5WyZZCRogtFPUb83jsXYUw4vYLz89DlbdoM57CpfjBNq0DQX_6CxWNVANXmJjc/exec";
         const SPREADSHEET_DB_SISTEM = "1nD60VMcGXeEED5JJVVzZAbU7BmkyIOE7EZtHEnsUkac";
         const SPREADSHEET_DB_SOAL   = "14Iy4Y18ITNtWciKrhQIFd2o_aq9KW1ARKxwV2HqE8KU";
 
@@ -965,29 +965,74 @@
             },
 
             exportTeacherResultsExcel() {
-                const subId = this.teacherSelectedSubject;
-                const subObj = DB.subjects.find(s => s.id === subId);
-                const subName = subObj ? subObj.name : 'Mapel';
-                const pkgVal = document.getElementById('filterTeacherResultPkg')?.value || 'all';
+                try {
+                    const subId = this.teacherSelectedSubject;
+                    const subObj = DB.subjects.find(s => s.id === subId);
+                    const subName = subObj ? subObj.name : 'Mapel';
+                    const pkgVal = document.getElementById('filterTeacherResultPkg')?.value || 'all';
 
-                let filtered = DB.results.filter(r => !r.subject || r.subject === subName || subName.includes(r.subject) || r.subject.includes(subName));
-                if (pkgVal !== 'all') {
-                    filtered = filtered.filter(r => String(r.package || 'A') === String(pkgVal));
+                    let filtered = DB.results.filter(r => !r.subject || r.subject === subName || subName.includes(r.subject) || r.subject.includes(subName));
+                    if (pkgVal !== 'all') {
+                        filtered = filtered.filter(r => String(r.package || 'A') === String(pkgVal));
+                    }
+
+                    if (typeof XLSX !== 'undefined') {
+                        // Kolom tabel terpisah secara eksplisit (tiap indeks menjadi kolom sel tersendiri di Excel)
+                        const headers = ["NO", "NIS", "NAMA_SISWA", "KELAS", "MATA_PELAJARAN", "PAKET_SOAL", "SKOR_AKHIR_BOBOT", "STATUS_UJIAN", "WAKTU_SELESAI"];
+                        const rows = filtered.map((r, idx) => {
+                            const currentPkg = r.package || 'A';
+                            const score = this.calculateStudentAccumulatedScore(r.nis, subId, subName, currentPkg, r.userAnswers);
+                            const finalScore = (score > 0 || Object.keys(r.userAnswers || {}).length > 0) ? score : (Number(r.totalScore) || 0);
+                            return [
+                                idx + 1,
+                                String(r.nis || ''),
+                                String(r.name || ''),
+                                String(r.class || '-'),
+                                subName,
+                                `Paket ${currentPkg}`,
+                                finalScore,
+                                String(r.status || 'Selesai'),
+                                String(r.submittedAt || '-')
+                            ];
+                        });
+
+                        const wb = XLSX.utils.book_new();
+                        const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+                        // Menetapkan lebar tiap kolom pembatas agar tidak terpotong
+                        ws['!cols'] = [
+                            { wch: 6 },  // NO
+                            { wch: 14 }, // NIS
+                            { wch: 28 }, // NAMA_SISWA
+                            { wch: 15 }, // KELAS
+                            { wch: 24 }, // MATA_PELAJARAN
+                            { wch: 14 }, // PAKET_SOAL
+                            { wch: 20 }, // SKOR_AKHIR_BOBOT
+                            { wch: 16 }, // STATUS_UJIAN
+                            { wch: 18 }  // WAKTU_SELESAI
+                        ];
+                        XLSX.utils.book_append_sheet(wb, ws, "Rekap_Nilai");
+                        XLSX.writeFile(wb, `Rekap_Nilai_${subName.replace(/\s+/g, '_')}_Paket_${pkgVal}.xlsx`);
+                        this.showToast("File Rekap Nilai Excel (.xlsx) kolom terpisah berhasil diunduh!", "success");
+                    } else {
+                        // Cadangan format CSV dengan UTF-8 BOM dan titik koma (;) agar otomatis terpisah kolom di Excel
+                        let csv = "\uFEFFNO;NIS;Nama Siswa;Kelas;Mata Pelajaran;Paket;Skor Akhir (Bobot);Status;Waktu Selesai\r\n";
+                        filtered.forEach((r, idx) => {
+                            const currentPkg = r.package || 'A';
+                            const score = this.calculateStudentAccumulatedScore(r.nis, subId, subName, currentPkg, r.userAnswers);
+                            const finalScore = (score > 0 || Object.keys(r.userAnswers || {}).length > 0) ? score : (Number(r.totalScore) || 0);
+                            csv += `${idx + 1};"${r.nis}";"${r.name}";"${r.class || '-'}";"${subName}";"Paket ${currentPkg}";${finalScore};"${r.status || 'Selesai'}";"${r.submittedAt || '-'}"\r\n`;
+                        });
+                        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `Rekap_Nilai_${subName.replace(/\s+/g, '_')}_Paket_${pkgVal}.csv`;
+                        a.click();
+                        this.showToast("File Rekap Nilai CSV berhasil diunduh!", "success");
+                    }
+                } catch(err) {
+                    this.showToast("Gagal mengunduh Excel: " + err.message, "error");
                 }
-
-                let csv = 'NIS,Nama,Kelas,Paket,Skor Akhir (Akumulasi Bobot Benar),Status,Waktu Selesai\n';
-                filtered.forEach(r => {
-                    const currentPkg = r.package || 'A';
-                    const score = this.calculateStudentAccumulatedScore(r.nis, subId, subName, currentPkg, r.userAnswers);
-                    csv += `"${r.nis}","${r.name}","${r.class || '-'}","Paket ${currentPkg}",${score},"${r.status || 'Selesai'}","${r.submittedAt || '-'}"\n`;
-                });
-
-                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `Rekap_Nilai_${subName.replace(/\s+/g, '_')}_Paket_${pkgVal}.csv`;
-                a.click();
             },
 
             filterTeacherResults() {
@@ -1141,6 +1186,20 @@
                     if (typeof XLSX !== 'undefined') {
                         const wb = XLSX.utils.book_new();
                         const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+                        // Menetapkan pembatas kolom sel dengan lebar presisi
+                        ws['!cols'] = [
+                            { wch: 6 },  // NO
+                            { wch: 15 }, // ID_SOAL
+                            { wch: 10 }, // TIPE
+                            { wch: 55 }, // PERTANYAAN
+                            { wch: 14 }, // BOBOT_POIN
+                            { wch: 16 }, // TOTAL_PESERTA
+                            { wch: 16 }, // JUMLAH_BENAR
+                            { wch: 16 }, // JUMLAH_SALAH
+                            { wch: 22 }, // INDEKS_KESUKARAN_P
+                            { wch: 18 }, // KATEGORI_SOAL
+                            { wch: 16 }  // FILTER_KELAS
+                        ];
                         XLSX.utils.book_append_sheet(wb, ws, "Analisis_Soal");
                         XLSX.writeFile(wb, `Analisis_Butir_Soal_${subjectName.replace(/\s+/g, '_')}_Paket_${pkg}.xlsx`);
                         this.showToast("File analisis butir soal Excel (.xlsx) berhasil diunduh!", "success");
@@ -1806,9 +1865,23 @@
                     ];
                     const wb = XLSX.utils.book_new();
                     const ws = XLSX.utils.aoa_to_sheet([headers, ...sampleRows]);
+                    // Penataan lebar tiap kolom sel
+                    ws['!cols'] = [
+                        { wch: 8 },  // NOMOR
+                        { wch: 8 },  // TIPE
+                        { wch: 55 }, // PERTANYAAN
+                        { wch: 20 }, // GAMBAR_URL
+                        { wch: 22 }, // OPSI_A
+                        { wch: 22 }, // OPSI_B
+                        { wch: 22 }, // OPSI_C
+                        { wch: 22 }, // OPSI_D
+                        { wch: 22 }, // OPSI_E
+                        { wch: 18 }, // KUNCI_JAWABAN
+                        { wch: 10 }  // BOBOT
+                    ];
                     XLSX.utils.book_append_sheet(wb, ws, "Template_Soal");
                     XLSX.writeFile(wb, "Template_Soal_CBT_SMAN1Kutowinangun.xlsx");
-                    this.showToast("Template Excel (.xlsx) berhasil diunduh!", "success");
+                    this.showToast("Template Excel (.xlsx) dengan kolom terpisah berhasil diunduh!", "success");
                 } catch(err) {
                     this.showToast("Gagal mengunduh template: " + err.message, "error");
                 }
@@ -2740,37 +2813,87 @@
                     `;
                 } else if (tab === 'results') {
                     return `
-                        <div class="overflow-x-auto border rounded-2xl bg-white shadow-sm">
-                            <table class="w-full text-left border-collapse text-xs">
-                                <thead class="bg-slate-100 border-b text-slate-700 font-bold">
-                                    <tr>
-                                        <th class="p-3">NIS</th>
-                                        <th class="p-3">Nama Siswa</th>
-                                        <th class="p-3">Kelas</th>
-                                        <th class="p-3">Mapel</th>
-                                        <th class="p-3">Paket</th>
-                                        <th class="p-3 font-extrabold text-purple-800">Skor Akhir (Bobot)</th>
-                                        <th class="p-3">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y text-slate-600">
-                                    ${DB.results.map(r => `
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center bg-slate-50 p-3 rounded-2xl border border-slate-200">
+                                <div>
+                                    <h5 class="font-bold text-xs text-slate-800">Laporan Seluruh Rekap Ujian Siswa</h5>
+                                    <p class="text-[11px] text-slate-500">Unduh data rekapitulasi nilai semua siswa dan mapel.</p>
+                                </div>
+                                <button onclick="EduGuard.exportAdminResultsExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                                    <i class="fa-solid fa-file-excel"></i> Unduh Excel (.xlsx)
+                                </button>
+                            </div>
+                            <div class="overflow-x-auto border rounded-2xl bg-white shadow-sm">
+                                <table class="w-full text-left border-collapse text-xs">
+                                    <thead class="bg-slate-100 border-b text-slate-700 font-bold">
                                         <tr>
-                                            <td class="p-3 font-bold">${r.nis}</td>
-                                            <td class="p-3">${r.name}</td>
-                                            <td class="p-3">${r.class || '-'}</td>
-                                            <td class="p-3">${r.subject}</td>
-                                            <td class="p-3 font-bold text-purple-700">Paket ${r.package || 'A'}</td>
-                                            <td class="p-3 font-black text-brand-600">${r.totalScore}</td>
-                                            <td class="p-3 font-bold text-emerald-600">${r.status || 'Selesai'}</td>
+                                            <th class="p-3">NIS</th>
+                                            <th class="p-3">Nama Siswa</th>
+                                            <th class="p-3">Kelas</th>
+                                            <th class="p-3">Mapel</th>
+                                            <th class="p-3">Paket</th>
+                                            <th class="p-3 font-extrabold text-purple-800">Skor Akhir (Bobot)</th>
+                                            <th class="p-3">Status</th>
                                         </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody class="divide-y text-slate-600">
+                                        ${DB.results.map(r => `
+                                            <tr>
+                                                <td class="p-3 font-bold">${r.nis}</td>
+                                                <td class="p-3">${r.name}</td>
+                                                <td class="p-3">${r.class || '-'}</td>
+                                                <td class="p-3">${r.subject}</td>
+                                                <td class="p-3 font-bold text-purple-700">Paket ${r.package || 'A'}</td>
+                                                <td class="p-3 font-black text-brand-600">${r.totalScore}</td>
+                                                <td class="p-3 font-bold text-emerald-600">${r.status || 'Selesai'}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     `;
                 }
                 return '';
+            },
+
+            exportAdminResultsExcel() {
+                try {
+                    if (typeof XLSX === 'undefined') {
+                        return this.showToast('Library XLSX belum selesai dimuat!', 'warning');
+                    }
+                    const headers = ["NO", "NIS", "NAMA_SISWA", "KELAS", "MATA_PELAJARAN", "PAKET", "SKOR_TOTAL", "STATUS_UJIAN", "WAKTU_SUBMIT"];
+                    const rows = DB.results.map((r, idx) => [
+                        idx + 1,
+                        String(r.nis || ''),
+                        String(r.name || ''),
+                        String(r.class || '-'),
+                        String(r.subject || '-'),
+                        `Paket ${r.package || 'A'}`,
+                        Number(r.totalScore) || 0,
+                        String(r.status || 'Selesai'),
+                        String(r.submittedAt || '-')
+                    ]);
+
+                    const wb = XLSX.utils.book_new();
+                    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+                    ws['!cols'] = [
+                        { wch: 6 },  // NO
+                        { wch: 14 }, // NIS
+                        { wch: 28 }, // NAMA_SISWA
+                        { wch: 15 }, // KELAS
+                        { wch: 25 }, // MATA_PELAJARAN
+                        { wch: 12 }, // PAKET
+                        { wch: 15 }, // SKOR_TOTAL
+                        { wch: 16 }, // STATUS_UJIAN
+                        { wch: 18 }  // WAKTU_SUBMIT
+                    ];
+                    XLSX.utils.book_append_sheet(wb, ws, "Rekap_Admin");
+                    XLSX.writeFile(wb, "Rekap_Nilai_Admin_Semua_Mapel.xlsx");
+                    this.showToast("File Rekap Admin Excel (.xlsx) kolom terpisah berhasil diunduh!", "success");
+                } catch(err) {
+                    this.showToast("Gagal mengunduh Excel Admin: " + err.message, "error");
+                }
             },
 
             async toggleAdminPublish(subId, pkg) {
