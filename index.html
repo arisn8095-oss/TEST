@@ -168,7 +168,7 @@
     </div>
 
     <script>
-        let GOOGLE_SCRIPT_URL = localStorage.getItem('CBT_APPSCRIPT_URL') || "";
+        let GOOGLE_SCRIPT_URL = localStorage.getItem('CBT_APPSCRIPT_URL') || "https://script.google.com/macros/s/AKfycbyJCfO9SE4etltyTofAL35-vfn4r8OrleRyu0irB0BRXS7lrBGvim5ggtAdQq7jFhA/exec";
         const SPREADSHEET_DB_SISTEM = "1nD60VMcGXeEED5JJVVzZAbU7BmkyIOE7EZtHEnsUkac";
         const SPREADSHEET_DB_SOAL   = "14Iy4Y18ITNtWciKrhQIFd2o_aq9KW1ARKxwV2HqE8KU";
 
@@ -1416,8 +1416,8 @@
                                     <p class="text-xs text-purple-700">Mapel: <strong>${subjectName}</strong> | Skor Akhir murni akumulasi bobot benar (Jawaban salah / kosong = 0).</p>
                                 </div>
                                 <div class="flex gap-2 items-center flex-wrap">
-                                    <button onclick="EduGuard.refreshTeacherCurrentTabDatabase()" class="bg-purple-100 hover:bg-purple-200 text-purple-800 px-3 py-2 rounded-xl text-xs font-bold transition active:scale-95 flex items-center gap-1.5 shadow-sm">
-                                        <i class="fa-solid fa-arrows-rotate"></i> Refresh Database (Maks 10s)
+                                    <button onclick="EduGuard.fetchTeacherResultsData10s()" class="bg-purple-600 hover:bg-purple-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition active:scale-95 flex items-center gap-1.5 shadow-md" title="Mengambil data dari database dengan sort mapel guru (maksimal 10 detik)">
+                                        <i class="fa-solid fa-cloud-arrow-down"></i> Ambil Data (Sort Mapel Guru)
                                     </button>
                                     <select id="filterTeacherResultPkg" onchange="EduGuard.filterTeacherResults()" class="px-3 py-2 border rounded-xl text-xs bg-white font-bold text-purple-900 shadow-sm">
                                         <option value="all">Semua Paket</option>
@@ -1492,8 +1492,8 @@
                                     <p class="text-xs text-purple-700">Mapel: <strong>${subjectName}</strong> | Klasifikasi: <strong>Mudah (P &gt; 0.70)</strong>, <strong>Sedang (0.30 &le; P &le; 0.70)</strong>, <strong>Sulit (P &lt; 0.30)</strong></p>
                                 </div>
                                 <div class="flex items-center gap-2 flex-wrap">
-                                    <button onclick="EduGuard.refreshTeacherCurrentTabDatabase()" class="bg-purple-100 hover:bg-purple-200 text-purple-800 px-3 py-1.5 rounded-xl text-xs font-bold transition active:scale-95 flex items-center gap-1.5 shadow-sm">
-                                        <i class="fa-solid fa-arrows-rotate"></i> Refresh Database (Maks 10s)
+                                    <button onclick="EduGuard.fetchTeacherAnalysisData10s()" class="bg-purple-600 hover:bg-purple-700 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition active:scale-95 flex items-center gap-1.5 shadow-md" title="Mengambil database analisis dengan sort data siswa perkelas (maksimal 10 detik)">
+                                        <i class="fa-solid fa-cloud-arrow-down"></i> Ambil Data (Sort Per Kelas)
                                     </button>
                                     <div class="flex items-center gap-1.5">
                                         <span class="text-xs font-bold text-slate-700">Sortir Kelas:</span>
@@ -1532,6 +1532,105 @@
                     `;
                 }
                 return '';
+            },
+
+            async fetchTeacherResultsData10s() {
+                this.showToast('Mengambil data rekap nilai dari Google Sheets (Sort Mapel Guru, Maks 10s)...', 'info');
+                this.renderTeacherDashboard(true);
+                this.startTabLoadingCountdown();
+                
+                const subId = this.teacherSelectedSubject;
+                const activeSubObj = DB.subjects.find(s => s.id === subId);
+                const subName = activeSubObj ? activeSubObj.name : '';
+
+                try {
+                    await Promise.race([
+                        Promise.all([
+                            (async () => {
+                                const remoteRes = await apiCall('getResults');
+                                if (remoteRes && remoteRes.status === 'success' && Array.isArray(remoteRes.data)) {
+                                    DB.results = remoteRes.data.filter(r => !r.subject || r.subject === subName || subName.includes(r.subject) || r.subject.includes(subName));
+                                }
+                            })(),
+                            (async () => {
+                                const remoteAnswers = await apiCall('getStudentAnswers', { subject: subName });
+                                if (remoteAnswers && remoteAnswers.status === 'success' && Array.isArray(remoteAnswers.data)) {
+                                    if (!DB.studentAnswersMap) DB.studentAnswersMap = {};
+                                    remoteAnswers.data.forEach(ans => {
+                                        if (ans && ans.nis && ans.package) {
+                                            const key = `${ans.nis}_${subName}_${ans.package}`;
+                                            DB.studentAnswersMap[key] = ans.userAnswers || {};
+                                        }
+                                    });
+                                }
+                            })(),
+                            (async () => {
+                                const remoteQ = await apiCall('getQuestions', { subjectId: subId, package: this.teacherSelectedPkg });
+                                if (remoteQ && remoteQ.status === 'success' && Array.isArray(remoteQ.data) && remoteQ.data.length > 0) {
+                                    if (!DB.examPackages[subId]) DB.examPackages[subId] = {};
+                                    DB.examPackages[subId][this.teacherSelectedPkg] = remoteQ.data;
+                                }
+                            })()
+                        ]),
+                        new Promise(resolve => setTimeout(resolve, 10000))
+                    ]);
+                } catch (e) {
+                    console.warn("Sinkronisasi rekap nilai gagal/timeout:", e);
+                }
+
+                this.stopTabLoadingCountdown();
+                this.renderTeacherDashboard(false);
+                this.showToast('Data Rekap Nilai (Sort Mapel) berhasil disinkronkan!', 'success');
+            },
+
+            async fetchTeacherAnalysisData10s() {
+                this.showToast('Mengambil data analisis soal dari Google Sheets (Sort Data Siswa Per Kelas, Maks 10s)...', 'info');
+                this.renderTeacherDashboard(true);
+                this.startTabLoadingCountdown();
+
+                const subId = this.teacherSelectedSubject;
+                const pkg = this.teacherSelectedPkg;
+                const activeSubObj = DB.subjects.find(s => s.id === subId);
+                const subName = activeSubObj ? activeSubObj.name : '';
+
+                try {
+                    await Promise.race([
+                        Promise.all([
+                            (async () => {
+                                const remoteQ = await apiCall('getQuestions', { subjectId: subId, package: pkg });
+                                if (remoteQ && remoteQ.status === 'success' && Array.isArray(remoteQ.data)) {
+                                    if (!DB.examPackages[subId]) DB.examPackages[subId] = {};
+                                    DB.examPackages[subId][pkg] = remoteQ.data;
+                                }
+                            })(),
+                            (async () => {
+                                const remoteRes = await apiCall('getResults');
+                                if (remoteRes && remoteRes.status === 'success' && Array.isArray(remoteRes.data)) {
+                                    DB.results = remoteRes.data.filter(r => !r.subject || r.subject === subName || subName.includes(r.subject) || r.subject.includes(subName));
+                                }
+                            })(),
+                            (async () => {
+                                const remoteAnswers = await apiCall('getStudentAnswers', { subject: subName });
+                                if (remoteAnswers && remoteAnswers.status === 'success' && Array.isArray(remoteAnswers.data)) {
+                                    if (!DB.studentAnswersMap) DB.studentAnswersMap = {};
+                                    remoteAnswers.data.forEach(ans => {
+                                        if (ans && ans.nis && ans.package) {
+                                            const key = `${ans.nis}_${subName}_${ans.package}`;
+                                            DB.studentAnswersMap[key] = ans.userAnswers || {};
+                                        }
+                                    });
+                                }
+                            })()
+                        ]),
+                        new Promise(resolve => setTimeout(resolve, 10000))
+                    ]);
+                } catch (e) {
+                    console.warn("Sinkronisasi analisis soal gagal/timeout:", e);
+                }
+
+                this.stopTabLoadingCountdown();
+                this.renderTeacherDashboard(false);
+                this.showToast('Data Analisis Butir Soal (Sort Per Kelas) berhasil diperbarui!', 'success');
             },
 
             renderTeacherCheatLogsRows() {
@@ -3027,20 +3126,21 @@
                     return this.showToast(`Harap masukkan ${roleLabel} terlebih dahulu!`, 'warning');
                 }
 
-                this.showToast('Memverifikasi akun pengguna...', 'info');
+                this.showToast('Memverifikasi akun dan otorisasi role ke database...', 'info');
 
                 try {
                     const remoteRes = await Promise.race([
-                        apiCall('login', { id: val, deviceId: this.deviceFingerprint }),
+                        apiCall('login', { id: val, role: role, deviceId: this.deviceFingerprint }),
                         new Promise(resolve => setTimeout(() => resolve(null), 5000))
                     ]);
 
                     if (remoteRes && remoteRes.status === 'success' && remoteRes.data) {
                         const user = remoteRes.data;
 
-                        if (user.role !== role) {
+                        // Validasi Ketat Role: Jika role di database tidak cocok dengan tab login yang dipilih
+                        if (String(user.role).toLowerCase() !== String(role).toLowerCase()) {
                             return this.showToast(
-                                `Akses Ditolak! ID ${val} terdaftar sebagai ${roleLabels[user.role] || user.role}, bukan ${roleLabels[role]}.`,
+                                `Akses Ditolak! ID "${val}" terdaftar sebagai ${roleLabels[user.role] || user.role}, bukan ${roleLabels[role]}. Anda tidak diizinkan masuk ke Dasbor ${roleLabels[role]}!`,
                                 'error'
                             );
                         }
@@ -3054,10 +3154,11 @@
                         this.redirectRoleDashboard();
                         return;
                     } else if (remoteRes && remoteRes.status === 'error') {
-                        return this.showToast(remoteRes.message, 'error');
+                        return this.showToast(remoteRes.message || 'Login gagal atau ID tidak ditemukan!', 'error');
                     }
                 } catch(e) {}
 
+                // Validasi Fallback Lokal terhadap Database Tersinkron
                 this.quickLogin(role, val);
             },
 
@@ -3074,14 +3175,16 @@
                 else if (isTeacher) { actualRole = 'teacher'; foundUser = { ...isTeacher, role: 'teacher' }; }
                 else if (isAdmin) { actualRole = 'admin'; foundUser = { ...DB.admin, role: 'admin' }; }
 
+                // Wajib terdata di database
                 if (!foundUser) {
                     const idLabel = role === 'student' ? 'NIS Siswa' : (role === 'teacher' ? 'NIP Guru' : 'ID Admin');
-                    return this.showToast(`${idLabel} "${id}" tidak ditemukan dalam database!`, 'error');
+                    return this.showToast(`ID ${idLabel} "${id}" tidak terdaftar dalam database!`, 'error');
                 }
 
+                // Ditolak tegas jika role tidak sesuai pilihan
                 if (actualRole !== role) {
                     return this.showToast(
-                        `Akses Ditolak: ID "${id}" adalah akun ${roleLabels[actualRole]}, bukan ${roleLabels[role]}!`,
+                        `Akses Ditolak! Akun "${id}" terdaftar sebagai ${roleLabels[actualRole]}, bukan ${roleLabels[role]}. Anda tidak dapat mengakses Dasbor ini!`,
                         'error'
                     );
                 }
