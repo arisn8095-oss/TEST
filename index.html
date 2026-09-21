@@ -12,7 +12,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SheetJS for Excel Import/Export -->
+    <!-- SheetJS for Explicit Excel Column Separation -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script>
         tailwind.config = {
@@ -48,31 +48,51 @@
             -ms-user-select: none;
             user-select: none;
         }
+        /* Mencegah auto zoom Safari iOS di iPhone saat fokus input */
         input, textarea, select {
             -webkit-user-select: text !important;
             user-select: text !important;
-            font-size: 16px !important; /* Mencegah auto-zoom Safari di iPhone */
+            font-size: 16px !important;
         }
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .mobile-shell {
-            max-width: 840px;
+        .device-container {
+            width: 100%;
+            max-width: 860px;
             margin: 0 auto;
-            min-height: calc(100vh - 120px);
+            min-height: calc(100vh - 125px);
             background: #ffffff;
             position: relative;
             padding-bottom: max(1rem, env(safe-area-inset-bottom));
         }
-        .math-symbol-btn { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 5px 9px; font-size: 12px; font-weight: bold; color: #334155; transition: all 0.12s ease; cursor: pointer; user-select: none; }
-        .math-symbol-btn:hover { background: #e0e7ff; color: #4338ca; border-color: #c7d2fe; }
+        .math-symbol-btn {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+            transition: all 0.12s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+        .math-symbol-btn:hover { background: #ede9fe; color: #6b21a8; border-color: #d8b4fe; }
         .math-symbol-btn:active { transform: scale(0.95); }
-        .sym-category-btn { padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; transition: all 0.15s; cursor: pointer; }
+        .sym-category-btn {
+            padding: 5px 11px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            transition: all 0.15s;
+            cursor: pointer;
+        }
         .sym-category-btn.active { background: #7e22ce; color: #ffffff; }
         .sym-category-btn:not(.active) { background: #f1f5f9; color: #475569; }
         .sym-category-btn:not(.active):hover { background: #e2e8f0; color: #1e293b; }
         @media print {
-            header, footer, button, .no-print, #modalContainer, .nav-tabs, #cheatOverlay, #terminatedOverlay { display: none !important; }
+            header, footer, button, .no-print, #modalContainer, #cheatOverlay, #terminatedOverlay { display: none !important; }
             body { background: white !important; color: black !important; }
             .print-full-width { width: 100% !important; max-width: 100% !important; box-shadow: none !important; }
         }
@@ -81,10 +101,12 @@
 <body class="bg-slate-100 text-slate-800 font-sans antialiased no-select min-h-screen flex flex-col justify-between">
 
     <!-- OVERLAY DETEKSI KECURANGAN LOCKDOWN -->
-    <div id="cheatOverlay" class="fixed inset-0 bg-red-600 bg-opacity-95 z-50 hidden flex-col items-center justify-center p-6 text-white text-center backdrop-blur-md">
+    <div id="cheatOverlay" class="fixed inset-0 bg-red-600/95 z-50 hidden flex-col items-center justify-center p-6 text-white text-center backdrop-blur-md">
         <i class="fa-solid fa-triangle-exclamation text-6xl mb-3 animate-bounce"></i>
         <h2 class="text-2xl font-black mb-2 tracking-tight">PELANGGARAN TERDETEKSI!</h2>
-        <p id="cheatOverlayMsg" class="text-xs sm:text-sm mb-5 max-w-md leading-relaxed">Anda terdeteksi keluar dari layar penuh, berpindah tab/aplikasi, membuka split layer/layar terbelah, atau mencoba copy-paste!</p>
+        <p id="cheatOverlayMsg" class="text-xs sm:text-sm mb-5 max-w-md leading-relaxed">
+            Anda terdeteksi keluar dari layar penuh, berpindah tab/aplikasi, membuka layar terbelah (split layer), atau mencoba copy-paste!
+        </p>
         <div class="bg-white text-red-700 px-4 py-2 rounded-xl font-bold mb-6 text-xs sm:text-sm shadow-md flex items-center gap-2">
             <i class="fa-solid fa-shield-halved"></i>
             <span>Sisa Kesempatan: <strong id="overlayStrikeCount" class="text-base font-black">1</strong> / <span id="overlayMaxStrike">3</span></span>
@@ -95,12 +117,14 @@
     </div>
 
     <!-- OVERLAY UJIAN DIBATALKAN KARENA MELEBIHI BATAS -->
-    <div id="terminatedOverlay" class="fixed inset-0 bg-slate-900 bg-opacity-98 z-50 hidden flex-col items-center justify-center p-6 text-white text-center">
+    <div id="terminatedOverlay" class="fixed inset-0 bg-slate-900/98 z-50 hidden flex-col items-center justify-center p-6 text-white text-center">
         <div class="w-20 h-20 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center mb-4 text-3xl">
             <i class="fa-solid fa-ban"></i>
         </div>
         <h2 class="text-2xl font-black mb-2 text-red-500">UJIAN DIBATALKAN</h2>
-        <p class="text-slate-300 text-xs sm:text-sm mb-6 max-w-md">Batas toleransi pelanggaran sistem lockdown telah habis. Lembar jawaban Anda telah dibekukan dan dikirim ke server pengawas.</p>
+        <p class="text-slate-300 text-xs sm:text-sm mb-6 max-w-md">
+            Batas toleransi sistem lockdown telah habis. Lembar jawaban Anda telah dibekukan dan dikirimkan ke server proktor sekolah.
+        </p>
         <button onclick="EduGuard.logout()" class="bg-brand-600 text-white font-semibold px-6 py-2.5 rounded-xl hover:bg-brand-700 transition text-xs sm:text-sm">
             Kembali ke Halaman Login
         </button>
@@ -109,16 +133,15 @@
     <div id="toastContainer" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 w-11/12 max-w-md pointer-events-none"></div>
     <div id="modalContainer"></div>
 
-    <!-- KONTEN APLIKASI UTAMA -->
     <div class="w-full flex-1 flex flex-col justify-between print-full-width">
         <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm no-print">
             <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <img src="https://lh3.googleusercontent.com/d/146YuridIPzE7wTiCCWIoeeM8-yGWMeVK" alt="Logo SMAN 1 Kutowinangun" class="w-[44px] h-[44px] object-contain rounded-lg shadow-sm" onerror="this.onerror=null; this.src='https://placehold.co/44x44/2563eb/ffffff?text=CBT';">
+                    <img src="https://lh3.googleusercontent.com/d/146YuridIPzE7wTiCCWIoeeM8-yGWMeVK" alt="Logo SMAN 1 Kutowinangun" class="w-[44px] h-[44px] object-contain rounded-xl shadow-sm" onerror="this.onerror=null; this.src='https://placehold.co/44x44/2563eb/ffffff?text=CBT';">
                     <div>
-                        <h1 class="font-extrabold text-slate-800 text-xs sm:text-sm md:text-base leading-tight">CBT SMA NEGERI 1 KUTOWINANGUN</h1>
+                        <h1 class="font-black text-slate-800 text-xs sm:text-sm md:text-base leading-tight">CBT SMA NEGERI 1 KUTOWINANGUN</h1>
                         <span class="text-[11px] text-brand-600 font-bold flex items-center gap-1">
-                            <i class="fa-solid fa-shield-halved text-[10px]"></i> High Security Android &amp; iOS (Anti-Nyontek &amp; Split-Layer)
+                            <i class="fa-solid fa-shield-halved text-[10px]"></i> High Security (HP, Tablet &amp; PC &bull; Anti-Split Layer)
                         </span>
                     </div>
                 </div>
@@ -135,17 +158,17 @@
             </div>
         </header>
 
-        <main id="appBody" class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5">
+        <main id="appBody" class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 md:p-6">
             <!-- Tampilan antarmuka dinamis disuntikkan via EduGuard -->
         </main>
 
         <footer class="bg-white border-t border-slate-200 py-3 text-center text-xs text-slate-500 no-print">
-            &copy; 2026 CBT SMA NEGERI 1 KUTOWINANGUN &bull; DB Sistem (1nD60VM...) &amp; DB Soal (14Iy4Y1...).
+            &copy; 2026 CBT SMA NEGERI 1 KUTOWINANGUN &bull; Terhubung DB Sistem (1nD60VM...) &amp; DB Soal (14Iy4Y1...).
         </footer>
     </div>
 
     <script>
-        let GOOGLE_SCRIPT_URL = localStorage.getItem('CBT_APPSCRIPT_URL') || "https://script.google.com/macros/s/AKfycbxJkkNAf7k0kIvJYg-fs-eMqsxfaMKp9ZQvI-hIrfFWqk-zIPZRyr1Ni_fi3GzGJAr1/exec";
+        let GOOGLE_SCRIPT_URL = localStorage.getItem('CBT_APPSCRIPT_URL') || "";
         const SPREADSHEET_DB_SISTEM = "1nD60VMcGXeEED5JJVVzZAbU7BmkyIOE7EZtHEnsUkac";
         const SPREADSHEET_DB_SOAL   = "14Iy4Y18ITNtWciKrhQIFd2o_aq9KW1ARKxwV2HqE8KU";
 
@@ -249,13 +272,12 @@
             }
         };
 
-        // Fungsi fetch anti-CORS dengan batas waktu maksimal 10 detik
         async function apiCall(action, payload = {}) {
             if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("PASTE_YOUR_WEB_APP_URL")) {
                 return null;
             }
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000);
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // Batas maksimal 10 detik
 
             try {
                 const res = await fetch(GOOGLE_SCRIPT_URL, {
@@ -271,7 +293,7 @@
                 return await res.json();
             } catch (err) {
                 clearTimeout(timeoutId);
-                console.warn(`API call [${action}] timeout/error:`, err);
+                console.warn(`API call [${action}] timeout / error:`, err);
                 return null;
             }
         }
@@ -301,11 +323,8 @@
             adminActiveTab: 'publication',
             _tabLoadingTimer: null,
 
-            // Parameter pendeteksi Android dan iOS
             isIOS: /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1),
             isAndroid: /Android/.test(navigator.userAgent),
-            initialInnerHeight: window.innerHeight,
-            initialInnerWidth: window.innerWidth,
 
             init() {
                 this.generateDeviceFingerprint();
@@ -330,7 +349,7 @@
                 try {
                     let saved = localStorage.getItem('EDUGUARD_DEVICE_FP');
                     if (!saved) {
-                        const platformPrefix = this.isIOS ? 'DEV-IOS-' : (this.isAndroid ? 'DEV-AND-' : 'DEV-HP-');
+                        const platformPrefix = this.isIOS ? 'DEV-IOS-' : (this.isAndroid ? 'DEV-AND-' : 'DEV-PC-');
                         saved = platformPrefix + Math.floor(1000 + Math.random() * 9000);
                         localStorage.setItem('EDUGUARD_DEVICE_FP', saved);
                     }
@@ -366,12 +385,12 @@
                         const tag = (e.target && e.target.tagName) ? e.target.tagName.toUpperCase() : '';
                         if (tag !== 'INPUT' && tag !== 'TEXTAREA') {
                             e.preventDefault();
-                            this.handleViolation("Kombinasi Tombol Salin/Tempel Terdeteksi!");
+                            this.handleViolation("Kombinasi Tombol Salin/Tempel Dilarang!");
                         }
                     }
                 }, false);
 
-                // 3. Anti Navigasi Back HP Android & iOS Swipe-Back Gesture
+                // 3. Anti Navigasi Kembali (Back) HP Android & iOS Swipe
                 window.addEventListener('popstate', () => {
                     if (this.activeExam) {
                         try { history.pushState(null, document.title, location.href); } catch(e) {}
@@ -406,7 +425,6 @@
                     const activeEl = document.activeElement;
                     const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
                     
-                    // Deteksi jika tinggi layar terpotong drastis (>45%) bukan karena keyboard virtual aktif
                     const heightRatio = window.innerHeight / screen.height;
                     const widthRatio = window.innerWidth / screen.width;
 
@@ -420,8 +438,7 @@
                     if (this.activeExam) {
                         const activeEl = document.activeElement;
                         const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable);
-                        if (isTyping) return; // Mengabaikan blur yang dipicu keyboard layar sentuh HP
-                        
+                        if (isTyping) return;
                         this.handleViolation("Aplikasi Kehilangan Fokus / Beralih Aplikasi!");
                     }
                 });
@@ -484,9 +501,10 @@
             },
 
             /**
-             * RUMUS RESMI SKOR AKHIR: AKUMULASI JUMLAH BOBOT SOAL YANG BENAR
-             * - Jika jawaban siswa BENAR : Skor bertambah sebesar bobot soal (q.weight)
-             * - Jika jawaban siswa SALAH / KOSONG : Bobot bernilai 0
+             * RUMUS RESMI SKOR AKHIR: AKUMULASI JUMLAH BOBOT SOAL BENAR
+             * - Jawaban BENAR  : Menambahkan nilai bobot soal (q.weight)
+             * - Jawaban SALAH  : Bobot bernilai 0
+             * - Tidak Dijawab  : Bobot bernilai 0
              */
             calculateStudentAccumulatedScore(nis, subId, subName, pkg, studentAnswersFallback = {}) {
                 const cleanQuestions = this.getCleanQuestions(subId, pkg);
@@ -540,7 +558,7 @@
 
                 const tasks = [];
 
-                // Tab Cek Soal & Preview (review), Analisis Soal (analisis), dan Rekap Nilai (results)
+                // 1. Tab Cek Soal & Preview (review), Analisis Soal (analisis), dan Rekap Nilai (results)
                 if (tab === 'review' || tab === 'analisis' || tab === 'results') {
                     tasks.push((async () => {
                         const remoteQ = await apiCall('getQuestions', { subjectId: subId, package: pkg });
@@ -564,6 +582,7 @@
                     })());
                 }
 
+                // 2. Tab Rekap Nilai Siswa & Analisis Butir Soal
                 if (tab === 'results' || tab === 'analisis') {
                     tasks.push((async () => {
                         const remoteRes = await apiCall('getResults');
@@ -600,7 +619,7 @@
                 const tabTitles = {
                     'review': 'Cek Soal & Preview Soal',
                     'results': 'Rekap Nilai Siswa (Akumulasi Bobot)',
-                    'analisis': 'Analisis Butir Soal'
+                    'analisis': 'Analisis Butir Soal & Tingkat Kesukaran'
                 };
                 return `
                     <div class="p-8 text-center bg-white border border-purple-200 rounded-3xl shadow-sm space-y-3 max-w-lg mx-auto my-4 animate-in fade-in duration-150">
@@ -608,7 +627,7 @@
                             <i class="fa-solid fa-cloud-arrow-down animate-bounce"></i>
                         </div>
                         <h4 class="font-extrabold text-slate-800 text-sm">Mengambil Data Google Sheets: ${tabTitles[tabName] || 'Data'}</h4>
-                        <p class="text-xs text-slate-500 max-w-sm mx-auto">Menghubungkan ke DB Soal &amp; DB Sistem secara langsung (Maksimal 10 detik)...</p>
+                        <p class="text-xs text-slate-500 max-w-sm mx-auto">Menghubungkan ke DB Soal &amp; DB Sistem (Maksimal 10 detik)...</p>
                         
                         <div class="bg-purple-50 text-purple-800 font-bold px-3.5 py-1.5 rounded-xl border border-purple-200 text-xs inline-flex items-center gap-2 shadow-sm">
                             <i class="fa-solid fa-clock-rotate-left text-purple-600"></i>
@@ -1002,7 +1021,6 @@
 
                         const wb = XLSX.utils.book_new();
                         const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-                        // Menetapkan batas lebar tiap kolom sel terpisah
                         ws['!cols'] = [
                             { wch: 6 },  // NO
                             { wch: 14 }, // NIS
@@ -1018,7 +1036,6 @@
                         XLSX.writeFile(wb, `Rekap_Nilai_${subName.replace(/\s+/g, '_')}_Paket_${pkgVal}.xlsx`);
                         this.showToast("File Rekap Nilai Excel (.xlsx) dengan kolom terpisah berhasil diunduh!", "success");
                     } else {
-                        // Cadangan CSV UTF-8 dengan pembatas titik koma (;) kolom terpisah di Excel Indonesia
                         let csv = "\uFEFFNO;NIS;Nama Siswa;Kelas;Mata Pelajaran;Paket;Skor Akhir (Bobot);Status;Waktu Selesai\r\n";
                         filtered.forEach((r, idx) => {
                             const currentPkg = r.package || 'A';
@@ -1190,7 +1207,6 @@
                     if (typeof XLSX !== 'undefined') {
                         const wb = XLSX.utils.book_new();
                         const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-                        // Menetapkan pembatas kolom sel dengan lebar presisi
                         ws['!cols'] = [
                             { wch: 6 },  // NO
                             { wch: 15 }, // ID_SOAL
@@ -1206,7 +1222,7 @@
                         ];
                         XLSX.utils.book_append_sheet(wb, ws, "Analisis_Soal");
                         XLSX.writeFile(wb, `Analisis_Butir_Soal_${subjectName.replace(/\s+/g, '_')}_Paket_${pkg}.xlsx`);
-                        this.showToast("File analisis butir soal Excel (.xlsx) berhasil diunduh!", "success");
+                        this.showToast("File analisis butir soal Excel (.xlsx) dengan kolom terpisah berhasil diunduh!", "success");
                     }
                 } catch(err) {
                     this.showToast("Gagal mengunduh file analisis: " + err.message, "error");
@@ -1397,7 +1413,7 @@
                                     <h4 class="font-bold text-purple-900 text-xs sm:text-sm flex items-center gap-2">
                                         <i class="fa-solid fa-square-poll-vertical text-purple-600"></i> Rekapitulasi Nilai Siswa (Akumulasi Bobot)
                                     </h4>
-                                    <p class="text-xs text-purple-700">Mapel: <strong>${subjectName}</strong> | Skor Akhir adalah akumulasi jumlah bobot benar (Jawaban salah = 0).</p>
+                                    <p class="text-xs text-purple-700">Mapel: <strong>${subjectName}</strong> | Skor Akhir murni akumulasi bobot benar (Jawaban salah / kosong = 0).</p>
                                 </div>
                                 <div class="flex gap-2 items-center flex-wrap">
                                     <button onclick="EduGuard.refreshTeacherCurrentTabDatabase()" class="bg-purple-100 hover:bg-purple-200 text-purple-800 px-3 py-2 rounded-xl text-xs font-bold transition active:scale-95 flex items-center gap-1.5 shadow-sm">
@@ -1408,7 +1424,7 @@
                                         ${uniquePkgs.map(p => `<option value="${p}">Paket ${p}</option>`).join('')}
                                     </select>
                                     <button onclick="EduGuard.exportTeacherResultsExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md transition flex items-center gap-2 active:scale-95 whitespace-nowrap">
-                                        <i class="fa-solid fa-file-excel text-sm"></i> Unduh Excel / CSV
+                                        <i class="fa-solid fa-file-excel text-sm"></i> Unduh Excel (.xlsx)
                                     </button>
                                 </div>
                             </div>
@@ -1869,7 +1885,6 @@
                     ];
                     const wb = XLSX.utils.book_new();
                     const ws = XLSX.utils.aoa_to_sheet([headers, ...sampleRows]);
-                    // Penataan pembatas lebar tiap kolom sel terpisah
                     ws['!cols'] = [
                         { wch: 8 },  // NOMOR
                         { wch: 8 },  // TIPE
@@ -1903,78 +1918,78 @@
                     const data = await file.arrayBuffer();
                     const workbook = XLSX.read(data, { type: 'array' });
                     const sheetName = workbook.SheetNames[0];
-            exportAnalysisExcel() {
-                try {
-                    const subId = this.teacherSelectedSubject;
-                    const pkg = this.teacherSelectedPkg;
-                    const questions = this.getCleanQuestions(subId, pkg);
-                    const activeSubjectObj = DB.subjects.find(s => s.id === subId);
-                    const subjectName = activeSubjectObj ? activeSubjectObj.name : 'Mata Pelajaran';
-                    const selectedClass = document.getElementById('filterAnalysisClassSelect')?.value || 'all';
+                    const worksheet = workbook.Sheets[sheetName];
+                    const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-                    let relevantResults = DB.results.filter(r => 
-                        (!r.subject || r.subject === subjectName || subjectName.includes(r.subject) || r.subject.includes(subjectName)) &&
-                        String(r.package || 'A') === String(pkg)
-                    );
-
-                    if (selectedClass !== 'all') {
-                        relevantResults = relevantResults.filter(r => (r.class || '') === selectedClass);
+                    if (!rows || rows.length < 2) {
+                        return this.showToast('File kosong atau format template tidak sesuai!', 'error');
                     }
 
-                    const totalExaminees = relevantResults.length;
-                    const headers = ["NO", "ID_SOAL", "TIPE", "PERTANYAAN", "BOBOT_POIN", "TOTAL_PESERTA", "JUMLAH_BENAR", "JUMLAH_SALAH", "INDEKS_KESUKARAN_P", "KATEGORI_SOAL", "FILTER_KELAS"];
+                    const newQuestions = [];
+                    for (let i = 1; i < rows.length; i++) {
+                        const row = rows[i];
+                        if (!row || !row[2]) continue;
+                        const qType = String(row[1] || 'PG').toUpperCase().trim();
+                        const qText = String(row[2] || '').trim();
+                        const qImg = String(row[3] || '').trim();
+                        const qWeight = Number(row[10]) || 20;
 
-                    const rows = questions.map((q, qIdx) => {
-                        let correctCount = 0;
-                        if (totalExaminees > 0) {
-                            relevantResults.forEach(r => {
-                                const ansKey = `${r.nis}_${subjectName}_${pkg}`;
-                                const answers = (DB.studentAnswersMap && DB.studentAnswersMap[ansKey]) || r.userAnswers || {};
-                                const uAns = (answers[qIdx] !== undefined) ? answers[qIdx] : answers[String(qIdx)];
-                                if (q.type === 'PG' && uAns !== undefined && uAns !== null && Number(uAns) === Number(q.correctKey)) correctCount++;
-                                else if (q.type === 'BS') {
-                                    const normU = String(uAns || '').toUpperCase();
-                                    const normK = String(q.correctKey || 'BENAR').toUpperCase();
-                                    if (normU === normK || (normU === 'B' && normK === 'BENAR') || (normU === 'S' && normK === 'SALAH')) correctCount++;
+                        if (qType === 'PG') {
+                            const opts = [];
+                            for (let o = 4; o <= 8; o++) {
+                                if (row[o] !== undefined && String(row[o]).trim() !== '') {
+                                    opts.push(String(row[o]).trim());
                                 }
+                            }
+                            const keyRaw = String(row[9] || 'A').toUpperCase().trim();
+                            let keyIdx = 0;
+                            if (['A','B','C','D','E'].includes(keyRaw)) {
+                                keyIdx = keyRaw.charCodeAt(0) - 65;
+                            } else if (!isNaN(Number(keyRaw))) {
+                                keyIdx = Number(keyRaw);
+                            }
+
+                            newQuestions.push({
+                                id: 'Q_' + Date.now() + '_' + i,
+                                type: 'PG',
+                                text: qText,
+                                image: qImg,
+                                options: opts.length > 0 ? opts : ['A', 'B', 'C', 'D', 'E'],
+                                correctKey: keyIdx,
+                                weight: qWeight
+                            });
+                        } else if (qType === 'BS') {
+                            const keyRaw = String(row[9] || 'BENAR').toUpperCase().trim();
+                            newQuestions.push({
+                                id: 'Q_' + Date.now() + '_' + i,
+                                type: 'BS',
+                                text: qText,
+                                image: qImg,
+                                options: ['BENAR', 'SALAH'],
+                                correctKey: keyRaw.includes('S') ? 'SALAH' : 'BENAR',
+                                weight: qWeight
                             });
                         }
-
-                        const wrongCount = totalExaminees - correctCount;
-                        const pVal = totalExaminees > 0 ? Number((correctCount / totalExaminees).toFixed(2)) : 0;
-                        let cat = "Belum Ada Data";
-                        if (totalExaminees > 0) {
-                            if (pVal > 0.70) cat = "MUDAH";
-                            else if (pVal >= 0.30) cat = "SEDANG";
-                            else cat = "SULIT";
-                        }
-
-                        return [qIdx + 1, q.id, q.type, q.text, q.weight || 20, totalExaminees, correctCount, wrongCount, pVal, cat, selectedClass === 'all' ? 'Semua Kelas' : selectedClass];
-                    });
-
-                    if (typeof XLSX !== 'undefined') {
-                        const wb = XLSX.utils.book_new();
-                        const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-                        // Menetapkan pembatas kolom sel dengan lebar presisi
-                        ws['!cols'] = [
-                            { wch: 6 },  // NO
-                            { wch: 15 }, // ID_SOAL
-                            { wch: 10 }, // TIPE
-                            { wch: 55 }, // PERTANYAAN
-                            { wch: 14 }, // BOBOT_POIN
-                            { wch: 16 }, // TOTAL_PESERTA
-                            { wch: 16 }, // JUMLAH_BENAR
-                            { wch: 16 }, // JUMLAH_SALAH
-                            { wch: 22 }, // INDEKS_KESUKARAN_P
-                            { wch: 18 }, // KATEGORI_SOAL
-                            { wch: 16 }  // FILTER_KELAS
-                        ];
-                        XLSX.utils.book_append_sheet(wb, ws, "Analisis_Soal");
-                        XLSX.writeFile(wb, `Analisis_Butir_Soal_${subjectName.replace(/\s+/g, '_')}_Paket_${pkg}.xlsx`);
-                        this.showToast("File analisis butir soal Excel (.xlsx) dengan kolom terpisah berhasil diunduh!", "success");
                     }
+
+                    if (newQuestions.length === 0) {
+                        return this.showToast('Tidak ada butir soal valid yang dapat diimpor!', 'warning');
+                    }
+
+                    if (!DB.examPackages[subId]) DB.examPackages[subId] = {};
+                    if (!DB.examPackages[subId][pkg]) DB.examPackages[subId][pkg] = [];
+
+                    DB.examPackages[subId][pkg].push(...newQuestions);
+                    this.getCleanQuestions(subId, pkg);
+
+                    apiCall('saveQuestionsBatch', { subjectId: subId, package: pkg, questions: newQuestions });
+
+                    this.showToast(`Berhasil mengimpor ${newQuestions.length} butir soal ke DB Soal!`, 'success');
+                    this.switchTeacherTab('review');
                 } catch(err) {
-                    this.showToast("Gagal mengunduh file analisis: " + err.message, "error");
+                    this.showToast('Gagal memproses file: ' + err.message, 'error');
+                } finally {
+                    event.target.value = '';
                 }
             },
 
@@ -2229,7 +2244,7 @@
                 this.ensureSubjectsUpToDate();
                 
                 body.innerHTML = `
-                    <div class="mobile-shell rounded-3xl p-5 border border-slate-200 bg-white shadow-xl my-2">
+                    <div class="device-container rounded-3xl p-5 border border-slate-200 bg-white shadow-xl my-2">
                         <div class="bg-gradient-to-r from-brand-600 to-blue-700 rounded-2xl p-5 text-white mb-5 shadow-lg">
                             <span class="text-[11px] text-blue-200 uppercase tracking-wider font-extrabold flex items-center gap-1.5">
                                 <i class="fa-solid fa-graduation-cap"></i> Portal Ujian Siswa
@@ -2494,7 +2509,7 @@
                 const formattedQImg = this.formatImageUrl(q.image);
 
                 body.innerHTML = `
-                    <div class="mobile-shell bg-white border border-slate-200 rounded-3xl flex flex-col justify-between p-4 sm:p-5 shadow-xl my-2">
+                    <div class="device-container bg-white border border-slate-200 rounded-3xl flex flex-col justify-between p-4 sm:p-5 shadow-xl my-2">
                         <div>
                             <div class="flex justify-between items-center bg-slate-900 text-white p-3 sm:p-4 rounded-2xl mb-4 shadow-md">
                                 <div>
@@ -2743,7 +2758,7 @@
 
                 const body = document.getElementById('appBody');
                 body.innerHTML = `
-                    <div class="mobile-shell bg-white border border-slate-200 rounded-3xl p-6 text-center shadow-xl my-4">
+                    <div class="device-container bg-white border border-slate-200 rounded-3xl p-6 text-center shadow-xl my-4">
                         <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl mb-4">
                             <i class="fa-solid fa-circle-check"></i>
                         </div>
@@ -2863,7 +2878,7 @@
 
             exportAdminResultsExcel() {
                 try {
-                    if (typeof XLSX !== 'undefined') {
+                    if (typeof XLSX === 'undefined') {
                         return this.showToast('Library XLSX belum selesai dimuat!', 'warning');
                     }
                     const headers = ["NO", "NIS", "NAMA_SISWA", "KELAS", "MATA_PELAJARAN", "PAKET", "SKOR_TOTAL", "STATUS_UJIAN", "WAKTU_SUBMIT"];
@@ -2881,7 +2896,6 @@
 
                     const wb = XLSX.utils.book_new();
                     const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-                    // Menetapkan pembatas kolom sel
                     ws['!cols'] = [
                         { wch: 6 },  // NO
                         { wch: 14 }, // NIS
@@ -2895,7 +2909,7 @@
                     ];
                     XLSX.utils.book_append_sheet(wb, ws, "Rekap_Admin");
                     XLSX.writeFile(wb, "Rekap_Nilai_Admin_Semua_Mapel.xlsx");
-                    this.showToast("File Rekap Admin Excel (.xlsx) kolom terpisah berhasil diunduh!", "success");
+                    this.showToast("File Rekap Admin Excel (.xlsx) dengan kolom terpisah berhasil diunduh!", "success");
                 } catch(err) {
                     this.showToast("Gagal mengunduh Excel Admin: " + err.message, "error");
                 }
@@ -2924,12 +2938,12 @@
                 document.getElementById('topUserBar').classList.add('hidden');
 
                 body.innerHTML = `
-                    <div class="mobile-shell flex flex-col justify-between p-6 border border-slate-200 rounded-3xl bg-white shadow-xl my-4">
+                    <div class="device-container flex flex-col justify-between p-6 border border-slate-200 rounded-3xl bg-white shadow-xl my-4">
                         <div>
                             <div class="text-center my-4">
                                 <img src="https://lh3.googleusercontent.com/d/146YuridIPzE7wTiCCWIoeeM8-yGWMeVK" alt="Logo SMAN 1 Kutowinangun" class="w-[64px] h-[64px] object-contain mx-auto mb-3 shadow-sm rounded-2xl" onerror="this.onerror=null; this.src='https://placehold.co/64x64/2563eb/ffffff?text=CBT';">
                                 <h2 class="text-lg sm:text-xl font-black text-slate-800 tracking-tight">CBT SMA NEGERI 1 KUTOWINANGUN</h2>
-                                <p class="text-xs text-slate-500 mt-1">Sistem Ujian Mobile Terintegrasi (DB Sistem &amp; DB Soal Cloud)</p>
+                                <p class="text-xs text-slate-500 mt-1">Sistem Ujian Terintegrasi (HP, Tablet &amp; PC &bull; DB Sistem &amp; Soal Cloud)</p>
                             </div>
 
                             <div class="bg-slate-100 p-1.5 rounded-2xl flex mb-6 text-xs font-bold text-slate-600">
@@ -3201,7 +3215,7 @@
             showModal(title, bodyHtml, footerHtml = '') {
                 const modal = document.getElementById('modalContainer');
                 modal.innerHTML = `
-                    <div class="fixed inset-0 bg-slate-900 bg-opacity-60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+                    <div class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
                         <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-150">
                             <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                                 <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">${title}</h3>
