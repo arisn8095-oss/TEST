@@ -1,20 +1,21 @@
-// URL Web App Google Script Anda
-let GOOGLE_SCRIPT_URL = localStorage.getItem('CBT_APPSCRIPT_URL') || "https://script.google.com/macros/s/AKfycbyualah5yj-Xqu0hayn_SORiltFbewHjQCJnuT8NO51KBJ5vWn457-BJNug7JGFn29X/exec";
+// ==========================================
+// KONFIGURASI API & TIMEOUT MAKSIMAL 10 DETIK
+// ==========================================
+let GOOGLE_SCRIPT_URL = localStorage.getItem('CBT_APPSCRIPT_URL') || "https://script.google.com/macros/s/AKfycby4vDUTp5cAHLRR0RB4iuXLZnMmiwaGJyXWdv-a-xDN1BvLhctHY6L7BeDLZ-H3cSXr/exec";
 const SPREADSHEET_DB_SISTEM = "1nD60VMcGXeEED5JJVVzZAbU7BmkyIOE7EZtHEnsUkac";
 const SPREADSHEET_DB_SOAL   = "14Iy4Y18ITNtWciKrhQIFd2o_aq9KW1ARKxwV2HqE8KU";
 
-// Fungsi komunikasi yang dioptimalkan untuk Google Apps Script (anti-CORS block)
+// Fungsi komunikasi backend dengan timeout 10 detik (10.000 ms)
 async function apiCall(action, payload = {}) {
     if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("PASTE_YOUR_WEB_APP_URL")) {
         console.warn("URL Google Script belum dikonfigurasi.");
         return null;
     }
-    
+
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 7000);
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // Batas maksimal 10 detik
 
     try {
-        // Menggunakan text/plain agar browser tidak mengirimkan preflight OPTIONS yang ditolak Apps Script
         const res = await fetch(GOOGLE_SCRIPT_URL, {
             method: 'POST',
             mode: 'cors',
@@ -25,48 +26,344 @@ async function apiCall(action, payload = {}) {
         });
         clearTimeout(timeoutId);
 
-        if (!res.ok) {
-            throw new Error(`HTTP Error: ${res.status}`);
-        }
-
+        if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
         const data = await res.json();
-        updateDbIndicator(true);
         return data;
     } catch (err) {
         clearTimeout(timeoutId);
-        console.warn(`API [${action}] gagal:`, err);
-        updateDbIndicator(false);
+        console.warn(`API call [${action}] timed out / error:`, err);
         return null;
     }
 }
+// ==============================================================
+    // PENGAMBILAN DATA GURU DENGAN TIMEOUT MAKSIMAL 10 DETIK & AKUMULASI BOBOT
+    // ==============================================================
+    async fetchTeacherTabData(tab) {
+        const subId = this.teacherSelectedSubject;
+        const pkg = this.teacherSelectedPkg;
+        const activeSubObj = DB.subjects.find(s => s.id === subId);
+        const subName = activeSubObj ? activeSubObj.name : '';
 
-// Indikator visual status koneksi Database Google Sheets
-function updateDbIndicator(isConnected) {
-    let badge = document.getElementById('dbConnectionStatusBadge');
-    if (!badge) {
-        badge = document.createElement('div');
-        badge.id = 'dbConnectionStatusBadge';
-        badge.className = 'fixed bottom-3 right-3 z-40 px-3 py-1.5 rounded-full text-[11px] font-bold shadow-lg transition-all flex items-center gap-1.5';
-        document.body.appendChild(badge);
+        const tasks = [];
+
+        // 1. Tab Cek Soal & Preview, Analisis Soal, dan Rekap Nilai membutuhkan butir soal & bobot
+        if (tab === 'review' || tab === 'analisis' || tab === 'results') {
+            tasks.push((async () => {
+                const remoteQ = await apiCall('getQuestions', { subjectId: subId, package: pkg });
+                if (remoteQ && remoteQ.status === 'success' && Array.isArray(remoteQ.data) && remoteQ.data.length > 0) {
+                    if (!DB.examPackages[subId]) DB.examPackages[subId] = {};
+                    const cleanLocalMap = new Map();
+                    remoteQ.data.forEach(rq => {
+                        if (!rq || !rq.id) return;
+                        const rqId = String(rq.id).trim();
+                        if (DB.deletedQuestionIds && DB.deletedQuestionIds.has(rqId)) return;
+                        if (DB.modifiedQuestionsMap && DB.modifiedQuestionsMap[rqId]) {
+                            cleanLocalMap.set(rqId, { ...DB.modifiedQuestionsMap[rqId] });
+                        } else {
+                            cleanLocalMap.set(rqId, rq);
+                        }
+                    });
+                    if (cleanLocalMap.size > 0) {
+                        DB.examPackages[subId][pkg] = Array.from(cleanLocalMap.values());
+                    }
+                }
+            })());
+        }
+
+        // 2. Tab Rekap Nilai Siswa & Analisis Butir Soal membutuhkan Rekap Nilai & Lembar Jawaban
+        if (tab === 'results' || tab === 'analisis') {
+            tasks.push((async () => {
+                const remoteRes = await apiCall('getResults');
+                if (remoteRes && remoteRes.status === 'success' && Array.isArray(remoteRes.data)) {
+                    DB.results = remoteRes.data;
+                }
+            })());
+
+            tasks.push((async () => {
+                const remoteAnswers = await apiCall('getStudentAnswers', { subject: subName });
+                if (remoteAnswers && remoteAnswers.status === 'success' && Array.isArray(remoteAnswers.data)) {
+                    if (!DB.studentAnswersMap) DB.studentAnswersMap = {};
+                    remoteAnswers.data.forEach(ans => {
+                        if (ans && ans.nis && ans.package) {
+                            const mapel = ans.subjectName || subName;
+                            const key = `${ans.nis}_${mapel}_${ans.package}`;
+                            DB.studentAnswersMap[key] = ans.userAnswers || {};
+                        }
+                    });
+                }
+            })());
+        }
+
+        try {
+            // Berjalan secara paralel dengan batas maksimal waktu pengerjaan 10 detik
+            await Promise.race([
+                Promise.all(tasks),
+                new Promise(resolve => setTimeout(resolve, 10000)) // Countdown limit 10 Detik
+            ]);
+        } catch (e) {
+            console.error("Gagal sinkron data tab guru:", e);
+        }
+    },
+
+    // Method pembantu untuk menghitung Skor Akhir Akumulasi Bobot (Benar = Bobot, Salah/Kosong = 0)
+    calculateStudentAccumulatedScore(nis, subId, subName, pkg, studentAnswersFallback = {}) {
+        const cleanQuestions = this.getCleanQuestions(subId, pkg);
+        if (!cleanQuestions || cleanQuestions.length === 0) return 0;
+
+        const ansKey = `${nis}_${subName}_${pkg}`;
+        const answers = (DB.studentAnswersMap && DB.studentAnswersMap[ansKey]) || studentAnswersFallback || {};
+
+        let totalAccumulatedScore = 0;
+
+        cleanQuestions.forEach((q, idx) => {
+            const uAns = answers[idx];
+            const weight = Number(q.weight || 20); // Bobot soal (default 20 jika tidak diisi)
+
+            if (q.type === 'PG') {
+                // Pilihan Ganda: Jika jawaban sama dengan kunci maka dapat bobot, jika salah bernilai 0
+                if (uAns !== undefined && uAns !== null && Number(uAns) === Number(q.correctKey)) {
+                    totalAccumulatedScore += weight;
+                }
+            } else if (q.type === 'BS') {
+                // Benar / Salah: Jika benar dapat bobot, jika salah bernilai 0
+                const normUser = String(uAns || '').trim().toUpperCase();
+                const normKey = String(q.correctKey || 'BENAR').trim().toUpperCase();
+                const isMatch = (normUser === normKey) || 
+                                (normUser === 'B' && normKey === 'BENAR') || 
+                                (normUser === 'S' && normKey === 'SALAH');
+                if (isMatch) {
+                    totalAccumulatedScore += weight;
+                }
+            }
+        });
+
+        return totalAccumulatedScore;
+    },
+
+    // Render Tampilan Loading Maksimal 10 Detik dengan Countdown Dinamis
+    renderLoadingTab10s(tabName) {
+        const tabLabels = {
+            'review': 'Cek Soal & Preview Soal',
+            'results': 'Rekap Nilai Siswa (Akumulasi Bobot)',
+            'analisis': 'Analisis Butir Soal & Tingkat Kesukaran'
+        };
+        return `
+            <div class="p-8 text-center bg-white border border-purple-200 rounded-3xl shadow-sm space-y-4 max-w-xl mx-auto my-6">
+                <div class="w-14 h-14 mx-auto rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-2xl shadow-inner animate-pulse">
+                    <i class="fa-solid fa-cloud-arrow-down"></i>
+                </div>
+                <div>
+                    <h4 class="font-black text-slate-800 text-sm sm:text-base">Mengambil Data: ${tabLabels[tabName] || 'Data'}</h4>
+                    <p class="text-xs text-slate-500 mt-1">Sedang menghubungkan ke Google Sheets DB Soal &amp; DB Sistem...</p>
+                </div>
+                <div class="bg-purple-50 border border-purple-200 text-purple-800 text-xs font-bold py-2 px-4 rounded-xl inline-flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left text-purple-600"></i>
+                    Batas waktu sinkronisasi data: <span id="loadingCountdown10s" class="text-purple-900 font-extrabold text-sm">10</span> detik
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div id="loadingProgressBar10s" class="bg-purple-600 h-full rounded-full transition-all duration-1000" style="width: 100%;"></div>
+                </div>
+            </div>
+        `;
+    },
+
+    startTabLoadingCountdown() {
+        let secondsLeft = 10;
+        if (this._tabLoadingTimer) clearInterval(this._tabLoadingTimer);
+
+        this._tabLoadingTimer = setInterval(() => {
+            secondsLeft--;
+            const countEl = document.getElementById('loadingCountdown10s');
+            const barEl = document.getElementById('loadingProgressBar10s');
+
+            if (countEl) countEl.innerText = Math.max(0, secondsLeft);
+            if (barEl) barEl.style.width = `${Math.max(0, (secondsLeft / 10) * 100)}%`;
+
+            if (secondsLeft <= 0) {
+                clearInterval(this._tabLoadingTimer);
+            }
+        }, 1000);
+    },
+
+    stopTabLoadingCountdown() {
+        if (this._tabLoadingTimer) clearInterval(this._tabLoadingTimer);
+    },
+
+    async switchTeacherTab(tabName) {
+        this.teacherActiveTab = tabName;
+        // Tab Cek Soal (review), Rekap Nilai (results), dan Analisis Soal (analisis)
+        if (['review', 'results', 'analisis'].includes(tabName)) {
+            this.renderTeacherDashboard(true);
+            this.startTabLoadingCountdown();
+            await this.fetchTeacherTabData(tabName);
+            this.stopTabLoadingCountdown();
+            this.renderTeacherDashboard(false);
+        } else {
+            this.renderTeacherDashboard(false);
+        }
+    },
+
+    async selectTeacherPackageOnly(pkg) {
+        this.teacherSelectedPkg = pkg;
+        if (['review', 'results', 'analisis'].includes(this.teacherActiveTab)) {
+            this.renderTeacherDashboard(true);
+            this.startTabLoadingCountdown();
+            await this.fetchTeacherTabData(this.teacherActiveTab);
+            this.stopTabLoadingCountdown();
+            this.renderTeacherDashboard(false);
+        } else {
+            this.renderTeacherDashboard(false);
+        }
+    },
+
+    async refreshTeacherCurrentTabDatabase() {
+        this.showToast('Menghubungkan ke DB Soal & DB Sistem (Maksimal 10s)...', 'info');
+        this.renderTeacherDashboard(true);
+        this.startTabLoadingCountdown();
+        await this.fetchTeacherTabData(this.teacherActiveTab);
+        this.stopTabLoadingCountdown();
+        this.renderTeacherDashboard(false);
+        this.showToast('Data database berhasil disinkronkan!', 'success');
+    },
+
+    // =========================================================================
+    // RENDERING TAB REKAP NILAI (SKOR AKHIR = AKUMULASI BOBOT, SALAH = 0)
+    // =========================================================================
+    renderTeacherResultsRows(subjectId, filterPkg) {
+        const activeSubjectObj = DB.subjects.find(s => s.id === subjectId);
+        const subjectName = activeSubjectObj ? activeSubjectObj.name : 'Mata Pelajaran';
+
+        let filtered = DB.results.filter(r => !r.subject || r.subject === subjectName || subjectName.includes(r.subject) || r.subject.includes(subjectName));
+        if (filterPkg !== 'all') {
+            filtered = filtered.filter(r => String(r.package || 'A') === String(filterPkg));
+        }
+
+        if (filtered.length === 0) {
+            return `<tr><td colspan="8" class="p-6 text-center text-slate-400 font-medium">Belum ada data pengerjaan ujian siswa dari database untuk filter ini.</td></tr>`;
+        }
+
+        return filtered.map(r => {
+            const currentPkg = r.package || 'A';
+            // Hitung skor akhir murni dari akumulasi bobot benar (jika salah = 0)
+            const calculatedAccumulatedScore = this.calculateStudentAccumulatedScore(r.nis, subjectId, subjectName, currentPkg, r.userAnswers);
+            const finalScore = (calculatedAccumulatedScore > 0 || Object.keys(r.userAnswers || {}).length > 0) 
+                ? calculatedAccumulatedScore 
+                : (Number(r.totalScore) || 0);
+
+            return `
+                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                    <td class="p-3 font-bold text-slate-800">${r.nis}</td>
+                    <td class="p-3 font-semibold text-slate-700">${r.name}</td>
+                    <td class="p-3">${r.class || '-'}</td>
+                    <td class="p-3"><span class="bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded text-[10px]">Paket ${currentPkg}</span></td>
+                    <td class="p-3">
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-black text-purple-700 text-sm bg-purple-50 border border-purple-200 px-2.5 py-1 rounded-lg shadow-sm">
+                                ${finalScore} Poin
+                            </span>
+                            <span class="text-[10px] text-slate-400 font-medium">(Bobot)</span>
+                        </div>
+                    </td>
+                    <td class="p-3">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.status && r.status.includes('Dibatalkan') ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}">${r.status || 'Selesai'}</span>
+                    </td>
+                    <td class="p-3 text-slate-500 font-mono">${r.submittedAt || '-'}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="EduGuard.openSingleStudentAnswerModal('${r.nis}', '${currentPkg}')" class="bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 mx-auto shadow-sm active:scale-95" title="Buka Rincian Jawaban Siswa">
+                            <i class="fa-solid fa-clipboard-list text-purple-600"></i> Detail Jawaban
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    },
+
+    // =========================================================================
+    // RENDERING TAB ANALISIS SOAL (INDEKS KESUKARAN P & BOBOT)
+    // =========================================================================
+    renderAnalysisTableRows(subjectId, pkg, selectedClass = 'all') {
+        const questions = this.getCleanQuestions(subjectId, pkg);
+        const activeSubjectObj = DB.subjects.find(s => s.id === subjectId);
+        const subjectName = activeSubjectObj ? activeSubjectObj.name : 'Mata Pelajaran';
+
+        let relevantResults = DB.results.filter(r => 
+            (!r.subject || r.subject === subjectName || subjectName.includes(r.subject) || r.subject.includes(subjectName)) &&
+            String(r.package || 'A') === String(pkg)
+        );
+
+        if (selectedClass !== 'all') {
+            relevantResults = relevantResults.filter(r => (r.class || '') === selectedClass);
+        }
+
+        if (questions.length === 0) {
+            return `<tr><td colspan="9" class="p-6 text-center text-slate-400">Belum ada butir soal di Paket ${pkg}.</td></tr>`;
+        }
+
+        const totalExaminees = relevantResults.length;
+
+        return questions.map((q, qIdx) => {
+            let correctCount = 0;
+
+            if (totalExaminees > 0) {
+                relevantResults.forEach(r => {
+                    const ansKey = `${r.nis}_${subjectName}_${pkg}`;
+                    const answers = (DB.studentAnswersMap && DB.studentAnswersMap[ansKey]) || r.userAnswers || {};
+                    const uAns = answers[qIdx];
+
+                    if (q.type === 'PG') {
+                        if (uAns !== undefined && uAns !== null && Number(uAns) === Number(q.correctKey)) {
+                            correctCount++;
+                        }
+                    } else if (q.type === 'BS') {
+                        const normU = String(uAns || '').trim().toUpperCase();
+                        const normK = String(q.correctKey || 'BENAR').trim().toUpperCase();
+                        if (normU === normK || (normU === 'B' && normK === 'BENAR') || (normU === 'S' && normK === 'SALAH')) {
+                            correctCount++;
+                        }
+                    }
+                });
+            }
+
+            const wrongCount = totalExaminees - correctCount;
+            const pValue = totalExaminees > 0 ? (correctCount / totalExaminees) : 0;
+            
+            let categoryLabel = 'Belum Ada Data';
+            let categoryClass = 'bg-slate-100 text-slate-500 border-slate-200';
+
+            if (totalExaminees > 0) {
+                if (pValue > 0.70) {
+                    categoryLabel = 'MUDAH';
+                    categoryClass = 'bg-emerald-100 text-emerald-800 border-emerald-300';
+                } else if (pValue >= 0.30) {
+                    categoryLabel = 'SEDANG';
+                    categoryClass = 'bg-amber-100 text-amber-800 border-amber-300';
+                } else {
+                    categoryLabel = 'SULIT';
+                    categoryClass = 'bg-red-100 text-red-800 border-red-300';
+                }
+            }
+
+            const snippet = q.text.length > 75 ? q.text.substring(0, 75) + '...' : q.text;
+
+            return `
+                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                    <td class="p-3 text-center font-bold">${qIdx + 1}</td>
+                    <td class="p-3"><span class="bg-purple-100 text-purple-800 text-[10px] font-bold px-2 py-0.5 rounded">${q.type}</span></td>
+                    <td class="p-3 font-medium text-slate-800">${snippet}</td>
+                    <td class="p-3 text-center font-bold text-purple-700">${q.weight || 20}</td>
+                    <td class="p-3 text-center font-bold">${totalExaminees}</td>
+                    <td class="p-3 text-center font-bold text-emerald-600">${correctCount}</td>
+                    <td class="p-3 text-center font-bold text-red-600">${wrongCount}</td>
+                    <td class="p-3 text-center font-mono font-bold text-slate-700">${totalExaminees > 0 ? pValue.toFixed(2) : '-'}</td>
+                    <td class="p-3 text-center">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold border ${categoryClass}">
+                            ${categoryLabel}
+                        </span>
+                    </td>
+                </tr>
+            `;
+        }).join('');
     }
-    if (isConnected) {
-        badge.className = 'fixed bottom-3 right-3 z-40 bg-emerald-600 text-white px-3 py-1.5 rounded-full text-[11px] font-bold shadow-lg transition-all flex items-center gap-1.5';
-        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-white animate-pulse"></span> DB Google Sheets: Terhubung`;
-    } else {
-        badge.className = 'fixed bottom-3 right-3 z-40 bg-amber-600 text-white px-3 py-1.5 rounded-full text-[11px] font-bold shadow-lg transition-all flex items-center gap-1.5 cursor-pointer';
-        badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> DB Google Sheets: Offline / Standby`;
-        badge.title = "Klik untuk tes ulang koneksi";
-        badge.onclick = () => EduGuard.testDatabaseConnection();
-    }
-}
-testDatabaseConnection: async function() {
-    this.showToast('Memeriksa koneksi ke Google Spreadsheet...', 'info');
-    const res = await apiCall('ping');
-    if (res && res.status === 'success') {
-        this.showToast('✅ Berhasil terhubung ke DB Google Sheets!', 'success');
-        updateDbIndicator(true);
-    } else {
-        this.showToast('⚠️ Belum dapat tersambung ke Web App. Periksa izin deploy Anyone.', 'warning');
-        updateDbIndicator(false);
-    }
-}
+<div id="teacherTabContent" class="pt-2">
+    ${isLoadingTab ? this.renderLoadingTab10s(activeTab) : this.renderTeacherTabContent(activeTab, activeSub, activePkg, questionsList, isFinalized)}
+</div>
