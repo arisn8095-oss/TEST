@@ -128,7 +128,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzhWiTo_xa-OzKZaa0BAOhhHeTkuEXwow-XDdXP4FDTozI3ahos7SShApPrsrXlK89R/exec";
+        const GOOGLE_SCRIPT_URL ="https://script.google.com/macros/s/AKfycbxW6gcmU7uU8ii-Vpi7RQ0hQVY4Ug6mnQAO9lPQ9kxlLk9GxhIS9onJ0pIXW5x-mq8d/exec";
         const SPREADSHEET_DB_SISTEM = "1nD60VMcGXeEED5JJVVzZAbU7BmkyIOE7EZtHEnsUkac";
         const SPREADSHEET_DB_SOAL   = "14Iy4Y18ITNtWciKrhQIFd2o_aq9KW1ARKxwV2HqE8KU";
 
@@ -338,7 +338,6 @@
             },
 
             setupSecurityListeners() {
-                // Anti Copypaste & Contextmenu
                 const preventDefaultAction = (e) => {
                     if (this.activeExam) {
                         e.preventDefault();
@@ -353,7 +352,6 @@
                 document.addEventListener('selectstart', preventDefaultAction);
                 document.addEventListener('dragstart', preventDefaultAction);
 
-                // Anti Shortcut (Ctrl+C, Ctrl+V, Ctrl+U, Ctrl+P, Ctrl+S, PrintScreen, F12)
                 document.addEventListener('keydown', (e) => {
                     if (!this.activeExam) return;
                     const key = e.key ? e.key.toLowerCase() : '';
@@ -368,13 +366,12 @@
                         } catch(err) {}
                         this.handleViolation("Percobaan Tangkapan Layar (Screenshot) Terdeteksi!");
                     }
-                    if (e.keyCode === 123) { // F12
+                    if (e.keyCode === 123) {
                         e.preventDefault();
                         this.handleViolation("Tombol Developer Tool (F12) Terdeteksi!");
                     }
                 });
 
-                // Anti Navigation Back
                 window.addEventListener('popstate', () => {
                     if (this.activeExam) {
                         try { history.pushState(null, document.title, location.href); } catch(e) {}
@@ -382,12 +379,10 @@
                     }
                 });
 
-                // Anti Split-Screen & Resizing Detection
                 this.baselineHeight = window.innerHeight;
                 window.addEventListener('resize', () => {
                     if (!this.activeExam) return;
                     const currentHeight = window.innerHeight;
-                    // Deteksi jika tinggi layar menyusut lebih dari 35% tanpa fokus keyboard
                     const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
                     const isInputFocus = (activeTag === 'input' || activeTag === 'textarea');
                     if (!isInputFocus && this.baselineHeight > 0 && (currentHeight / this.baselineHeight) < 0.65) {
@@ -395,7 +390,6 @@
                     }
                 });
 
-                // Fullscreen change detection
                 const handleFullscreenChange = () => {
                     const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
                     if (this.activeExam && !isFullscreen) {
@@ -408,14 +402,12 @@
                 document.addEventListener('mozfullscreenchange', handleFullscreenChange);
                 document.addEventListener('MSFullscreenChange', handleFullscreenChange);
 
-                // Tab Switch & Visibility Change
                 document.addEventListener('visibilitychange', () => {
                     if (this.activeExam && document.visibilityState === 'hidden') {
                         this.handleViolation("Berpindah Tab / Membuka Aplikasi Lain / Beralih Layar!");
                     }
                 });
 
-                // Window Blur (Kehilangan Fokus / Floating Overlay)
                 window.addEventListener('blur', () => {
                     if (this.activeExam) {
                         this.handleViolation("Aplikasi Kehilangan Fokus / Layar Melayang (Floating App)!");
@@ -1533,7 +1525,6 @@
                     const currentTotalWeight = cleanQList.reduce((s, q) => s + (Number(q.weight) || 0), 0);
                     return `
                         <div class="space-y-3">
-                            <!-- Banner Penegasan Rumus Penilaian -->
                             <div class="bg-gradient-to-r from-blue-900 to-indigo-900 text-white p-4 rounded-2xl shadow-md flex items-center gap-3.5">
                                 <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0 text-xl text-amber-400">
                                     <i class="fa-solid fa-scale-balanced"></i>
@@ -2542,7 +2533,6 @@
                 if (this.questionTimerInterval) clearInterval(this.questionTimerInterval);
                 const currentIdx = this.activeExam.currentQuestionIdx;
                 
-                // Jika soal nomor ini sudah pernah selesai 1 menit, tidak perlu menunggu ulang
                 if (this.unlockedQuestionsMap[currentIdx]) {
                     this.questionViewSecondsLeft = 0;
                     this.updateQuestionNextButtonState();
@@ -2604,7 +2594,6 @@
                     }
                 }
 
-                // Update status tombol palet
                 const paletteContainer = document.getElementById('examPaletteContainer');
                 if (paletteContainer) {
                     const buttons = paletteContainer.querySelectorAll('button[data-qidx]');
